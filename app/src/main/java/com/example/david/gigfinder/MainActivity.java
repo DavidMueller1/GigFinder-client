@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "APPLOG - MainActivity";
 
     private SectionsPageAdapter sectionsPageAdapter;
     private ViewPager mViewPager;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,20 +21,26 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "App starting...");
 
-        sectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
-
-        mViewPager = findViewById(R.id.container); // TODO ?
+        mViewPager = findViewById(R.id.viewpager);
         setupViewPager(mViewPager);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+        //tabLayout.getTabAt(0).setIcon(R.drawable.ic_music_gig);
     }
 
+    /**
+     * Adds the Fragments which will be selectable by the Tabs and their Titles to a SectionsPageAdapter and passes it to the ViewPager
+     */
     private void setupViewPager(ViewPager viewPager) {
-        SectionsPageAdapter adapter = new SectionsPageAdapter(getSupportFragmentManager());
-        adapter.addFragment(new ExploreFragment(), getString(R.string.nav_explore));
-        adapter.addFragment(new FavoritesFragment(), getString(R.string.nav_favorites));
-        viewPager.setAdapter(adapter);
+        sectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
+        sectionsPageAdapter.addFragment(new ExploreFragment(), getString(R.string.nav_explore));
+        sectionsPageAdapter.addFragment(new FavoritesFragment(), getString(R.string.nav_favorites));
+        sectionsPageAdapter.addFragment(new GigsFragment(), getString(R.string.nav_gigs));
+        sectionsPageAdapter.addFragment(new ChatFragment(), getString(R.string.nav_chat));
+        sectionsPageAdapter.addFragment(new ProfileFragment(), getString(R.string.nav_profile));
+        viewPager.setAdapter(sectionsPageAdapter);
     }
 
 

@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class ExploreFragment extends Fragment {
-    private static final String TAG = "ExploreFragment";
+    private static final String TAG = "APPLOG - ExploreFragment";
 
     @Nullable
     @Override
