@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Gig.Finder</string>
+
+    <string name="nav_explore">Explore</string>
+    <string name="nav_favorites">Favoriten</string>
+    <string name="nav_gigs">Gigs</string>
+    <string name="nav_chat">Chat</string>
+    <string name="nav_profile">Profil</string>
 </resources>
