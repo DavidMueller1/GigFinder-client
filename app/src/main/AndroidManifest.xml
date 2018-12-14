@@ -36,14 +36,14 @@
 
         </activity>
         <activity android:name=".SelectUserActivity">
-
-        </activity>
-        <activity android:name=".RegistrationArtistActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".RegistrationArtistActivity">
+
         </activity>
     </application>
 

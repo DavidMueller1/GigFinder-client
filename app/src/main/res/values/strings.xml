@@ -11,12 +11,21 @@
     <string name="selectuser_button_host">Als Location Host</string>
     <string name="selectuser_button_artist">Als Musiker</string>
 
+    <!-- Registrierung  -->
     <string name="registration_artist_name">Nutzername (sichtbar für andere)</string>
     <string name="registration_artist_name_hint">Name</string>
     <string name="registration_artist_description">Beschreibung</string>
     <string name="registration_artist_description_hint">Beschreibung des Musikers</string>
     <string name="registration_artist_color">Hintergrundfarbe</string>
     <string name="registration_artist_color_hint">Platzhalter für ColorPicker (hexcode)</string>
+    <string name="registration_artist_genre">Genre</string>
 
     <string name="registration_button">Registrieren</string>
+
+    <!-- Genres  -->
+    <string name="artist_genre_choose">Bitte auswählen…</string>
+    <string name="artist_genre_techno">Techno</string>
+    <string name="artist_genre_schlager">Schlager</string>
+    <string name="artist_genre_rock">Rock</string>
+    <string name="artist_genre_other">Anderes</string>
 </resources>
