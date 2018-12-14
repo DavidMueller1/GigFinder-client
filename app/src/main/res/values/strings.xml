@@ -6,4 +6,17 @@
     <string name="nav_gigs">Gigs</string>
     <string name="nav_chat">Chat</string>
     <string name="nav_profile">Profil</string>
+
+    <string name="selectuser_label">Wie wollen sie die App nutzen?</string>
+    <string name="selectuser_button_host">Als Location Host</string>
+    <string name="selectuser_button_artist">Als Musiker</string>
+
+    <string name="registration_artist_name">Nutzername (sichtbar für andere)</string>
+    <string name="registration_artist_name_hint">Name</string>
+    <string name="registration_artist_description">Beschreibung</string>
+    <string name="registration_artist_description_hint">Beschreibung des Musikers</string>
+    <string name="registration_artist_color">Hintergrundfarbe</string>
+    <string name="registration_artist_color_hint">Platzhalter für ColorPicker (hexcode)</string>
+
+    <string name="registration_button">Registrieren</string>
 </resources>
