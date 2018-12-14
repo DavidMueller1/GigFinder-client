@@ -81,6 +81,9 @@ public class LoginActivity extends AppCompatActivity {
             GoogleAccount = completedTask.getResult(ApiException.class);
 
             //TODO: Update GUI
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
 
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
