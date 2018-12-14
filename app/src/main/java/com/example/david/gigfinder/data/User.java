@@ -45,6 +45,14 @@ public class User {
         this.description = description;
     }
 
+    public ArrayList<SocialMediaLink> getSocialMediaLinks() {
+        return socialMediaLinks;
+    }
+
+    public void setSocialMediaLinks(ArrayList<SocialMediaLink> socialMediaLinks) {
+        this.socialMediaLinks = socialMediaLinks;
+    }
+
     public URI getImageURI() {
         return imageURI;
     }
