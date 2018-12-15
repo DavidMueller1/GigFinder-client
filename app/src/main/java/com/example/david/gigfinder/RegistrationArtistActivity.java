@@ -96,13 +96,15 @@ public class RegistrationArtistActivity extends AppCompatActivity {
      * User can choose between camera and gallery
      */
     private void performProfilePictureSelection() {
-        Intent pickIntent = new Intent(Intent.ACTION_PICK,
+        /*Intent pickIntent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Intent chooserIntent = Intent.createChooser(pickIntent, getResources().getString(R.string.pick_photo_intent));
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {takePhotoIntent});
 
-        startActivityForResult(chooserIntent, PICK_IMAGE);
+        startActivityForResult(chooserIntent, PICK_IMAGE);*/
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickIntent, PICK_IMAGE);
     }
 
     @Override
