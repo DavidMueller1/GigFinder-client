@@ -21,7 +21,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
     String artistName;
     String artistDescription;
-    String artistGenre;
+    String artistGenre; //TODO Replace with the Enum Genre
     int artistBackgroundColor;
 
     Button registrationButton;
@@ -36,7 +36,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         genreSpinner = findViewById(R.id.registration_artist_genre);
         backgroundColorPicker = findViewById(R.id.registration_artist_color);
 
-        String[] spinnerItems = new String[]{getResources().getString(R.string.artist_genre_choose), getResources().getString(R.string.artist_genre_techno), getResources().getString(R.string.artist_genre_schlager), getResources().getString(R.string.artist_genre_rock), getResources().getString(R.string.artist_genre_other)};
+        String[] spinnerItems = new String[]{getResources().getString(R.string.artist_genre_choose), getResources().getString(R.string.artist_genre_techno), getResources().getString(R.string.artist_genre_schlager), getResources().getString(R.string.artist_genre_rock), getResources().getString(R.string.artist_genre_other)}; //TODO Replace with the Enum Genre
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, spinnerItems);
         genreSpinner.setAdapter(adapter);
 

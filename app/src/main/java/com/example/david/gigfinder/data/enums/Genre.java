@@ -16,6 +16,45 @@ public enum Genre {
     FOLK,
     TECHNO,
     HOUSE,
-    SINGERSONGWRITER,
+    SINGERSONGWRITER,;
     //TODO Add more
+
+    @Override
+    public String toString() {
+        switch (this){
+            case ALTERNATIVE:
+                return "Alternative";
+            case ELECTRONIC:
+                return "Electronic";
+            case EXPERMIENTAL:
+                return "Experimental";
+            case HIPHOP:
+                return "Hip-Hop and Rap";
+            case TRAP:
+                return "Trap";
+            case POP:
+                return "Pop";
+            case RNB:
+                return "R&B";
+            case LATINO:
+                return "Latino";
+            case ROCK:
+                return "Rock";
+            case PUNK:
+                return "Punk";
+            case METAL:
+                return "Metal";
+            case JAZZ:
+                return "Jazz";
+            case FOLK:
+                return "Folk";
+            case TECHNO:
+                return "Techno";
+            case HOUSE:
+                return "House";
+            case SINGERSONGWRITER:
+                return "Singer Songwriter";
+        }
+        return "";
+    }
 }

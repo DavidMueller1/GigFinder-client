@@ -1,10 +1,11 @@
 package com.example.david.gigfinder;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -80,8 +81,8 @@ public class LoginActivity extends AppCompatActivity {
             Log.d(TAG, "GoogleSignIn: Successful");
             GoogleAccount = completedTask.getResult(ApiException.class);
 
-            //TODO: Update GUI
-            Intent intent = new Intent(this, MainActivity.class);
+            //Update GUI to SelectUserActivity
+            Intent intent = new Intent(this, SelectUserActivity.class);
             startActivity(intent);
             finish();
 
@@ -89,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "GoogleSignIn: Failed code = " + e.getStatusCode());
+            Toast.makeText(getApplicationContext(),"GoogleSignIn failed",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -103,6 +105,7 @@ public class LoginActivity extends AppCompatActivity {
         if(account != null) {
             Log.d(TAG, "GoogleSignIn: Account already signed in");
             //TODO: Update GUI
+            Toast.makeText(getApplicationContext(),"Already Signed In",Toast.LENGTH_SHORT).show();
         } else {
             Log.d(TAG, "GoogleSignIn: No Account signed in");
         }
