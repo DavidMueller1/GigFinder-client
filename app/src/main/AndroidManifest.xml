@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.david.gigfinder">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <!--
     application
         android:allowBackup="true"
@@ -31,9 +33,7 @@
             android:configChanges="orientation"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
-
             <!-- android:theme="@style/AppTheme.NoActionBar" -->
-
         </activity>
         <activity android:name=".SelectUserActivity">
             <intent-filter>
@@ -43,7 +43,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".RegistrationArtistActivity">
-
+        </activity>
+        <activity android:name=".LoginActivity">
         </activity>
     </application>
 
