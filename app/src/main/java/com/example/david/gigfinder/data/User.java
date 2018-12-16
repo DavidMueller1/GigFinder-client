@@ -11,6 +11,9 @@ public class User {
     private ArrayList<SocialMediaLink> socialMediaLinks;
     private URI imageURI; //Uri or?
 
+    public User(){
+    }
+
     public User(int id, String name, String description, ArrayList<SocialMediaLink> socialMediaLinks, URI imageURI) {
         this.id = id;
         this.name = name;
