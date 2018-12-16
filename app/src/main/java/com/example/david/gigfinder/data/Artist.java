@@ -1,7 +1,5 @@
 package com.example.david.gigfinder.data;
 
-import android.graphics.Color;
-
 import com.example.david.gigfinder.data.enums.Genre;
 
 import java.net.URI;
@@ -11,9 +9,12 @@ public class Artist extends User {
 
     //region Attributes and Constructor
     private ArrayList<Genre> genres; //How many?
-    private Color color;
+    private int color;
 
-    public Artist(int id, String name, String description, ArrayList<SocialMediaLink> socialMediaLinks, URI imageURI, ArrayList<Genre> genres, Color color) {
+    public Artist(){
+    }
+
+    public Artist(int id, String name, String description, ArrayList<SocialMediaLink> socialMediaLinks, URI imageURI, ArrayList<Genre> genres, int color) {
         super(id, name, description, socialMediaLinks, imageURI);
         this.genres = genres;
         this.color = color;
@@ -29,11 +30,11 @@ public class Artist extends User {
         this.genres = genres;
     }
 
-    public Color getColor() {
+    public int getColor() {
         return color;
     }
 
-    public void setColor(Color color) {
+    public void setColor(int color) {
         this.color = color;
     }
     //endregion
