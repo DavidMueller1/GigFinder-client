@@ -3,6 +3,7 @@ package com.example.david.gigfinder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ public class ChatFragment extends Fragment {
 
     private static final String TAG = "APPLOG - ChatFragment";
     private ChatAdapter chatAdapter;
+    private FloatingActionButton chatfab;
 
     @Nullable
     @Override
@@ -27,6 +29,8 @@ public class ChatFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        chatfab = (FloatingActionButton) getView().findViewById(R.id.chatfab);
 
         ArrayList<String[]> placeholderStrings = new ArrayList<>();
         placeholderStrings.add(new String[]{"Artist Name", "Placeholder message..."});
