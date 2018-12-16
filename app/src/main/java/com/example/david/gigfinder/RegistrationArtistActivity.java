@@ -3,11 +3,8 @@ package com.example.david.gigfinder;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -18,10 +15,13 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.david.gigfinder.data.Artist;
+import com.example.david.gigfinder.data.enums.Genre;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class RegistrationArtistActivity extends AppCompatActivity {
     private static final String TAG = "MYLOG_RegistrationArtistActivity";
@@ -32,22 +32,19 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private EditText descriptionField;
     private Spinner genreSpinner;
     private Button backgroundColorPickerButton;
+    private Button registrationButton;
 
     private ColorPicker colorPicker;
 
+    private Artist artist;
     private Bitmap profilePicture;
-    private String artistName;
-    private String artistDescription;
-    private String artistGenre;
-    private int artistBackgroundColor;
-
-    private Button registrationButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_artist);
 
+        artist = new Artist();
 
         profilePictureButton = findViewById(R.id.registration_artist_profilePicture);
         profilePictureButton.setOnClickListener(new View.OnClickListener() {
@@ -60,8 +57,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         nameField = findViewById(R.id.registration_artist_name);
         descriptionField = findViewById(R.id.registration_artist_description);
         genreSpinner = findViewById(R.id.registration_artist_genre);
-        String[] spinnerItems = new String[]{getResources().getString(R.string.artist_genre_choose), getResources().getString(R.string.artist_genre_techno), getResources().getString(R.string.artist_genre_schlager), getResources().getString(R.string.artist_genre_rock), getResources().getString(R.string.artist_genre_other)};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, spinnerItems);
+        //Replaced the Strings with the Genre-Enum
+        ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
 
         genreSpinner.setAdapter(adapter);
         backgroundColorPickerButton = findViewById(R.id.button_registration_colorPicker);
@@ -167,8 +164,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     }
 
     private void applyColor(int color) {
-        artistBackgroundColor = color;
-        findViewById(android.R.id.content).setBackgroundColor(artistBackgroundColor);
+        artist.setColor(color);
+        findViewById(android.R.id.content).setBackgroundColor(artist.getColor());
     }
 
     /**
@@ -178,7 +175,11 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         Log.d(TAG, "Checking user input...");
         if(checkUserInputBasic()) {
             Log.d(TAG, "User input ok");
-            // TODO redirect to tabview and send data to Server
+            // TODO Send data to Server and get verification
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -186,17 +187,19 @@ public class RegistrationArtistActivity extends AppCompatActivity {
      * Checks whether the user input is valid (ex. name not empty)
      */
     private boolean checkUserInputBasic() {
-        artistName = nameField.getText().toString();
-        if(artistName.equals("")) {
+        artist.setName(nameField.getText().toString());
+        if(artist.getName().equals("")) {
             Toast.makeText(getApplicationContext(),"Namensfeld ist leer.",Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Namefield empty.");
             return false;
         }
 
-        artistDescription = descriptionField.getText().toString(); // Description is optional
+        artist.setDescription(descriptionField.getText().toString()); // Description is optional
 
-        artistGenre = genreSpinner.getSelectedItem().toString();
-        if(artistGenre.equals(getResources().getString(R.string.artist_genre_choose))) {
+        ArrayList genres = new ArrayList();
+        genres.add((Genre)genreSpinner.getSelectedItem());
+        artist.setGenres(genres);
+        if(artist.getGenres().get(0).equals(getResources().getString(R.string.artist_genre_choose))) {
             Toast.makeText(getApplicationContext(),"Kein Genre ausgewählt",Toast.LENGTH_SHORT).show();
             Log.d(TAG, "No genre selected.");
             return false;
