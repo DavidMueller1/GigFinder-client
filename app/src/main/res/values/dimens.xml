@@ -3,4 +3,6 @@
     <dimen name="padding_big">50dp</dimen>
     <dimen name="padding_default">16dp</dimen>
     <dimen name="padding_small">4dp</dimen>
+
+    <dimen name="element_big">80dp</dimen>
 </resources>

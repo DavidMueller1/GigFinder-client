@@ -13,6 +13,7 @@
 
     <!-- Registrierung  -->
     <string name="registration_artist_picture">Profilbild</string>
+    <string name="registration_artist_image_hint">(zum ändern antippen)</string>
     <string name="registration_artist_name">Nutzername (sichtbar für andere)</string>
     <string name="registration_artist_name_hint">Name</string>
     <string name="registration_artist_description">Beschreibung</string>
