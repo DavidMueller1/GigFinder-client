@@ -1,5 +1,6 @@
 package com.example.david.gigfinder;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,11 +12,13 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
@@ -40,6 +43,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private String artistDescription;
     private String artistGenre;
     private int artistBackgroundColor;
+    private int artistFontColor;
 
     private Button registrationButton;
 
@@ -116,7 +120,15 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
                 try {
                     profilePicture = decodeUri(path);
+
+                    ViewGroup.LayoutParams params = profilePictureButton.getLayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    profilePictureButton.setBackground(null);
+                    profilePictureButton.setLayoutParams(params);
                     profilePictureButton.setImageBitmap(profilePicture);
+
+                    findViewById(R.id.registration_artist_image_hint).setVisibility(View.VISIBLE);
                 } catch (FileNotFoundException e) {
                     Log.d(TAG, "File not found");
                 }
@@ -166,10 +178,37 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         colorPicker.show();
     }
 
+    /**
+     * Called when the user chose a color
+     */
     private void applyColor(int color) {
         artistBackgroundColor = color;
         findViewById(android.R.id.content).setBackgroundColor(artistBackgroundColor);
+
+        if(isBrightColor(artistBackgroundColor)) {
+            artistFontColor = getResources().getColor(R.color.black);
+        }
+        else {
+            artistFontColor = getResources().getColor(R.color.white);
+        }
+
+        updateFontColor();
     }
+
+    /**
+     * Updates the font color of all relevant elements
+     */
+    private void updateFontColor() {
+        ViewGroup layout = findViewById(R.id.registration_artist_layout);
+        for(int index = 0; index < layout.getChildCount(); ++index) {
+            View child = layout.getChildAt(index);
+            if(child instanceof TextView) {
+                ((TextView) child).setTextColor(artistFontColor);
+            }
+        }
+    }
+
+
 
     /**
      * Called when the user presses the registrate button
@@ -202,21 +241,26 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             return false;
         }
 
-        /*String colorString = backgroundColorPicker.getText().toString();
-        if(!colorString.matches("#(\\d|a|b|c|d|e|f){6}")) {
-            Toast.makeText(getApplicationContext(),"Falsches Farbformat (Bsp. #1a2bc3)",Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Wrong hex format on color.");
-            return false;
-        }
-        try {
-            artistBackgroundColor = Color.parseColor(colorString);
-        }
-        catch(Exception e) {
-            Toast.makeText(getApplicationContext(),"Fehler beim Farbformat. Bitte andere Farbe wählen.",Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Error on parsing color.");
-            return false;
-        }*/
-
         return true;
+    }
+
+    /**
+     * Checks whether a background color is light enough to use black font
+     * @param color
+     * @return is the color a bright
+     */
+    private static boolean isBrightColor(int color) {
+        boolean returnValue = false;
+
+        int[] rgb = {Color.red(color), Color.green(color), Color.blue(color)};
+        Log.d(TAG, rgb[0] + "");
+        // formula for the brightness
+        int brightness = (int) Math.sqrt(rgb[0] * rgb[0] * .241 + rgb[1] * rgb[1] * .691 + rgb[2] * rgb[2] * .068);
+
+        if (brightness >= 100) {
+            returnValue = true;
+        }
+
+        return returnValue;
     }
 }
