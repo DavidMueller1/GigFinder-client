@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.getTabAt(4).select(); // TODO select the relevant Tab
 
         //tabLayout.getTabAt(0).setIcon(R.drawable.ic_music_gig);
     }
