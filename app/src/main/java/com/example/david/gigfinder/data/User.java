@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class User {
 
     //region Attributes and Constructor
-    private int id;
+    private int id, color;
     private String name, description;
     private ArrayList<SocialMediaLink> socialMediaLinks;
     private URI imageURI; //Uri or?
@@ -14,8 +14,9 @@ public class User {
     public User(){
     }
 
-    public User(int id, String name, String description, ArrayList<SocialMediaLink> socialMediaLinks, URI imageURI) {
+    public User(int id, int color, String name, String description, ArrayList<SocialMediaLink> socialMediaLinks, URI imageURI) {
         this.id = id;
+        this.color = color;
         this.name = name;
         this.description = description;
         this.socialMediaLinks = socialMediaLinks;
@@ -30,6 +31,14 @@ public class User {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 
     public String getName() {

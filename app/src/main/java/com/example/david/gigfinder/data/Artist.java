@@ -9,16 +9,14 @@ public class Artist extends User {
 
     //region Attributes and Constructor
     private ArrayList<Genre> genres; //How many?
-    private int color;
     private int fontColor;
 
     public Artist(){
     }
 
-    public Artist(int id, String name, String description, ArrayList<SocialMediaLink> socialMediaLinks, URI imageURI, ArrayList<Genre> genres, int color, int fontColor) {
-        super(id, name, description, socialMediaLinks, imageURI);
+    public Artist(int id, int color, String name, String description, ArrayList<SocialMediaLink> socialMediaLinks, URI imageURI, ArrayList<Genre> genres, int fontColor) {
+        super(id, color, name, description, socialMediaLinks, imageURI);
         this.genres = genres;
-        this.color = color;
         this.fontColor = fontColor;
     }
     //endregion
@@ -30,14 +28,6 @@ public class Artist extends User {
 
     public void setGenres(ArrayList<Genre> genres) {
         this.genres = genres;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
     }
 
     public int getFontColor() {
