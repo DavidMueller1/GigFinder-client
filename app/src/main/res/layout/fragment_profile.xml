@@ -7,13 +7,97 @@
     android:layout_height="match_parent">
 
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/nav_profile"
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/padding_default"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/profile_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <ImageButton
+                android:id="@+id/profile_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_baseline_add_photo_alternate_24px"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:id="@+id/profile_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_bigger"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="@dimen/font_big"
+                android:textStyle="bold"
+                android:text="Test" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_description"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_bigger"
+                android:fontFeatureSettings="smcp" />
+
+            <TextView
+                android:id="@+id/profile_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_bigger"
+                android:layout_marginStart="@dimen/padding_default"
+                android:text="blabla"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_bigger" />
+
+            <TextView
+                android:id="@+id/profile_genres_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_genre_single"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_bigger"
+                android:fontFeatureSettings="smcp" />
+
+            <TextView
+                android:id="@+id/profile_genres"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_bigger"
+                android:layout_marginStart="@dimen/padding_default"
+                android:text="blabla"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_bigger" />
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_social_media_links"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_bigger"
+                android:fontFeatureSettings="smcp" />
+
+            <TextView
+                android:id="@+id/profile_links_placeholder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_bigger"
+                android:layout_marginStart="@dimen/padding_default"
+                android:text="[TODO]"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_bigger" />
+
+        </LinearLayout>
+    </ScrollView>
+
 </android.support.constraint.ConstraintLayout>

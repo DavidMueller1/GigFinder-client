@@ -1,27 +1,36 @@
 package com.example.david.gigfinder;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidbuts.multispinnerfilter.MultiSpinner;
+import com.androidbuts.multispinnerfilter.MultiSpinnerListener;
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
+import com.example.david.gigfinder.tools.ImageTools;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class RegistrationArtistActivity extends AppCompatActivity {
     private static final String TAG = "MYLOG_RegistrationArtistActivity";
@@ -59,8 +68,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         genreSpinner = findViewById(R.id.registration_artist_genre);
         //Replaced the Strings with the Genre-Enum
         ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
-
         genreSpinner.setAdapter(adapter);
+
         backgroundColorPickerButton = findViewById(R.id.button_registration_colorPicker);
         backgroundColorPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,8 +121,16 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 Uri path = data.getData();
 
                 try {
-                    profilePicture = decodeUri(path);
+                    profilePicture = ImageTools.decodeUri(path, getContentResolver());
+
+                    ViewGroup.LayoutParams params = profilePictureButton.getLayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    profilePictureButton.setBackground(null);
+                    profilePictureButton.setLayoutParams(params);
                     profilePictureButton.setImageBitmap(profilePicture);
+
+                    findViewById(R.id.registration_artist_image_hint).setVisibility(View.VISIBLE);
                 } catch (FileNotFoundException e) {
                     Log.d(TAG, "File not found");
                 }
@@ -121,38 +138,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
             }
         }
-    }
-
-    /**
-     * @param selectedImage
-     * @return Bitmap of the selected image
-     */
-    private Bitmap decodeUri(Uri selectedImage) throws FileNotFoundException {
-        // Decode image size
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o);
-
-        // The new size
-        final int REQUIRED_SIZE = 200;
-
-        // Find the correct scale value. It should be the power of 2.
-        int width_tmp = o.outWidth, height_tmp = o.outHeight;
-        int scale = 1;
-        while (true) {
-            if (width_tmp / 2 < REQUIRED_SIZE
-                    || height_tmp / 2 < REQUIRED_SIZE) {
-                break;
-            }
-            width_tmp /= 2;
-            height_tmp /= 2;
-            scale *= 2;
-        }
-
-        // Decode with inSampleSize
-        BitmapFactory.Options o2 = new BitmapFactory.Options();
-        o2.inSampleSize = scale;
-        return BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o2);
     }
 
 
@@ -163,10 +148,42 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         colorPicker.show();
     }
 
+    /**
+     * Called when the user chose a color
+     */
     private void applyColor(int color) {
         artist.setColor(color);
         findViewById(android.R.id.content).setBackgroundColor(artist.getColor());
+
+        if(isBrightColor(artist.getColor())) {
+            artist.setFontColor(getResources().getColor(R.color.black));
+        }
+        else {
+            artist.setFontColor(getResources().getColor(R.color.white));
+        }
+
+        updateFontColor();
     }
+
+    /**
+     * Updates the font color of all relevant elements
+     */
+    private void updateFontColor() {
+        int fontColor = artist.getFontColor();
+
+        ViewGroup layout = findViewById(R.id.registration_artist_layout);
+        for(int index = 0; index < layout.getChildCount(); ++index) {
+            View child = layout.getChildAt(index);
+            if(child instanceof TextView) {
+                ((TextView) child).setTextColor(fontColor);
+            }
+            else if(child instanceof EditText) {
+                ((EditText) child).setTextColor(fontColor);
+            }
+        }
+    }
+
+
 
     /**
      * Called when the user presses the registrate button
@@ -187,6 +204,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
      * Checks whether the user input is valid (ex. name not empty)
      */
     private boolean checkUserInputBasic() {
+        // Check whether name field is empty
         artist.setName(nameField.getText().toString());
         if(artist.getName().equals("")) {
             Toast.makeText(getApplicationContext(),"Namensfeld ist leer.",Toast.LENGTH_SHORT).show();
@@ -194,8 +212,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             return false;
         }
 
-        artist.setDescription(descriptionField.getText().toString()); // Description is optional
+        // Description is optional (can be empty)
+        artist.setDescription(descriptionField.getText().toString());
 
+        // TODO multiple genres selectable
         ArrayList genres = new ArrayList();
         genres.add((Genre)genreSpinner.getSelectedItem());
         artist.setGenres(genres);
@@ -205,21 +225,24 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             return false;
         }
 
-        /*String colorString = backgroundColorPicker.getText().toString();
-        if(!colorString.matches("#(\\d|a|b|c|d|e|f){6}")) {
-            Toast.makeText(getApplicationContext(),"Falsches Farbformat (Bsp. #1a2bc3)",Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Wrong hex format on color.");
-            return false;
-        }
-        try {
-            artistBackgroundColor = Color.parseColor(colorString);
-        }
-        catch(Exception e) {
-            Toast.makeText(getApplicationContext(),"Fehler beim Farbformat. Bitte andere Farbe wählen.",Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Error on parsing color.");
-            return false;
-        }*/
-
         return true;
+    }
+
+    /**
+     * Checks whether a background color is light enough to use black font
+     * @param color
+     * @return is the color a bright
+     */
+    private static boolean isBrightColor(int color) {
+        int[] rgb = {Color.red(color), Color.green(color), Color.blue(color)};
+        Log.d(TAG, rgb[0] + "");
+        // formula for the brightness (returns a value between 0 and 255)
+        int brightness = (int) Math.sqrt(rgb[0] * rgb[0] * .299 + rgb[1] * rgb[1] * .587 + rgb[2] * rgb[2] * .114);
+
+        if (brightness >= 110) {
+            return true;
+        }
+
+        return false;
     }
 }

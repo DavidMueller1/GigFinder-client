@@ -13,6 +13,7 @@
 
     <!-- Registrierung  -->
     <string name="registration_artist_picture">Profilbild</string>
+    <string name="registration_artist_image_hint">(zum ändern antippen)</string>
     <string name="registration_artist_name">Nutzername (sichtbar für andere)</string>
     <string name="registration_artist_name_hint">Name</string>
     <string name="registration_artist_description">Beschreibung</string>
@@ -31,4 +32,10 @@
     <string name="artist_genre_other">Anderes</string>
 
     <string name="pick_photo_intent">Bild auswählen</string>
+
+    <!-- Profil  -->
+    <string name="profile_description">Beschreibung:</string>
+    <string name="profile_social_media_links">Social Media Links:</string>
+    <string name="profile_genre_single">Genre:</string>
+    <string name="profile_genre_multiple">Genres:</string>
 </resources>
