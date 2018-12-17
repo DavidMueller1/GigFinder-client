@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class RegistrationArtistActivity extends AppCompatActivity {
+
     private static final String TAG = "MYLOG_RegistrationArtistActivity";
     private static final int PICK_IMAGE = 1;
 

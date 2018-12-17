@@ -47,7 +47,7 @@ public class ProfileFragment extends Fragment {
         ArrayList<Genre> list = new ArrayList<>();
         list.add(Genre.ROCK);
         list.add(Genre.HOUSE);
-        artist = new Artist(1, "TestArtist", "Hallo, ich bin ein Test.", null, null, list, Color.DKGRAY, Color.WHITE);
+        artist = new Artist(1, Color.DKGRAY, "TestArtist", "Hallo, ich bin ein Test.", null, null, list, Color.WHITE);
 
         imageButton = getView().findViewById(R.id.profile_image);
         nameText = getView().findViewById(R.id.profile_name);
