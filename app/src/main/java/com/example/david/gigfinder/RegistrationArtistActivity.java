@@ -1,9 +1,7 @@
 package com.example.david.gigfinder;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,8 +17,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidbuts.multispinnerfilter.MultiSpinner;
-import com.androidbuts.multispinnerfilter.MultiSpinnerListener;
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ImageTools;
@@ -29,8 +25,6 @@ import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class RegistrationArtistActivity extends AppCompatActivity {
     private static final String TAG = "MYLOG_RegistrationArtistActivity";
