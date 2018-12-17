@@ -63,6 +63,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
+    /**
+     * Checks if the permission is granded, if true calls initMap()
+     */
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         mLocationPermissionsGranted = false;
 
@@ -82,6 +85,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * Initalizes the Map
+     */
     private void initMap(){
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(ExploreFragment.this);
