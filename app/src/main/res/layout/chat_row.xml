@@ -7,6 +7,7 @@
 
     <ImageView
         android:id="@+id/chatImg"
+        android:transitionName="chat"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginBottom="8dp"

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class ChatAdapter extends ArrayAdapter<String[]> {
 
     private static final String TAG = "ChatAdapter";
+    private ArrayList<ImageView> chatImgs = new ArrayList<ImageView>();
 
     public ChatAdapter(@NonNull Context context, ArrayList<String[]> strings) {
         super(context, R.layout.chat_row, strings);
@@ -35,6 +36,12 @@ public class ChatAdapter extends ArrayAdapter<String[]> {
         chatName.setText(getItem(position)[0]);
         chatMsg.setText(getItem(position)[1]);
 
+        chatImgs.add(chatImg);
+
         return customView;
+    }
+
+    public ArrayList<ImageView> getChatImgs() {
+        return chatImgs;
     }
 }
