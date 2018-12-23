@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,8 +49,10 @@ public class ChatFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
+                Pair<View, String> p1 = Pair.create((View) chatAdapter.getChatImgs().get(position), "chatimg");
+                Pair<View, String> p2 = Pair.create((View) chatAdapter.getChatNames().get(position), "chatname");
                 ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(getActivity(), chatAdapter.getChatImgs().get(position), "chat");
+                        makeSceneTransitionAnimation(getActivity(), p1, p2);
                 startActivity(intent, options.toBundle());
             }
         });
