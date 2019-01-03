@@ -25,8 +25,8 @@
 
             <!-- android:theme="@style/AppTheme.NoActionBar" -->
         </activity>
-        <activity android:name=".SelectUserActivity"></activity>
-        <activity android:name=".RegistrationArtistActivity"></activity>
+        <activity android:name=".SelectUserActivity" />
+        <activity android:name=".RegistrationArtistActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,7 +34,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".ChatActivity" />
+        <activity android:name=".HostProfileActivity" />
+        <activity android:name=".EventProfileActivity" />
+        <activity android:name=".ArtistProfileActivity"></activity>
     </application>
 
 </manifest> <!-- "@mipmap/ic_launcher_round" -->
