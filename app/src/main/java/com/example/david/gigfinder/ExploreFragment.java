@@ -1,7 +1,13 @@
 package com.example.david.gigfinder;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,9 +20,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "APPLOG - ExploreFragment";
@@ -25,6 +36,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionsGranted = false;
     private static final float DEFAULT_ZOOM = 15;
+    Marker myMarker;
 
     @Nullable
     @Override
@@ -38,10 +50,50 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         getLocationPermission();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "Map Ready!");
         mMap = googleMap;
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                Intent intent = new Intent(getActivity(), EventProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+        addTestMarker();
+
+        //mMap.setMyLocationEnabled(true);
+        //setLocation();
+    }
+
+    private void addTestMarker(){
+        LatLng testMarker = new LatLng(48.150960, 11.580820);
+        myMarker = mMap.addMarker(new MarkerOptions().position(testMarker)
+                .title("Test Event").snippet("This is my Event!"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(testMarker));
+
+    }
+
+    private void setLocation(){
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        @SuppressLint("MissingPermission")
+        Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+        if (location != null)
+        {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
+
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                    .zoom(17)                   // Sets the zoom
+                    .bearing(90)                // Sets the orientation of the camera to east
+                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                    .build();                   // Creates a CameraPosition from the builder
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
     }
 
     /**
