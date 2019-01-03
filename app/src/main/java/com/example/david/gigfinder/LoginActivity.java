@@ -2,17 +2,22 @@ package com.example.david.gigfinder;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 public class LoginActivity extends AppCompatActivity {
@@ -32,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();
 
@@ -66,30 +72,34 @@ public class LoginActivity extends AppCompatActivity {
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
         }
     }
 
     /**
      * Handles the Sign In Result after GoogleSignIn Task is completed
-     * @param completedTask
+     * @param result
      */
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
+    private void handleSignInResult(GoogleSignInResult result) {
+
+        if(result.isSuccess()){
             // Signed in successfully, show authenticated UI.
             Log.d(TAG, "GoogleSignIn: Successful");
-            GoogleAccount = completedTask.getResult(ApiException.class);
+            GoogleSignInAccount googleSignInAccount = result.getSignInAccount();
+            String idToken = googleSignInAccount.getIdToken();
+
+            //TODO: Send idToken to Server and wait for answer
 
             //Update GUI to SelectUserActivity
             Intent intent = new Intent(this, SelectUserActivity.class);
             startActivity(intent);
             finish();
 
-        } catch (ApiException e) {
+        }  else {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "GoogleSignIn: Failed code = " + e.getStatusCode());
+            Log.w(TAG, "GoogleSignIn: Failed");
             Toast.makeText(getApplicationContext(),"GoogleSignIn failed",Toast.LENGTH_SHORT).show();
         }
     }
