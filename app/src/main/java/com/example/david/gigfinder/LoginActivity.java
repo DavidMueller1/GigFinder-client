@@ -1,6 +1,7 @@
 package com.example.david.gigfinder;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,17 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -89,12 +101,9 @@ public class LoginActivity extends AppCompatActivity {
             GoogleSignInAccount googleSignInAccount = result.getSignInAccount();
             String idToken = googleSignInAccount.getIdToken();
 
-            //TODO: Send idToken to Server and wait for answer
-
-            //Update GUI to SelectUserActivity
-            Intent intent = new Intent(this, SelectUserActivity.class);
-            startActivity(intent);
-            finish();
+            // Send Login request and wait for answer
+            SendLogin sendLogin = new SendLogin();
+            sendLogin.execute(idToken);
 
         }  else {
             // The ApiException status code indicates the detailed failure reason.
@@ -118,6 +127,60 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Already Signed In",Toast.LENGTH_SHORT).show();
         } else {
             Log.d(TAG, "GoogleSignIn: No Account signed in");
+        }
+    }
+
+    /**
+     * Updates the GUI if the Login was successful
+     */
+    private void updateGUI(){
+        Intent intent = new Intent(this, SelectUserActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    /**
+     * Sends the Authorization Token to the Rest Server and UpdatesGUI if Login is successful
+     */
+    class SendLogin extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/login");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", params[0]);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "SendLogin: " + result);
+
+            if(result.equalsIgnoreCase("true")){
+                updateGUI();
+            }
         }
     }
 }
