@@ -13,7 +13,6 @@ public class SelectUserActivity extends AppCompatActivity {
 
     String googleID;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

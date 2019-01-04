@@ -24,9 +24,14 @@ import com.example.david.gigfinder.tools.ImageTools;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -195,7 +200,11 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         Log.d(TAG, "Checking user input...");
         if(checkUserInputBasic()) {
             Log.d(TAG, "User input ok");
+
             // TODO Send data to Server and get verification
+            SendRegisterArtist sendRegisterArtist = new SendRegisterArtist();
+            //sendRegisterArtist.execute(artist.getName(), artist.getDescription(), artist.getGenres().toString(), "color", "image");
+
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -257,24 +266,52 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                urlConnection.setRequestProperty("Authorization", params[0]);
+                urlConnection.setRequestProperty("Authorization", params[0]); //TODO googleToken
                 urlConnection.setRequestMethod("PUT");
+                urlConnection.setUseCaches(false);
+                urlConnection.setDoOutput(true);
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
+                //Send data
+                DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("name", params[0]);
+                jsonObject.put("description", params[1]);
+                jsonObject.put("genre", params[2]);
+                jsonObject.put("color", params[3]);
+                jsonObject.put("image", params[4]);
+                os.writeBytes(jsonObject.toString());
+                os.close();
 
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                //Get response
+                InputStream is = null;
+                try {
+                    is = urlConnection.getInputStream();
+                } catch (IOException ioe) {
+                    if (urlConnection instanceof HttpURLConnection) {
+                        HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
+                        int statusCode = httpConn.getResponseCode();
+                        if (statusCode != 200) {
+                            is = httpConn.getErrorStream();
+                        }
+                    }
                 }
-                in.close();
 
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
                 return response.toString();
             } catch (ProtocolException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
@@ -284,6 +321,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "SendRegisterArtist: " + result);
+            Log.d(TAG, "SendRegisterArtistt: " + result);
         }
     }
 }
