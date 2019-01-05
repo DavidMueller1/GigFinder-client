@@ -272,6 +272,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestProperty("Content-Type","application/json");
+                //urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
@@ -298,6 +299,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                         if (statusCode != 200) {
                             is = httpConn.getErrorStream();
                             Log.d(TAG, "SendRegisterArtist: STATUS CODE: " + statusCode);
+                            Log.d(TAG, "SendRegisterArtist: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
+                            Log.d(TAG, httpConn.getURL().toString());
                         }
                     }
                 }
@@ -311,7 +314,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 }
                 rd.close();
 
-                Log.d(TAG, "SendRegisterArtist: " + response.toString());
+                Log.d(TAG, "SendRegisterArtist: ERROR STREAM:" + response.toString());
 
                 return response.toString();
             } catch (ProtocolException e) {
