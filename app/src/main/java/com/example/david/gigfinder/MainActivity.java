@@ -13,11 +13,14 @@ public class MainActivity extends AppCompatActivity {
 
     private SectionsPageAdapter sectionsPageAdapter;
     private ViewPager mViewPager;
+    private String idToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        idToken = getIntent().getExtras().getString("idToken");
 
         Log.d(TAG, "App starting...");
 

@@ -55,11 +55,14 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
     private Artist artist;
     private Bitmap profilePicture;
+    private String idToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_artist);
+
+        idToken = getIntent().getExtras().getString("idToken");
 
         artist = new Artist();
 
@@ -203,10 +206,11 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
             // TODO Send data to Server and get verification
             SendRegisterArtist sendRegisterArtist = new SendRegisterArtist();
-            //sendRegisterArtist.execute(artist.getName(), artist.getDescription(), artist.getGenres().toString(), "color", "image");
+            sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()));
 
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.putExtra("idToken", idToken);
             startActivity(intent);
             finish();
         }
@@ -266,8 +270,9 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                urlConnection.setRequestProperty("Authorization", params[0]); //TODO googleToken
-                urlConnection.setRequestMethod("PUT");
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestProperty("Content-Type","application/json");
+                urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
@@ -276,9 +281,9 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("name", params[0]);
                 jsonObject.put("description", params[1]);
-                jsonObject.put("genre", params[2]);
-                jsonObject.put("color", params[3]);
-                jsonObject.put("image", params[4]);
+                jsonObject.put("backgroundColor", params[2]);
+                //jsonObject.put("genre", params[3]);
+                //jsonObject.put("image", params[4]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
@@ -292,6 +297,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                         int statusCode = httpConn.getResponseCode();
                         if (statusCode != 200) {
                             is = httpConn.getErrorStream();
+                            Log.d(TAG, "SendRegisterArtist: STATUS CODE: " + statusCode);
                         }
                     }
                 }
@@ -304,6 +310,9 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                     response.append('\r');
                 }
                 rd.close();
+
+                Log.d(TAG, "SendRegisterArtist: " + response.toString());
+
                 return response.toString();
             } catch (ProtocolException e) {
                 e.printStackTrace();
@@ -320,8 +329,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            Log.d(TAG, "SendRegisterArtist: " + result);
-            Log.d(TAG, "SendRegisterArtistt: " + result);
+
         }
     }
 }
