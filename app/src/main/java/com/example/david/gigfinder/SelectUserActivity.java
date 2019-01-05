@@ -11,15 +11,14 @@ public class SelectUserActivity extends AppCompatActivity {
     Button artistButton;
     Button hostButton;
 
-    String googleID;
+    String idToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_user);
 
-        // TODO Get google ID from Login
-        googleID = "ThisIsATest";
+        idToken = getIntent().getExtras().getString("idToken");
 
         artistButton = findViewById(R.id.button_artist);
         artistButton.setOnClickListener(new View.OnClickListener() {
@@ -40,7 +39,7 @@ public class SelectUserActivity extends AppCompatActivity {
 
     private void startArtistRegistration() {
         Intent intent = new Intent(getApplicationContext(), RegistrationArtistActivity.class);
-        intent.putExtra("googleID", googleID);
+        intent.putExtra("idToken", idToken);
         startActivity(intent);
     }
 

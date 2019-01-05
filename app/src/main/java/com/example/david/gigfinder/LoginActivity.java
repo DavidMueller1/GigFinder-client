@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private GoogleSignInClient mGoogleSignInClient;
     private SignInButton signInButton;
-    private GoogleSignInAccount GoogleAccount;
+    private String idToken;
     private static final int RC_SIGN_IN = 123;
 
     @Override
@@ -99,7 +99,7 @@ public class LoginActivity extends AppCompatActivity {
             // Signed in successfully, show authenticated UI.
             Log.d(TAG, "GoogleSignIn: Successful");
             GoogleSignInAccount googleSignInAccount = result.getSignInAccount();
-            String idToken = googleSignInAccount.getIdToken();
+            idToken = googleSignInAccount.getIdToken();
 
             // Send Login request and wait for answer
             SendLogin sendLogin = new SendLogin();
@@ -135,6 +135,7 @@ public class LoginActivity extends AppCompatActivity {
      */
     private void updateGUI(){
         Intent intent = new Intent(this, SelectUserActivity.class);
+        intent.putExtra("idToken", idToken);
         startActivity(intent);
         finish();
     }
@@ -179,6 +180,8 @@ public class LoginActivity extends AppCompatActivity {
             Log.d(TAG, "SendLogin: " + result);
 
             if(result.equalsIgnoreCase("true")){
+                //
+            } else if (result.equalsIgnoreCase("false")) {
                 updateGUI();
             }
         }
