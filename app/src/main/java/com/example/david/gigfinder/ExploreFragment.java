@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -28,6 +29,14 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "APPLOG - ExploreFragment";
@@ -50,7 +59,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         getLocationPermission();
     }
 
-    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "Map Ready!");
@@ -68,6 +76,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         //setLocation();
     }
 
+    /**
+     * Adding a test marker
+     */
     private void addTestMarker(){
         LatLng testMarker = new LatLng(48.150960, 11.580820);
         myMarker = mMap.addMarker(new MarkerOptions().position(testMarker)
@@ -76,24 +87,11 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private void setLocation(){
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
+    /**
+     * TODO Zooms the Map to the current (last known) location.
+     */
+    private void setMyLocation(){
 
-        @SuppressLint("MissingPermission")
-        Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
-        if (location != null)
-        {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
-
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                    .zoom(17)                   // Sets the zoom
-                    .bearing(90)                // Sets the orientation of the camera to east
-                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                    .build();                   // Creates a CameraPosition from the builder
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        }
     }
 
     /**
@@ -143,5 +141,47 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private void initMap(){
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(ExploreFragment.this);
+    }
+
+
+    /**
+     *
+     */
+    class GetEvents extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/events"); //TODO: latlng
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", params[0]); //TODO idToken
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            //TODO Add markers to the map
+        }
     }
 }
