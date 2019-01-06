@@ -38,12 +38,18 @@ public class MainActivity extends AppCompatActivity {
      * Adds the Fragments which will be selectable by the Tabs and their Titles to a SectionsPageAdapter and passes it to the ViewPager
      */
     private void setupViewPager(ViewPager viewPager) {
+        Bundle args = new Bundle();
+        args.putString("idToken", idToken);
         sectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
-        sectionsPageAdapter.addFragment(new ExploreFragment(), getString(R.string.nav_explore));
+        ProfileFragment profileFragment = new ProfileFragment();
+        profileFragment.setArguments(args);
+        ExploreFragment exploreFragment = new ExploreFragment();
+        exploreFragment.setArguments(args);
+        sectionsPageAdapter.addFragment(exploreFragment, getString(R.string.nav_explore));
         sectionsPageAdapter.addFragment(new FavoritesFragment(), getString(R.string.nav_favorites));
         sectionsPageAdapter.addFragment(new GigsFragment(), getString(R.string.nav_gigs));
         sectionsPageAdapter.addFragment(new ChatFragment(), getString(R.string.nav_chat));
-        sectionsPageAdapter.addFragment(new ProfileFragment(), getString(R.string.nav_profile));
+        sectionsPageAdapter.addFragment(profileFragment, getString(R.string.nav_profile));
         viewPager.setAdapter(sectionsPageAdapter);
     }
 

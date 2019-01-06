@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -29,6 +30,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,6 +44,7 @@ import java.net.URL;
 public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "APPLOG - ExploreFragment";
 
+    String idToken;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionsGranted = false;
@@ -54,15 +58,19 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        idToken = getArguments().getString("idToken");
         getLocationPermission();
+        GetEvents getEvents = new GetEvents();
+        getEvents.execute();
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "Map Ready!");
         mMap = googleMap;
+
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
@@ -72,8 +80,57 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         });
         addTestMarker();
 
-        //mMap.setMyLocationEnabled(true);
-        //setLocation();
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            getLocationPermission();
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+
+        if (mLocationPermissionsGranted) {
+            Log.d(TAG, "Getting device location!");
+            getDeviceLocation();
+        }
+    }
+
+    /**
+     * Gets the location of the device and moves the camera
+     */
+    private void getDeviceLocation(){
+        Log.d(TAG, "getDeviceLocation: getting the devices current location");
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        try{
+            if(mLocationPermissionsGranted){
+                final Task location = mFusedLocationProviderClient.getLastLocation();
+                location.addOnCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(@NonNull Task task) {
+                        if(task.isSuccessful() && task.getResult() != null){
+                            Log.d(TAG, "Found location!");
+                            Location currentLocation = (Location) task.getResult();
+                            Log.d(TAG, String.valueOf(currentLocation.getLatitude()));
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+
+                        }
+                        else{
+                            Log.d(TAG, "Could not find location!");
+                        }
+                    }
+                });
+            }
+        }catch(SecurityException e){
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+    /**
+     * Moves the map do a location
+     * @param latLng
+     * @param zoom
+     */
+    private void moveCamera(LatLng latLng, float zoom){
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
     /**
@@ -84,13 +141,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         myMarker = mMap.addMarker(new MarkerOptions().position(testMarker)
                 .title("Test Event").snippet("This is my Event!"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(testMarker));
-
-    }
-
-    /**
-     * TODO Zooms the Map to the current (last known) location.
-     */
-    private void setMyLocation(){
 
     }
 
@@ -152,10 +202,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/events"); //TODO: latlng
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/events?location=" + 48.150960 + "," + 11.580820); //TODO: latlng
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", params[0]); //TODO idToken
+                urlConnection.setRequestProperty("Authorization", idToken); //TODO idToken
                 urlConnection.setRequestMethod("GET");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -181,7 +230,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
 
         @Override
         protected void onPostExecute(String result){
-            //TODO Add markers to the map
+            Log.d(TAG, "EVENTS: " + result);
         }
     }
 }

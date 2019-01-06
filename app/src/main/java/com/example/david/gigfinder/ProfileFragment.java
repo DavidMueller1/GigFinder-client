@@ -1,10 +1,13 @@
 package com.example.david.gigfinder;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,17 @@ import android.widget.TextView;
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -29,7 +43,7 @@ public class ProfileFragment extends Fragment {
     private TextView descriptionText;
     private TextView genresText;
     private TextView genresLabel; // to change "Genre" to "Genres" if there are multiple
-
+    private String idToken;
 
     private Artist artist;
 
@@ -40,8 +54,8 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        idToken = getArguments().getString("idToken");
 
         // Test Artist
         ArrayList<Genre> list = new ArrayList<>();
@@ -56,6 +70,11 @@ public class ProfileFragment extends Fragment {
         genresLabel = getView().findViewById(R.id.profile_genres_label);
 
         initProfile();
+
+        GetUser getUser = new GetUser();
+        getUser.execute();
+
+        super.onActivityCreated(savedInstanceState);
     }
 
     private void initProfile() {
@@ -94,6 +113,60 @@ public class ProfileFragment extends Fragment {
             if(child instanceof TextView) {
                 ((TextView) child).setTextColor(fontColor);
             }
+        }
+    }
+
+    private void updateProfile(String jsonString){
+        try {
+            JSONArray jsonArray = new JSONArray(jsonString);
+            JSONObject userProfile = jsonArray.getJSONObject(0);
+            nameText.setText(userProfile.getString("name"));
+            descriptionText.setText(userProfile.getString("description"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     */
+    class GetUser extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
+                //URL url = new URL("http://87.153.82.101:25632/api/login");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "USER PROFILE: " + result);
+            updateProfile(result);
         }
     }
 }
