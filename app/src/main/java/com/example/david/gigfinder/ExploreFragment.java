@@ -33,6 +33,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,7 +53,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionsGranted = false;
     private static final float DEFAULT_ZOOM = 15;
-    Marker myMarker;
 
     @Nullable
     @Override
@@ -74,11 +77,14 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
+                JSONObject event = (JSONObject) marker.getTag();
                 Intent intent = new Intent(getActivity(), EventProfileActivity.class);
+                intent.putExtra("Event", event.toString());
+                Log.d(TAG, event.toString());
                 startActivity(intent);
             }
         });
-        addTestMarker();
+        //addTestMarker();
 
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -134,17 +140,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Adding a test marker
-     */
-    private void addTestMarker(){
-        LatLng testMarker = new LatLng(48.150960, 11.580820);
-        myMarker = mMap.addMarker(new MarkerOptions().position(testMarker)
-                .title("Test Event").snippet("This is my Event!"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(testMarker));
-
-    }
-
-    /**
      * Checks the permission for Locations and External Storage
      */
     private void getLocationPermission() {
@@ -193,6 +188,39 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(ExploreFragment.this);
     }
 
+    private void showEvents(String events){
+        try {
+            JSONArray jsonArray = new JSONArray(events);
+            for(int i=0; i<=jsonArray.length(); i++){
+                dropMarker(jsonArray.getJSONObject(i));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void dropMarker(JSONObject event){
+        try {
+            if(event.getInt("id") == 1) {
+                LatLng testMarker = new LatLng(48.150960, 11.580820);
+                Marker myMarker = mMap.addMarker(new MarkerOptions()
+                        .position(testMarker)
+                        .title(event.getString("title"))
+                        .snippet(event.getString("description")));
+                myMarker.setTag(event);
+            } else {
+                LatLng testMarker = new LatLng(47.150960, 12.580820);
+                Marker myMarker = mMap.addMarker(new MarkerOptions()
+                        .position(testMarker)
+                        .title(event.getString("title"))
+                        .snippet(event.getString("description")));
+                myMarker.setTag(event);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      *
@@ -231,6 +259,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         @Override
         protected void onPostExecute(String result){
             Log.d(TAG, "EVENTS: " + result);
+            showEvents(result);
         }
     }
 }

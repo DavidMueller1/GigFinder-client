@@ -41,14 +41,23 @@ public class MainActivity extends AppCompatActivity {
         Bundle args = new Bundle();
         args.putString("idToken", idToken);
         sectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
-        ProfileFragment profileFragment = new ProfileFragment();
-        profileFragment.setArguments(args);
+
         ExploreFragment exploreFragment = new ExploreFragment();
+        FavoritesFragment favoritesFragment = new FavoritesFragment();
+        ProfileFragment profileFragment = new ProfileFragment();
+        GigsFragment gigsFragment = new GigsFragment();
+        ChatFragment chatFragment = new ChatFragment();
+
         exploreFragment.setArguments(args);
+        favoritesFragment.setArguments(args);
+        profileFragment.setArguments(args);
+        gigsFragment.setArguments(args);
+        chatFragment.setArguments(args);
+
         sectionsPageAdapter.addFragment(exploreFragment, getString(R.string.nav_explore));
-        sectionsPageAdapter.addFragment(new FavoritesFragment(), getString(R.string.nav_favorites));
-        sectionsPageAdapter.addFragment(new GigsFragment(), getString(R.string.nav_gigs));
-        sectionsPageAdapter.addFragment(new ChatFragment(), getString(R.string.nav_chat));
+        sectionsPageAdapter.addFragment(favoritesFragment, getString(R.string.nav_favorites));
+        sectionsPageAdapter.addFragment(gigsFragment, getString(R.string.nav_gigs));
+        sectionsPageAdapter.addFragment(chatFragment, getString(R.string.nav_chat));
         sectionsPageAdapter.addFragment(profileFragment, getString(R.string.nav_profile));
         viewPager.setAdapter(sectionsPageAdapter);
     }
