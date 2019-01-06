@@ -194,8 +194,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
-
-
     /**
      * Called when the user presses the registrate button
      */
@@ -268,6 +266,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
+                //URL url = new URL("https://87.153.82.101:44386/api/artists");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);

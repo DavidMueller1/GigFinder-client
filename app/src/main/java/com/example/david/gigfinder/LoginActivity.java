@@ -149,6 +149,7 @@ public class LoginActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/login");
+                //URL url = new URL("http://87.153.82.101:25632/api/login");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", params[0]);
@@ -180,7 +181,11 @@ public class LoginActivity extends AppCompatActivity {
             Log.d(TAG, "SendLogin: " + result);
 
             if(result.equalsIgnoreCase("true")){
-                //
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("idToken", idToken);
+                startActivity(intent);
+                finish();
             } else if (result.equalsIgnoreCase("false")) {
                 updateGUI();
             }
