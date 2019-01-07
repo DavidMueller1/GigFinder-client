@@ -16,6 +16,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDmyo-Vhg21l58N5gA24I63QVtrSSy2gQo" />
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation"
@@ -36,7 +37,8 @@
         <activity android:name=".ChatActivity" />
         <activity android:name=".HostProfileActivity" />
         <activity android:name=".EventProfileActivity" />
-        <activity android:name=".ArtistProfileActivity"></activity>
+        <activity android:name=".ArtistProfileActivity" />
+        <activity android:name=".RegistrationHostActivity"></activity>
     </application>
 
 </manifest> <!-- "@mipmap/ic_launcher_round" -->

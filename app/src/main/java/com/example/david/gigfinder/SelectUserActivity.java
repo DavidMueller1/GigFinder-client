@@ -44,6 +44,8 @@ public class SelectUserActivity extends AppCompatActivity {
     }
 
     private void startHostRegistration() {
-        // TODO Activity für Registrierung des Hosts aufrufen
+        Intent intent = new Intent(getApplicationContext(), RegistrationHostActivity.class);
+        intent.putExtra("idToken", idToken);
+        startActivity(intent);
     }
 }

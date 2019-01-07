@@ -202,7 +202,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         if(checkUserInputBasic()) {
             Log.d(TAG, "User input ok");
 
-            // TODO Send data to Server and get verification
             SendRegisterArtist sendRegisterArtist = new SendRegisterArtist();
             sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()));
 
@@ -313,7 +312,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 }
                 rd.close();
 
-                Log.d(TAG, "SendRegisterArtist: ERROR STREAM:" + response.toString());
+                Log.d(TAG, "SendRegisterArtist: RESPONSE:" + response.toString());
 
                 return response.toString();
             } catch (ProtocolException e) {
