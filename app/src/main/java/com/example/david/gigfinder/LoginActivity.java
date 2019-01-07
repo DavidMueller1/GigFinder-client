@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -38,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private GoogleSignInClient mGoogleSignInClient;
     private SignInButton signInButton;
+    private ProgressBar progress;
     private String idToken;
     private static final int RC_SIGN_IN = 123;
 
@@ -64,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
                 signIn();
             }
         });
+        progress = findViewById(R.id.login_progress);
     }
 
     /**
@@ -72,6 +75,9 @@ public class LoginActivity extends AppCompatActivity {
     private void signIn() {
 
         Log.d(TAG, "GoogleSignIn: Started!");
+
+        signInButton.setVisibility(View.GONE);
+        progress.setVisibility(View.VISIBLE);
 
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -86,6 +92,11 @@ public class LoginActivity extends AppCompatActivity {
             // The Task returned from this call is always completed, no need to attach a listener.
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
+        }
+        else {
+            signInButton.setVisibility(View.VISIBLE);
+            progress.setVisibility(View.GONE);
+            Toast.makeText(getApplicationContext(),"Could not sign in",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -179,15 +190,21 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "SendLogin: " + result);
-
-            if(result.equalsIgnoreCase("true")){
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                intent.putExtra("idToken", idToken);
-                startActivity(intent);
-                finish();
-            } else if (result.equalsIgnoreCase("false")) {
-                updateGUI();
+            if(result != null) {
+                if (result.equalsIgnoreCase("true")) {
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.putExtra("idToken", idToken);
+                    startActivity(intent);
+                    finish();
+                } else if (result.equalsIgnoreCase("false")) {
+                    updateGUI();
+                }
+            }
+            else {
+                signInButton.setVisibility(View.VISIBLE);
+                progress.setVisibility(View.GONE);
+                Toast.makeText(getApplicationContext(),"Could not sign in",Toast.LENGTH_SHORT).show();
             }
         }
     }
