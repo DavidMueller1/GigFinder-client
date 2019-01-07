@@ -33,6 +33,7 @@ public class ChatFragment extends Fragment {
     private static final String TAG = "APPLOG - ChatFragment";
     private ChatAdapter chatAdapter;
     private FloatingActionButton chatfab;
+    String idToken;
 
     @Nullable
     @Override
@@ -43,6 +44,8 @@ public class ChatFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        idToken = getArguments().getString("idToken");
 
         chatfab = (FloatingActionButton) getView().findViewById(R.id.chatfab);
 
@@ -58,6 +61,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
+                intent.putExtra("idToken", idToken);
                 startActivity(intent);
             }
         });
@@ -71,10 +75,10 @@ public class ChatFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/messages?receiver=" + 1); //TODO: id instead of 1
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/messages");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-                urlConnection.setRequestProperty("Authorization", params[0]); //TODO idToken
+                urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -100,6 +104,7 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result){
+            Log.d(TAG, "MESSAGES: " + result);
         }
     }
 }
