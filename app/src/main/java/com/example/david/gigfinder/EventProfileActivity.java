@@ -1,13 +1,142 @@
 package com.example.david.gigfinder;
 
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
+import android.nfc.Tag;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.example.david.gigfinder.data.Artist;
+import com.example.david.gigfinder.data.Event;
+import com.example.david.gigfinder.data.Host;
+import com.example.david.gigfinder.data.enums.Genre;
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBufferResponse;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.RuntimeRemoteException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class EventProfileActivity extends AppCompatActivity {
+    private static final String TAG = "EventProfileActivity";
+
+    private Event event;
+
+    TextView titleText;
+    TextView genreText;
+    TextView descriptionText;
+    TextView timeText;
+    TextView dateText;
+    TextView locationText;
+    LinearLayout locationContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_profile);
+
+
+
+        titleText = findViewById(R.id.event_title);
+        genreText = findViewById(R.id.event_genre);
+        descriptionText = findViewById(R.id.event_description);
+        timeText = findViewById(R.id.event_time_text);
+        dateText = findViewById(R.id.event_date_text);
+        locationText = findViewById(R.id.event_location_text);
+        locationContainer = findViewById(R.id.event_location_container);
+        locationContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickLocation();
+            }
+        });
+
+        // TODO move the following code (including the callback method) to where the Event is generated
+
+        // region Test Event
+        GeoDataClient mGeoDataClient = Places.getGeoDataClient(this);
+        Task<PlaceBufferResponse> placeResult = mGeoDataClient.getPlaceById("ChIJQwJTzpl1nkcR2vIR4mH1Bfw");
+        placeResult.addOnCompleteListener(mUpdatePlaceDetailsCallback);
+
     }
+
+    /**
+     *  Callback for after the Place is found by its ID
+     */
+    private OnCompleteListener<PlaceBufferResponse> mUpdatePlaceDetailsCallback
+            = new OnCompleteListener<PlaceBufferResponse>() {
+        @Override
+        public void onComplete(Task<PlaceBufferResponse> task) {
+            try {
+                PlaceBufferResponse places = task.getResult();
+
+                // Get the Place object from the buffer.
+                Place place = places.get(0);
+
+                // Some example Genres
+                ArrayList<Genre> list = new ArrayList<>();
+                list.add(Genre.ROCK);
+                list.add(Genre.HOUSE);
+
+                // Generate a Test Event
+                event = new Event(1, "Testevent in der gemütlichen Beispielbar",
+                        "Suche talentierten Drehorgelspieler für Freitag Abend in meiner Bar. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+                        list, place, new Timestamp(2019, 1, 20, 20, 15, 0, 0),
+                        new Timestamp(2019, 1, 21, 3, 30, 0, 0), null);
+
+                displayEvent();
+
+
+            } catch (RuntimeRemoteException e) {
+                // Request did not complete successfully
+                Log.e(TAG, "Place query did not complete.", e);
+                return;
+            }
+        }
+    };
+    // endregion
+
+
+    /**
+     * Displays the given Event in the Activity
+     */
+    private void displayEvent() {
+        titleText.setText(event.getTitle());
+
+        String genreString = "(";
+        for(Genre g : event.getGenres()) {
+            if(!genreString.equals("(")) {
+                genreString += ", ";
+            }
+            genreString += g.toString();
+        }
+        descriptionText.setText(event.getDescription());
+        genreString += ")";
+        genreText.setText(genreString);
+        String time = event.getTimeFrom().getHours() + ":" + event.getTimeFrom().getMinutes() + " Uhr - " + event.getTimeTo().getHours() + ":" + event.getTimeTo().getMinutes() + " Uhr";
+        timeText.setText(time);
+        String date = event.getTimeFrom().getDate() + "." + event.getTimeFrom().getMonth() + "." + event.getTimeFrom().getYear();
+        dateText.setText(date);
+        String placeName = event.getLocation().getName().toString();
+        locationText.setText(placeName);
+    }
+
+    /**
+     *  Called when the user clicks anywhere on the Location Icon or Text
+     */
+    private void onClickLocation() {
+        String uriString = "https://www.google.com/maps/search/?api=1&query=Google&query_place_id=" + event.getLocation().getId();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
+        startActivity(browserIntent);
+    }
+
 }

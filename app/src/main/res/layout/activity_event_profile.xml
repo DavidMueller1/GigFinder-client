@@ -1,9 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".EventProfileActivity">
+    android:padding="@dimen/padding_default">
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/event_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_small"
+        android:text="Event Title"
+        android:textSize="@dimen/font_big"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/event_genre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_default"
+        android:text="(Rock, Pop, Beispielgenre)"
+        android:textSize="@dimen/font_default"
+        android:textAlignment="center" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/event_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_bigger"
+                android:text="Beschreibung haf kjsdhaf kjhsdaf kjhkj ashj hsakdjf haskjd kasjd fhkjdjfh akjksdhf kasjdhf kjashdf kjh askdfj"
+                android:textSize="@dimen/font_default"
+                android:textColor="@color/black"/>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_bigger"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/event_date_time_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:src="@drawable/ic_baseline_schedule_48px"
+                    android:tint="@color/darkOrange"/>
+
+                <TextView
+                    android:id="@+id/event_time_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/event_date_time_icon"
+                    android:text="20:15 Uhr"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/event_date_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/event_time_text"
+                    android:layout_toRightOf="@id/event_date_time_icon"
+                    android:text="20.03.2019"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/black"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/event_location_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_bigger"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/event_location_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:src="@drawable/ic_baseline_location_on_48px"
+                    android:tint="@color/darkOrange"/>
+
+                <TextView
+                    android:id="@+id/event_location_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/event_location_icon"
+                    android:text="Beispielstraße 7, 81737 München"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+</LinearLayout>
