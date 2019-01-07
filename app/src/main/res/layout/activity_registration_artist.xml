@@ -40,14 +40,23 @@
                 android:textSize="@dimen/font_smaller"
                 android:visibility="gone" />
 
-            <ImageButton
+            <!--ImageButton
                 android:id="@+id/registration_artist_profilePicture"
                 style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="@dimen/element_big"
                 android:layout_height="@dimen/element_big"
                 android:layout_gravity="center"
                 android:layout_marginBottom="@dimen/padding_default"
-                app:srcCompat="@drawable/ic_baseline_add_photo_alternate_24px" />
+                app:srcCompat="@drawable/ic_baseline_add_photo_alternate_24px" /-->
+
+            <ImageView
+                android:id="@+id/registration_artist_profilePicture"
+                android:layout_width="@dimen/element_big"
+                android:layout_height="@dimen/element_big"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/padding_default"
+                android:src="@drawable/ic_baseline_add_photo"
+                android:clickable="true"/>
 
             <TextView
                 android:id="@+id/textView4"

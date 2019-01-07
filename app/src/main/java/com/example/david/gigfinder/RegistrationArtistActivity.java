@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +45,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private static final String TAG = "MYLOG_RegistrationArtistActivity";
     private static final int PICK_IMAGE = 1;
 
-    private ImageButton profilePictureButton;
+    private ImageView profilePictureButton;
     private EditText nameField;
     private EditText descriptionField;
     private Spinner genreSpinner;

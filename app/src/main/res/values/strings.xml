@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Gig.Finder</string>
+    <string name="app_name">GigFinder</string>
 
     <!-- Sign-In -->
     <string name="server_client_id">998701200015-krr5qpgg3go6iol8b2oqv3l4jcttspom.apps.googleusercontent.com</string>
