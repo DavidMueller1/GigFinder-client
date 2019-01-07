@@ -64,8 +64,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         });
         addTestMarker();
 
-        //mMap.setMyLocationEnabled(true);
-        //setLocation();
+        mMap.setMyLocationEnabled(true);
+        setLocation();
     }
 
     private void addTestMarker(){
