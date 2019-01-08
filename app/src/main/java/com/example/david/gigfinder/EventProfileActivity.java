@@ -23,6 +23,9 @@ import com.google.android.gms.maps.model.RuntimeRemoteException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -30,6 +33,7 @@ public class EventProfileActivity extends AppCompatActivity {
     private static final String TAG = "EventProfileActivity";
 
     private Event event;
+    private JSONObject eventJson;
 
     TextView titleText;
     TextView genreText;
@@ -43,8 +47,6 @@ public class EventProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_profile);
-
-
 
         titleText = findViewById(R.id.event_title);
         genreText = findViewById(R.id.event_genre);
@@ -60,13 +62,18 @@ public class EventProfileActivity extends AppCompatActivity {
             }
         });
 
+        try {
+            eventJson = new JSONObject(getIntent().getExtras().getString("Event"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         // TODO move the following code (including the callback method) to where the Event is generated
 
         // region Test Event
         GeoDataClient mGeoDataClient = Places.getGeoDataClient(this);
         Task<PlaceBufferResponse> placeResult = mGeoDataClient.getPlaceById("ChIJQwJTzpl1nkcR2vIR4mH1Bfw");
         placeResult.addOnCompleteListener(mUpdatePlaceDetailsCallback);
-
     }
 
     /**
@@ -95,22 +102,23 @@ public class EventProfileActivity extends AppCompatActivity {
 
                 displayEvent();
 
-
             } catch (RuntimeRemoteException e) {
                 // Request did not complete successfully
                 Log.e(TAG, "Place query did not complete.", e);
                 return;
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
     };
     // endregion
 
-
     /**
      * Displays the given Event in the Activity
      */
-    private void displayEvent() {
-        titleText.setText(event.getTitle());
+    private void displayEvent() throws JSONException {
+        titleText.setText(eventJson.getString("title"));
+        descriptionText.setText(eventJson.getString("description"));
 
         String genreString = "(";
         for(Genre g : event.getGenres()) {
@@ -119,7 +127,6 @@ public class EventProfileActivity extends AppCompatActivity {
             }
             genreString += g.toString();
         }
-        descriptionText.setText(event.getDescription());
         genreString += ")";
         genreText.setText(genreString);
         String time = event.getTimeFrom().getHours() + ":" + event.getTimeFrom().getMinutes() + " Uhr - " + event.getTimeTo().getHours() + ":" + event.getTimeTo().getMinutes() + " Uhr";

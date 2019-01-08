@@ -26,6 +26,7 @@ import com.example.david.gigfinder.tools.ImageTools;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -199,7 +200,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             Log.d(TAG, "User input ok");
 
             SendRegisterArtist sendRegisterArtist = new SendRegisterArtist();
-            sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()));
+            sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()),
+                    artist.getGenres().get(0).toString());
 
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -259,7 +261,9 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 jsonObject.put("name", params[0]);
                 jsonObject.put("description", params[1]);
                 jsonObject.put("backgroundColor", params[2]);
-                //jsonObject.put("genre", params[3]);
+                JSONArray genres = new JSONArray();
+                genres.put(params[3]);
+                //jsonObject.put("genres", genres);
                 //jsonObject.put("image", params[4]);
                 os.writeBytes(jsonObject.toString());
                 os.close();

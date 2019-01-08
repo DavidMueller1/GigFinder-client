@@ -84,7 +84,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
                 startActivity(intent);
             }
         });
-        //addTestMarker();
 
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -191,7 +190,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private void showEvents(String events){
         try {
             JSONArray jsonArray = new JSONArray(events);
-            for(int i=0; i<=jsonArray.length(); i++){
+            for(int i=0; i<jsonArray.length(); i++){
                 dropMarker(jsonArray.getJSONObject(i));
             }
         } catch (JSONException e) {
@@ -230,7 +229,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/events?location=" + 48.150960 + "," + 11.580820); //TODO: latlng
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/events?location=" + 48.150960 + "," + 11.580820 + "&radius=5000.0"); //TODO: latlng
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestProperty("Authorization", idToken); //TODO idToken
                 urlConnection.setRequestMethod("GET");

@@ -229,8 +229,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
         }
     }
 
-
-
     /**
      * Called when the user presses the registrate button
      */
@@ -240,7 +238,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
             Log.d(TAG, "User input ok");
 
             SendRegisterHost sendRegisterHost = new SendRegisterHost();
-            sendRegisterHost.execute(); //TODO params
+            sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor())); //TODO params
 
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
