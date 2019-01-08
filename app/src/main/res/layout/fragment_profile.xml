@@ -97,6 +97,12 @@
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/font_bigger" />
 
+            <Button
+                android:id="@+id/deleteBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Delete Profile" />
+
         </LinearLayout>
     </ScrollView>
 

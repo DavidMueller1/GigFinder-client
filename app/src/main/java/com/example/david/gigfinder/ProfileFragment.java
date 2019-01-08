@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -39,6 +40,8 @@ import static com.example.david.gigfinder.data.enums.Genre.ROCK;
 public class ProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - ProfileFragment";
 
+    private int userID;
+    private Button testDeleteBtn;
     private ImageButton imageButton;
     private TextView nameText;
     private TextView descriptionText;
@@ -64,11 +67,20 @@ public class ProfileFragment extends Fragment {
         list.add(Genre.HOUSE);
         artist = new Artist(1, Color.DKGRAY, "TestArtist", "Hallo, ich bin ein Test.", null, null, list);
 
+        testDeleteBtn = getView().findViewById(R.id.deleteBtn);
         imageButton = getView().findViewById(R.id.profile_image);
         nameText = getView().findViewById(R.id.profile_name);
         descriptionText = getView().findViewById(R.id.profile_description);
         genresText = getView().findViewById(R.id.profile_genres);
         genresLabel = getView().findViewById(R.id.profile_genres_label);
+
+        testDeleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DeleteUser deleteUser = new DeleteUser();
+                deleteUser.execute();
+            }
+        });
 
         initProfile();
 
@@ -123,6 +135,8 @@ public class ProfileFragment extends Fragment {
             JSONObject userProfile = jsonArray.getJSONObject(0);
             nameText.setText(userProfile.getString("name"));
             descriptionText.setText(userProfile.getString("description"));
+            userID = userProfile.getInt("id");
+            testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -137,7 +151,6 @@ public class ProfileFragment extends Fragment {
         protected String doInBackground(String... params) {
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
-                //URL url = new URL("http://87.153.82.101:25632/api/login");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
@@ -170,4 +183,47 @@ public class ProfileFragment extends Fragment {
             updateProfile(result);
         }
     }
+
+    /**
+     *
+     */
+    class DeleteUser extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/artists/"+userID);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("DELETE");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "DELETE ARTIST: " + result);
+            getActivity().finish();
+        }
+    }
+
 }

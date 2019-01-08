@@ -159,12 +159,15 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             try {
+                Log.d(TAG, "SendLogin: Sending GET Request");
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/login");
                 //URL url = new URL("http://87.153.82.101:25632/api/login");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", params[0]);
                 urlConnection.setRequestMethod("GET");
+
+                Log.d(TAG, params[0]);
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
