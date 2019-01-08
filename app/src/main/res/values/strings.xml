@@ -14,7 +14,10 @@
     <string name="selectuser_button_host">Als Location Host</string>
     <string name="selectuser_button_artist">Als Musiker</string>
 
-    <!-- Registrierung  -->
+    <string name="selectuser_title">Registrieren</string>
+
+    <!-- Registrierung Artist  -->
+    <string name="registration_artist_title">Registrieren - Musiker</string>
     <string name="registration_artist_picture">Profilbild</string>
     <string name="registration_artist_image_hint">(zum ändern antippen)</string>
     <string name="registration_artist_name">Nutzername (sichtbar für andere)</string>
@@ -24,6 +27,19 @@
     <string name="registration_artist_color">Hintergrundfarbe wählen</string>
     <string name="registration_artist_color_hint">Platzhalter für ColorPicker (hexcode)</string>
     <string name="registration_artist_genre">Genre</string>
+
+    <!-- Registrierung Host  -->
+    <string name="registration_host_title">Registrieren - Location Host</string>
+    <string name="registration_host_picture">Profilbild</string>
+    <string name="registration_host_image_hint">(zum ändern antippen)</string>
+    <string name="registration_host_name">Nutzername (sichtbar für andere)</string>
+    <string name="registration_host_name_hint">Name</string>
+    <string name="registration_host_description">Beschreibung</string>
+    <string name="registration_host_description_hint">Beschreibung von Location und Host</string>
+    <string name="registration_host_location_hint">Location wählen</string>
+    <string name="registration_host_color">Hintergrundfarbe wählen</string>
+    <string name="registration_host_color_hint">Platzhalter für ColorPicker (hexcode)</string>
+    <string name="registration_host_genre">Genre</string>
 
     <string name="registration_button">Registrieren</string>
 

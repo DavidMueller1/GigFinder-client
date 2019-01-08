@@ -1,16 +1,40 @@
 package com.example.david.gigfinder;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.example.david.gigfinder.data.Host;
+import com.example.david.gigfinder.data.enums.Genre;
+import com.example.david.gigfinder.tools.ColorTools;
+import com.example.david.gigfinder.tools.ImageTools;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
+import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
+import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,8 +44,25 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 public class RegistrationHostActivity extends AppCompatActivity {
-
     private static final String TAG = "RegistrationHostActivity";
+    private static final int PICK_IMAGE = 1;
+    private static final int PLACE_PICKER_REQUEST = 2;
+
+    private ImageView profilePictureButton;
+    private EditText nameField;
+    private EditText descriptionField;
+    private LinearLayout locationButton;
+    private TextView locationButtonText;
+    private Spinner genreSpinner;
+    private Button backgroundColorPickerButton;
+    private Button registrationButton;
+
+    private ColorPicker colorPicker;
+
+    private Host host;
+    private Bitmap profilePicture;
+    private LatLng position;
+
     String idToken;
 
     @Override
@@ -30,7 +71,165 @@ public class RegistrationHostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration_host);
 
         idToken = getIntent().getExtras().getString("idToken");
+
+        host = new Host();
+
+        profilePictureButton = findViewById(R.id.registration_host_profilePicture);
+        profilePictureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performProfilePictureSelection();
+            }
+        });
+
+        nameField = findViewById(R.id.registration_host_name);
+        descriptionField = findViewById(R.id.registration_host_description);
+        locationButton = findViewById(R.id.registration_host_location_container);
+        locationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performLocationSelection();
+            }
+        });
+        locationButtonText = findViewById(R.id.registration_host_location_text);
+        genreSpinner = findViewById(R.id.registration_host_genre);
+        //Replaced the Strings with the Genre-Enum
+        ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
+        genreSpinner.setAdapter(adapter);
+
+        backgroundColorPickerButton = findViewById(R.id.button_registration_host_colorPicker);
+        backgroundColorPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performColorSelection();
+            }
+        });
+
+
+        registrationButton = findViewById(R.id.button_host_registration);
+        registrationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performRegistration();
+            }
+        });
+
+        colorPicker = new ColorPicker(RegistrationHostActivity.this, 255, 255, 255);
+        colorPicker.enableAutoClose();
+        colorPicker.setCallback(new ColorPickerCallback() {
+            @Override
+            public void onColorChosen(int color) {
+                applyColor(color);
+            }
+        });
+
+        position = null;
     }
+
+    /**
+     * Called when the user presses the profile picture button
+     * User can choose between camera and gallery
+     */
+    private void performProfilePictureSelection() {
+        /*Intent pickIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent chooserIntent = Intent.createChooser(pickIntent, getResources().getString(R.string.pick_photo_intent));
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {takePhotoIntent});
+
+        startActivityForResult(chooserIntent, PICK_IMAGE);*/
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickIntent, PICK_IMAGE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == PICK_IMAGE) {
+            if(resultCode == RESULT_OK) {
+                Uri path = data.getData();
+
+                try {
+                    profilePicture = ImageTools.decodeUri(path, getContentResolver());
+
+                    ViewGroup.LayoutParams params = profilePictureButton.getLayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    profilePictureButton.setBackground(null);
+                    profilePictureButton.setLayoutParams(params);
+                    profilePictureButton.setImageBitmap(profilePicture);
+                    profilePictureButton.setImageTintList(null);
+
+                    findViewById(R.id.registration_host_image_hint).setVisibility(View.VISIBLE);
+                } catch (FileNotFoundException e) {
+                    Log.d(TAG, "File not found");
+                }
+
+
+            }
+        }
+        else if(requestCode == PLACE_PICKER_REQUEST) {
+            if(resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(data, this);
+                position = place.getLatLng();
+
+                // TODO convert from latlng
+                String address = place.getAddress().toString();
+                locationButtonText.setText(address);
+            }
+        }
+    }
+
+    /**
+     * Called when the user presses the choose location button
+     */
+    private void performLocationSelection() {
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+
+        try {
+            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("MYLOG", e.getMessage());
+        }
+    }
+
+    /**
+     * Called when the user presses the choose color button
+     */
+    private void performColorSelection() {
+        colorPicker.show();
+    }
+
+    /**
+     * Called when the user chose a color
+     */
+    private void applyColor(int color) {
+        host.setColor(color);
+        findViewById(android.R.id.content).setBackgroundColor(host.getColor());
+
+        updateFontColor();
+    }
+
+    /**
+     * Updates the font color of all relevant elements
+     */
+    private void updateFontColor() {
+        int fontColor = ColorTools.isBrightColor(host.getColor());
+
+        ViewGroup layout = findViewById(R.id.registration_host_layout);
+        for(int index = 0; index < layout.getChildCount(); ++index) {
+            View child = layout.getChildAt(index);
+            if(child instanceof TextView) {
+                ((TextView) child).setTextColor(fontColor);
+            }
+            else if(child instanceof EditText) {
+                ((EditText) child).setTextColor(fontColor);
+            }
+        }
+    }
+
+
 
     /**
      * Called when the user presses the registrate button

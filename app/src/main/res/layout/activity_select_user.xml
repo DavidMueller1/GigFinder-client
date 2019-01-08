@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SelectUserActivity">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:id="@+id/selectuser_title_bar_form"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_big"
-        android:layout_marginEnd="@dimen/padding_big"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@color/orange">
+
+        <TextView
+            android:id="@+id/selectuser_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/selectuser_title"
+            android:padding="@dimen/padding_default"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_bigger"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding_default"
+        android:layout_marginRight="@dimen/padding_default"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/padding_small"
+            android:layout_marginBottom="@dimen/padding_smaller"
             android:text="@string/selectuser_label"
             android:textAlignment="center"
             android:textColor="@android:color/black" />
@@ -30,8 +43,8 @@
             android:id="@+id/button_location_host"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/padding_small"
-            android:background="@color/orange"
+            android:layout_marginBottom="@dimen/padding_smaller"
+            android:background="@drawable/standart_button"
             android:text="@string/selectuser_button_host"
             android:textColor="@color/white" />
 
@@ -39,8 +52,8 @@
             android:id="@+id/button_artist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/orange"
+            android:background="@drawable/standart_button"
             android:text="@string/selectuser_button_artist"
             android:textColor="@color/white" />
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

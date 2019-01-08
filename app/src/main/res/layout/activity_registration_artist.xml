@@ -1,19 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context=".RegistrationArtistActivity">
+
+    <LinearLayout
+        android:id="@+id/login_title_bar_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/orange">
+
+        <TextView
+            android:id="@+id/registration_artist_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/registration_artist_title"
+            android:padding="@dimen/padding_default"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_bigger"/>
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="@dimen/padding_default">
+        android:paddingRight="@dimen/padding_default"
+        android:paddingLeft="@dimen/padding_default"
+        android:scrollbarStyle="outsideInset">
 
         <LinearLayout
             android:id="@+id/registration_artist_layout"
@@ -25,9 +41,11 @@
                 android:id="@+id/textView0"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_default"
                 android:text="@string/registration_artist_picture"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
                 android:textSize="@dimen/font_default" />
 
             <TextView
@@ -36,18 +54,11 @@
                 android:layout_height="wrap_content"
                 android:text="@string/registration_artist_image_hint"
                 android:textAlignment="center"
-                android:textColor="@android:color/black"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
                 android:textSize="@dimen/font_smaller"
                 android:visibility="gone" />
 
-            <!--ImageButton
-                android:id="@+id/registration_artist_profilePicture"
-                style="@style/Widget.AppCompat.ImageButton"
-                android:layout_width="@dimen/element_big"
-                android:layout_height="@dimen/element_big"
-                android:layout_gravity="center"
-                android:layout_marginBottom="@dimen/padding_default"
-                app:srcCompat="@drawable/ic_baseline_add_photo_alternate_24px" /-->
 
             <ImageView
                 android:id="@+id/registration_artist_profilePicture"
@@ -56,6 +67,7 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="@dimen/padding_default"
                 android:src="@drawable/ic_baseline_add_photo"
+                android:tint="@color/darkGrey"
                 android:clickable="true"/>
 
             <TextView
@@ -63,7 +75,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/registration_artist_name"
-                android:textColor="@android:color/black"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
                 android:textSize="@dimen/font_default" />
 
             <EditText
@@ -81,7 +94,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/registration_artist_description"
-                android:textColor="@android:color/black"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
                 android:textSize="@dimen/font_default" />
 
             <EditText
@@ -100,7 +114,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/registration_artist_genre"
-                android:textColor="@android:color/black"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
                 android:textSize="@dimen/font_default" />
 
             <Spinner
@@ -123,13 +138,12 @@
                 android:id="@+id/button_artist_registration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_small"
-                android:background="@color/orange"
+                android:layout_marginBottom="@dimen/padding_default"
+                android:background="@drawable/standart_button"
                 android:text="@string/registration_button"
                 android:textColor="@color/white"
                 android:textSize="@dimen/font_default" />
 
         </LinearLayout>
     </ScrollView>
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
