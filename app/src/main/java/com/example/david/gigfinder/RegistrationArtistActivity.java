@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
+import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.ImageTools;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
@@ -141,6 +142,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                     profilePictureButton.setBackground(null);
                     profilePictureButton.setLayoutParams(params);
                     profilePictureButton.setImageBitmap(profilePicture);
+                    profilePictureButton.setImageTintList(null);
 
                     findViewById(R.id.registration_artist_image_hint).setVisibility(View.VISIBLE);
                 } catch (FileNotFoundException e) {
@@ -167,13 +169,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         artist.setColor(color);
         findViewById(android.R.id.content).setBackgroundColor(artist.getColor());
 
-        if(isBrightColor(artist.getColor())) {
-            artist.setFontColor(getResources().getColor(R.color.black));
-        }
-        else {
-            artist.setFontColor(getResources().getColor(R.color.white));
-        }
-
         updateFontColor();
     }
 
@@ -181,7 +176,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
      * Updates the font color of all relevant elements
      */
     private void updateFontColor() {
-        int fontColor = artist.getFontColor();
+        int fontColor = ColorTools.isBrightColor(artist.getColor());
 
         ViewGroup layout = findViewById(R.id.registration_artist_layout);
         for(int index = 0; index < layout.getChildCount(); ++index) {
@@ -240,24 +235,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
 
         return true;
-    }
-
-    /**
-     * Checks whether a background color is light enough to use black font
-     * @param color
-     * @return is the color a bright
-     */
-    private static boolean isBrightColor(int color) {
-        int[] rgb = {Color.red(color), Color.green(color), Color.blue(color)};
-        Log.d(TAG, rgb[0] + "");
-        // formula for the brightness (returns a value between 0 and 255)
-        int brightness = (int) Math.sqrt(rgb[0] * rgb[0] * .299 + rgb[1] * rgb[1] * .587 + rgb[2] * rgb[2] * .114);
-
-        if (brightness >= 110) {
-            return true;
-        }
-
-        return false;
     }
 
     class SendRegisterArtist extends AsyncTask<String, Void, String> {

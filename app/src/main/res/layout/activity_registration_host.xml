@@ -1,9 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context=".RegistrationHostActivity">
 
-</android.support.constraint.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/login_title_bar_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/orange">
+
+        <TextView
+            android:id="@+id/registration_host_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/registration_host_title"
+            android:padding="@dimen/padding_default"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_bigger"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingRight="@dimen/padding_default"
+        android:paddingLeft="@dimen/padding_default"
+        android:scrollbarStyle="outsideInset">
+
+        <LinearLayout
+            android:id="@+id/registration_host_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_default"
+                android:text="@string/registration_host_picture"
+                android:textAlignment="center"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
+                android:textSize="@dimen/font_default" />
+
+            <TextView
+                android:id="@+id/registration_host_image_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/registration_host_image_hint"
+                android:textAlignment="center"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
+                android:textSize="@dimen/font_smaller"
+                android:visibility="gone" />
+
+
+            <ImageView
+                android:id="@+id/registration_host_profilePicture"
+                android:layout_width="@dimen/element_big"
+                android:layout_height="@dimen/element_big"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/padding_default"
+                android:src="@drawable/ic_baseline_add_photo"
+                android:tint="@color/darkGrey"
+                android:clickable="true"/>
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/registration_host_name"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
+                android:textSize="@dimen/font_default" />
+
+            <EditText
+                android:id="@+id/registration_host_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_default"
+                android:ems="10"
+                android:hint="@string/registration_host_name_hint"
+                android:inputType="textPersonName"
+                android:textSize="@dimen/font_bigger" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/registration_host_description"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
+                android:textSize="@dimen/font_default" />
+
+            <EditText
+                android:id="@+id/registration_host_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_default"
+                android:ems="10"
+                android:hint="@string/registration_host_description_hint"
+                android:inputType="textMultiLine"
+                android:singleLine="false"
+                android:textSize="@dimen/font_bigger" />
+
+            <LinearLayout
+                android:id="@+id/registration_host_location_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_bigger"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:background="@drawable/border">
+
+                <ImageView
+                    android:id="@+id/registration_host_location_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:src="@drawable/ic_baseline_location_on_48px"
+                    android:tint="@color/darkOrange"/>
+
+                <TextView
+                    android:id="@+id/registration_host_location_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/registration_host_location_icon"
+                    android:text="@string/registration_host_location_hint"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/black"
+                    android:textStyle="italic"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/registration_host_genre"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
+                android:textSize="@dimen/font_default" />
+
+            <Spinner
+                android:id="@+id/registration_host_genre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_default"
+                android:spinnerMode="dropdown" />
+
+            <Button
+                android:id="@+id/button_registration_host_colorPicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_default"
+                android:text="@string/registration_host_color"
+                android:textColor="@color/black"
+                android:textSize="@dimen/font_default" />
+
+            <Button
+                android:id="@+id/button_host_registration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_default"
+                android:background="@drawable/standart_button"
+                android:text="@string/registration_button"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_default" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

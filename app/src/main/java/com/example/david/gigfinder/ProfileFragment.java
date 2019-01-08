@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
+import com.example.david.gigfinder.tools.ColorTools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,7 +62,7 @@ public class ProfileFragment extends Fragment {
         ArrayList<Genre> list = new ArrayList<>();
         list.add(Genre.ROCK);
         list.add(Genre.HOUSE);
-        artist = new Artist(1, Color.DKGRAY, "TestArtist", "Hallo, ich bin ein Test.", null, null, list, Color.WHITE);
+        artist = new Artist(1, Color.DKGRAY, "TestArtist", "Hallo, ich bin ein Test.", null, null, list);
 
         imageButton = getView().findViewById(R.id.profile_image);
         nameText = getView().findViewById(R.id.profile_name);
@@ -105,7 +106,7 @@ public class ProfileFragment extends Fragment {
      * Updates the font color of all relevant elements
      */
     private void updateFontColor() {
-        int fontColor = artist.getFontColor();
+        int fontColor = ColorTools.isBrightColor(artist.getColor());
 
         ViewGroup layout = getView().findViewById(R.id.profile_layout);
         for(int index = 0; index < layout.getChildCount(); ++index) {
