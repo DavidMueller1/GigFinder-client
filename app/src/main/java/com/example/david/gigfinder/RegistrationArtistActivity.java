@@ -67,6 +67,9 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
         idToken = getIntent().getExtras().getString("idToken");
 
+        GetGenres getGenres = new GetGenres();
+        //getGenres.execute();
+
         artist = new Artist();
 
         profilePictureButton = findViewById(R.id.registration_artist_profilePicture);
@@ -149,8 +152,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 } catch (FileNotFoundException e) {
                     Log.d(TAG, "File not found");
                 }
-
-
             }
         }
     }
@@ -202,13 +203,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             SendRegisterArtist sendRegisterArtist = new SendRegisterArtist();
             sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()),
                     artist.getGenres().get(0).toString());
-
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra("idToken", idToken);
-            intent.putExtra("user", "artist");
-            startActivity(intent);
-            finish();
         }
     }
 
@@ -313,7 +307,50 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
+            Intent intent = new Intent(RegistrationArtistActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.putExtra("idToken", idToken);
+            intent.putExtra("user", "artist");
+            startActivity(intent);
+            finish();
+        }
+    }
 
+    class GetGenres extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/genres");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "GENRES: " + result);
         }
     }
 }

@@ -19,6 +19,8 @@ import android.widget.ListView;
 
 import com.example.david.gigfinder.adapters.ChatAdapter;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,6 +35,7 @@ public class ChatFragment extends Fragment {
     private static final String TAG = "APPLOG - ChatFragment";
     private ChatAdapter chatAdapter;
     private FloatingActionButton chatfab;
+    ArrayList<String[]> chatStrings;
     String idToken;
 
     @Nullable
@@ -47,13 +50,16 @@ public class ChatFragment extends Fragment {
 
         idToken = getArguments().getString("idToken");
 
+        GetMessages getMessages = new GetMessages();
+        getMessages.execute();
+
         chatfab = (FloatingActionButton) getView().findViewById(R.id.chatfab);
 
-        ArrayList<String[]> placeholderStrings = new ArrayList<>();
-        placeholderStrings.add(new String[]{"Artist Name", "Placeholder message..."});
-        placeholderStrings.add(new String[]{"Host Name", "Test message..."});
+        chatStrings = new ArrayList<>();
+        chatStrings.add(new String[]{"Artist Name", "Placeholder message..."});
+        chatStrings.add(new String[]{"Host Name", "Test message..."});
 
-        chatAdapter = new ChatAdapter(this.getContext(), placeholderStrings);
+        chatAdapter = new ChatAdapter(this.getContext(), chatStrings);
         ListView listView = (ListView) getView().findViewById(R.id.chatListView);
         listView.setAdapter(chatAdapter);
 
@@ -65,6 +71,13 @@ public class ChatFragment extends Fragment {
                 startActivity(intent);
             }
         });
+    }
+
+    private void showMessages(String result){
+        String name = null;
+        String lastmsg = null;
+        //chatStrings.add(new String[]{name, lastmsg});
+        //chatAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -105,6 +118,7 @@ public class ChatFragment extends Fragment {
         @Override
         protected void onPostExecute(String result){
             Log.d(TAG, "MESSAGES: " + result);
+            showMessages(result);
         }
     }
 }

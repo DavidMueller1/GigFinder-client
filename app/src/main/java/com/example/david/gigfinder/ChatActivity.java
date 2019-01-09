@@ -85,8 +85,8 @@ public class ChatActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SendMessage sendMessage = new SendMessage();
-                //sendMessage.execute(); TODO: Parameters?
+                PostMessage postMessage = new PostMessage();
+                //postMessage.execute(); TODO: Parameters?
                 chatText.getText().clear();
             }
         });
@@ -99,7 +99,7 @@ public class ChatActivity extends AppCompatActivity {
         mMessageAdapter.notifyDataSetChanged();
     }
 
-    class SendMessage extends AsyncTask<String, Void, String> {
+    class PostMessage extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -109,7 +109,6 @@ public class ChatActivity extends AppCompatActivity {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestProperty("Content-Type","application/json");
-                //urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
@@ -131,9 +130,8 @@ public class ChatActivity extends AppCompatActivity {
                         int statusCode = httpConn.getResponseCode();
                         if (statusCode != 200) {
                             is = httpConn.getErrorStream();
-                            Log.d(TAG, "SendRegisterArtist: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "SendRegisterArtist: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
-                            Log.d(TAG, httpConn.getURL().toString());
+                            Log.d(TAG, "PostMessage: STATUS CODE: " + statusCode);
+                            Log.d(TAG, "PostMessage: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
                         }
                     }
                 }
@@ -147,7 +145,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
                 rd.close();
 
-                Log.d(TAG, "SendRegisterArtist: ERROR STREAM:" + response.toString());
+                Log.d(TAG, "PostMessage: RESPONSE:" + response.toString());
 
                 return response.toString();
             } catch (ProtocolException e) {

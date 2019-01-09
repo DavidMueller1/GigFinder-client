@@ -186,7 +186,7 @@ public class ArtistProfileFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {
-            getView().findViewById(R.id.progressBarHolder).setVisibility(View.VISIBLE);
+            //getView().findViewById(R.id.progressBarHolder).setVisibility(View.VISIBLE); TODO: liefert error
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
