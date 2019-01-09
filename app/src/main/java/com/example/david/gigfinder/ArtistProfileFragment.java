@@ -37,8 +37,8 @@ import java.util.Arrays;
 import static com.example.david.gigfinder.data.enums.Genre.HIPHOP;
 import static com.example.david.gigfinder.data.enums.Genre.ROCK;
 
-public class ProfileFragment extends Fragment {
-    private static final String TAG = "APPLOG - ProfileFragment";
+public class ArtistProfileFragment extends Fragment {
+    private static final String TAG = "APPLOG - ArtistProfileFragment";
 
     private int userID;
     private Button testDeleteBtn;

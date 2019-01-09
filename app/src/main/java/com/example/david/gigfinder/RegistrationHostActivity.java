@@ -3,6 +3,8 @@ package com.example.david.gigfinder;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.david.gigfinder.data.Host;
 import com.example.david.gigfinder.data.enums.Genre;
@@ -42,6 +45,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class RegistrationHostActivity extends AppCompatActivity {
     private static final String TAG = "RegistrationHostActivity";
@@ -173,8 +179,16 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 Place place = PlacePicker.getPlace(data, this);
                 position = place.getLatLng();
 
-                // TODO convert from latlng
-                String address = place.getAddress().toString();
+                String address = position.toString();
+                List<Address> addresses = null;
+                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.GERMANY);
+                try {
+                    geocoder.getFromLocation(position.latitude, position.longitude, 1);
+                    address = addresses.get(0).getAddressLine(0);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 locationButtonText.setText(address);
             }
         }
@@ -243,14 +257,40 @@ public class RegistrationHostActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtra("idToken", idToken);
+            intent.putExtra("user", "host");
             startActivity(intent);
             finish();
         }
     }
 
     private boolean checkUserInputBasic(){
-        //TODO
-        return false;
+        // Check whether name field is empty
+        host.setName(nameField.getText().toString());
+        if(host.getName().equals("")) {
+            Toast.makeText(getApplicationContext(),"Namensfeld ist leer.",Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Namefield empty.");
+            return false;
+        }
+
+        // Description is optional (can be empty)
+        host.setDescription(descriptionField.getText().toString());
+
+        if(position == null) {
+            Toast.makeText(getApplicationContext(),"Keine Location ausgewählt",Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "No Location choosen.");
+            return false;
+        }
+
+        ArrayList genres = new ArrayList();
+        genres.add((Genre)genreSpinner.getSelectedItem());
+        host.setGenres(genres);
+        if(host.getGenres().get(0).equals(getResources().getString(R.string.artist_genre_choose))) {
+            Toast.makeText(getApplicationContext(),"Kein Genre ausgewählt",Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "No genre selected.");
+            return false;
+        }
+
+        return true;
     }
 
     class SendRegisterHost extends AsyncTask<String, Void, String> {

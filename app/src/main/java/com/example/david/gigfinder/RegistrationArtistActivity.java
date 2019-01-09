@@ -206,6 +206,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtra("idToken", idToken);
+            intent.putExtra("user", "artist");
             startActivity(intent);
             finish();
         }
