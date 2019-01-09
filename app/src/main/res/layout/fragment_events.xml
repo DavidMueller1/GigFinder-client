@@ -4,12 +4,12 @@
     android:layout_height="match_parent">
 
     <ListView
-        android:id="@+id/chatListView"
+        android:id="@+id/events_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/chatfab"
+        android:id="@+id/events_addbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
@@ -17,7 +17,8 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-    android:src="@drawable/ic_message_white_24dp"/>
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_baseline_add"
+        android:tint="@color/white"/>
 
 </RelativeLayout>

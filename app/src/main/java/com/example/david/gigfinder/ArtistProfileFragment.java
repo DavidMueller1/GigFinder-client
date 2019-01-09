@@ -1,6 +1,9 @@
 package com.example.david.gigfinder;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,16 +37,18 @@ import java.util.ArrayList;
 public class ArtistProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - ArtistProfileFragment";
 
+    SharedPreferences sharedPreferences;
+
     private int userID;
     private Button testDeleteBtn;
     private ImageView imageButton;
     private TextView nameText;
     private TextView descriptionText;
     private TextView genresText;
-    private TextView genresLabel; // to change "Genre" to "Genres" if there are multiple
+    //private TextView genresLabel; // to change "Genre" to "Genres" if there are multiple
     private String idToken;
 
-    private Artist artist;
+    //private Artist artist;
 
     @Nullable
     @Override
@@ -56,18 +60,20 @@ public class ArtistProfileFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         idToken = getArguments().getString("idToken");
 
+        sharedPreferences = getContext().getSharedPreferences("List", Context.MODE_PRIVATE);
+
         // Test Artist
-        ArrayList<Genre> list = new ArrayList<>();
+        /*ArrayList<Genre> list = new ArrayList<>();
         list.add(Genre.ROCK);
         list.add(Genre.HOUSE);
         artist = new Artist(1, Color.DKGRAY, "TestArtist", "Hallo, ich bin ein Test.", null, null, list);
-
+           */
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
         imageButton = getView().findViewById(R.id.profile_artist_profilePicture);
-        nameText = getView().findViewById(R.id.profile_name);
-        descriptionText = getView().findViewById(R.id.profile_description);
-        genresText = getView().findViewById(R.id.profile_genres);
-        genresLabel = getView().findViewById(R.id.profile_genres_label);
+        nameText = getView().findViewById(R.id.profile_artist_name);
+        descriptionText = getView().findViewById(R.id.profile_artist_description);
+        genresText = getView().findViewById(R.id.profile_artist_genre);
+        //genresLabel = getView().findViewById(R.id.profile_genres_label);
 
         testDeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,7 +83,8 @@ public class ArtistProfileFragment extends Fragment {
             }
         });
 
-        initProfile();
+        //
+        //initProfile();
 
         GetUser getUser = new GetUser();
         getUser.execute();
@@ -85,9 +92,8 @@ public class ArtistProfileFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
-    private void initProfile() {
-        getView().setBackgroundColor(artist.getColor());
-        updateFontColor();
+    /*private void initProfile() {
+        //updateColor();
 
         nameText.setText(artist.getName());
         descriptionText.setText(artist.getDescription());
@@ -101,36 +107,72 @@ public class ArtistProfileFragment extends Fragment {
         }
         genresText.setText(genreString);
 
-        if(artist.getGenres().size() > 1) {
+        /*if(artist.getGenres().size() > 1) {
             genresLabel.setText(getResources().getString(R.string.profile_genre_multiple));
         }
         else {
             genresLabel.setText(getResources().getString(R.string.profile_genre_single));
         }
-    }
+    }*/
 
     /**
-     * Updates the font color of all relevant elements
+     * Updates the color of all relevant elements
      */
-    private void updateFontColor() {
-        int fontColor = ColorTools.isBrightColor(artist.getColor());
+    private void updateColor(int color) {
+        int fontColor = ColorTools.isBrightColor(color);
+        nameText.setTextColor(fontColor);
+        genresText.setTextColor(fontColor);
+        getView().findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
 
-        ViewGroup layout = getView().findViewById(R.id.profile_layout);
+        float deltaValue = 0.15f;
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        if(hsv[2] < deltaValue) {
+            hsv[2] += deltaValue;
+        }
+        else {
+            hsv[2] -= deltaValue;
+        }
+
+        int titleBarColor = Color.HSVToColor(hsv);
+        getActivity().getWindow().setStatusBarColor(titleBarColor);
+
+        TextView descriptionLabel = getView().findViewById(R.id.profile_artist_description_label);
+        if(ColorTools.isBrightColorBool(color)) {
+            descriptionLabel.setTextColor(titleBarColor);
+        }
+        else {
+            descriptionLabel.setTextColor(color);
+        }
+
+        descriptionLabel.setTextColor(color);
+
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("titleBarColor", titleBarColor);
+        editor.putInt("userColor", color);
+        editor.commit();
+
+        /*ViewGroup layout = getView().findViewById(R.id.profile_layout);
         for(int index = 0; index < layout.getChildCount(); ++index) {
             View child = layout.getChildAt(index);
             if(child instanceof TextView) {
                 ((TextView) child).setTextColor(fontColor);
             }
-        }
+        }*/
+
+
     }
 
     private void updateProfile(String jsonString){
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
             JSONObject userProfile = jsonArray.getJSONObject(0);
+            Log.d(TAG, userProfile.toString());
             nameText.setText(userProfile.getString("name"));
             descriptionText.setText(userProfile.getString("description"));
             userID = userProfile.getInt("id");
+            updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -144,6 +186,7 @@ public class ArtistProfileFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {
+            getView().findViewById(R.id.progressBarHolder).setVisibility(View.VISIBLE);
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -175,6 +218,7 @@ public class ArtistProfileFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "USER PROFILE: " + result);
+            getView().findViewById(R.id.progressBarHolder).setVisibility(View.GONE);
             updateProfile(result);
         }
     }
@@ -216,6 +260,9 @@ public class ArtistProfileFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.commit();
             Log.d(TAG, "DELETE ARTIST: " + result);
             getActivity().finish();
         }

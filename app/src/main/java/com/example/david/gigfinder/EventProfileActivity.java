@@ -28,6 +28,7 @@ import org.json.JSONObject;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class EventProfileActivity extends AppCompatActivity {
     private static final String TAG = "EventProfileActivity";
@@ -141,9 +142,17 @@ public class EventProfileActivity extends AppCompatActivity {
      *  Called when the user clicks anywhere on the Location Icon or Text
      */
     private void onClickLocation() {
-        String uriString = "https://www.google.com/maps/search/?api=1&query=Google&query_place_id=" + event.getLocation().getId();
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uriString));
-        startActivity(browserIntent);
+        try {
+            float lat = Float.parseFloat(eventJson.getString("latitude"));
+            float lng = Float.parseFloat(eventJson.getString("longitude"));
+            String title = eventJson.getString("title");
+            String uri = String.format(Locale.ENGLISH, "geo:%f,%f?q=%f,%f(%s)", lat, lng, lat, lng, title);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            startActivity(intent);
+        }
+        catch (JSONException e) {
+
+        }
     }
 
 }

@@ -2,15 +2,18 @@ package com.example.david.gigfinder;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -18,7 +21,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +52,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class RegistrationHostActivity extends AppCompatActivity {
+import static android.app.Activity.RESULT_OK;
+
+public class AddEventFragment extends Fragment {
     private static final String TAG = "RegistrationHostActivity";
     private static final int PICK_IMAGE = 1;
     private static final int PLACE_PICKER_REQUEST = 2;
@@ -64,24 +68,27 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private Button backgroundColorPickerButton;
     private Button registrationButton;
 
-    private ColorPicker colorPicker;
-
     private Host host;
     private Bitmap profilePicture;
     private LatLng position;
 
     String idToken;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registration_host);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_event_add, container, false);
+    }
 
-        idToken = getIntent().getExtras().getString("idToken");
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        idToken = getArguments().getString("idToken");
 
         host = new Host();
 
-        profilePictureButton = findViewById(R.id.registration_host_profilePicture);
+        profilePictureButton = getView().findViewById(R.id.registration_host_profilePicture);
         profilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,44 +96,35 @@ public class RegistrationHostActivity extends AppCompatActivity {
             }
         });
 
-        nameField = findViewById(R.id.registration_host_name);
-        descriptionField = findViewById(R.id.registration_host_description);
-        locationButton = findViewById(R.id.registration_host_location_container);
+        nameField = getView().findViewById(R.id.registration_host_name);
+        descriptionField = getView().findViewById(R.id.registration_host_description);
+        locationButton = getView().findViewById(R.id.registration_host_location_container);
         locationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 performLocationSelection();
             }
         });
-        locationButtonText = findViewById(R.id.registration_host_location_text);
-        genreSpinner = findViewById(R.id.registration_host_genre);
+        locationButtonText = getView().findViewById(R.id.registration_host_location_text);
+        genreSpinner = getView().findViewById(R.id.registration_host_genre);
         //Replaced the Strings with the Genre-Enum
-        ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
+        ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
         genreSpinner.setAdapter(adapter);
 
-        backgroundColorPickerButton = findViewById(R.id.button_registration_host_colorPicker);
+        backgroundColorPickerButton = getView().findViewById(R.id.button_registration_host_colorPicker);
         backgroundColorPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                performColorSelection();
+                //performColorSelection();
             }
         });
 
 
-        registrationButton = findViewById(R.id.button_host_registration);
+        registrationButton = getView().findViewById(R.id.button_host_registration);
         registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                performRegistration();
-            }
-        });
-
-        colorPicker = new ColorPicker(RegistrationHostActivity.this, 255, 255, 255);
-        colorPicker.enableAutoClose();
-        colorPicker.setCallback(new ColorPickerCallback() {
-            @Override
-            public void onColorChosen(int color) {
-                applyColor(color);
+                //performRegistration();
             }
         });
 
@@ -152,7 +150,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if (requestCode == PICK_IMAGE) {
+        /*if (requestCode == PICK_IMAGE) {
             if(resultCode == RESULT_OK) {
                 Uri path = data.getData();
 
@@ -174,15 +172,15 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
 
             }
-        }
-        else if(requestCode == PLACE_PICKER_REQUEST) {
+        }*/
+        if(requestCode == PLACE_PICKER_REQUEST) {
             if(resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(data, this);
+                Place place = PlacePicker.getPlace(data, getContext());
                 position = place.getLatLng();
 
-                String address = "";
+                String address = position.toString();
                 List<Address> addresses = null;
-                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.GERMANY);
+                Geocoder geocoder = new Geocoder(getContext(), Locale.GERMANY);
                 try {
                     addresses = geocoder.getFromLocation(position.latitude, position.longitude, 1);
 
@@ -205,7 +203,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
         try {
-            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+            startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("MYLOG", e.getMessage());
@@ -213,50 +211,15 @@ public class RegistrationHostActivity extends AppCompatActivity {
     }
 
     /**
-     * Called when the user presses the choose color button
+     * Called when the user presses the registrate button TODO modify to add event
      */
-    private void performColorSelection() {
-        colorPicker.show();
-    }
-
-    /**
-     * Called when the user chose a color
-     */
-    private void applyColor(int color) {
-        host.setColor(color);
-        findViewById(android.R.id.content).setBackgroundColor(host.getColor());
-
-        updateFontColor();
-    }
-
-    /**
-     * Updates the font color of all relevant elements
-     */
-    private void updateFontColor() {
-        int fontColor = ColorTools.isBrightColor(host.getColor());
-
-        ViewGroup layout = findViewById(R.id.registration_host_layout);
-        for(int index = 0; index < layout.getChildCount(); ++index) {
-            View child = layout.getChildAt(index);
-            if(child instanceof TextView) {
-                ((TextView) child).setTextColor(fontColor);
-            }
-            else if(child instanceof EditText) {
-                ((EditText) child).setTextColor(fontColor);
-            }
-        }
-    }
-
-    /**
-     * Called when the user presses the registrate button
-     */
-    private void performRegistration() {
+    /*private void performRegistration() {
         Log.d(TAG, "Checking user input...");
         if(checkUserInputBasic()) {
             Log.d(TAG, "User input ok");
 
             SendRegisterHost sendRegisterHost = new SendRegisterHost();
-            sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude); //TODO params
+            sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor())); //TODO params
 
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -295,7 +258,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
         }
 
         return true;
-    }
+    }*/
 
     class SendRegisterHost extends AsyncTask<String, Void, String> {
 
@@ -318,8 +281,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 jsonObject.put("name", params[0]);
                 jsonObject.put("description", params[1]);
                 jsonObject.put("backgroundColor", params[2]);
-                jsonObject.put("latitude", params[3]);
-                jsonObject.put("longitude", params[4]);
                 //jsonObject.put("genre", params[3]);
                 //jsonObject.put("image", params[4]);
                 os.writeBytes(jsonObject.toString());
