@@ -31,6 +31,8 @@ public class SectionsPageAdapter extends FragmentPagerAdapter {
         return fragmentsTitleList.get(position);
     }
 
+
+
     @Override
     public Fragment getItem(int i) {
         return fragmentList.get(i);

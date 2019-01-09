@@ -117,9 +117,7 @@
                 android:orientation="horizontal"
                 android:clickable="true"
                 android:gravity="center_vertical"
-                android:background="@drawable/border"
-                android:paddingTop="@dimen/padding_small"
-                android:paddingBottom="@dimen/padding_small">
+                android:background="@drawable/border">
 
                 <ImageView
                     android:id="@+id/registration_host_location_icon"

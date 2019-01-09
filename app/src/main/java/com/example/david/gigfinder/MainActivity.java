@@ -1,15 +1,24 @@
 package com.example.david.gigfinder;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.SectionsPageAdapter;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "APPLOG - MainActivity";
+
+    SharedPreferences sharedPreferences;
 
     private SectionsPageAdapter sectionsPageAdapter;
     private ViewPager mViewPager;
@@ -20,19 +29,137 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        idToken = getIntent().getExtras().getString("idToken");
-        String user = getIntent().getStringExtra("user");
+        sharedPreferences = getSharedPreferences("List", Context.MODE_PRIVATE);
 
-        Log.d(TAG, "App starting...");
+        String user = "none";
+        try {
+            user = getIntent().getStringExtra("user");
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            //editor.clear();
+            editor.putString("user", user);
+            editor.commit();
+        }
+        catch (NullPointerException e) {
+            user = sharedPreferences.getString("user", "none");
+        }
+
+        if(user == null || user.equals("none")) {
+            // TODO get user from server
+            Toast.makeText(getApplicationContext(),"Using default user",Toast.LENGTH_SHORT).show();
+            user = "host";
+        }
+
+
+        idToken = getIntent().getExtras().getString("idToken");
+
+
 
         mViewPager = findViewById(R.id.viewpager);
         setupViewPager(mViewPager, user);
 
-        TabLayout tabLayout = findViewById(R.id.tabs);
+        final TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.getTabAt(0).select(); // TODO select the relevant Tab
 
-        //tabLayout.getTabAt(0).setIcon(R.drawable.ic_music_gig);
+
+        if(user.equals("artist")) {
+            int[] icons = {R.drawable.ic_baseline_search_24px, R.drawable.ic_baseline_star , R.drawable.ic_guitar, R.drawable.ic_baseline_chat_bubble, R.drawable.ic_baseline_user};
+            int tabColor = getResources().getColor(R.color.orange);
+            for(int i = 0; i < 5; i++) {
+                TabLayout.Tab tab = tabLayout.getTabAt(i);
+                tab.setIcon(icons[i]);
+                tab.getIcon().setColorFilter(tabColor, PorterDuff.Mode.SRC_IN);
+            }
+
+            tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    if(tab == tabLayout.getTabAt(4)) {
+                        int statusBarColor = sharedPreferences.getInt("titleBarColor", getResources().getColor(R.color.darkOrange));
+                        getWindow().setStatusBarColor(statusBarColor);
+
+                        int userColor = sharedPreferences.getInt("userColor", getResources().getColor(R.color.orange));
+                        for(int i = 0; i < 5; i++) {
+                            TabLayout.Tab t = tabLayout.getTabAt(i);
+                            t.getIcon().setColorFilter(userColor, PorterDuff.Mode.SRC_IN);
+                            tabLayout.setTabTextColors(userColor, userColor);
+                            tabLayout.setSelectedTabIndicatorColor(userColor);
+                        }
+                    }
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+                    if(tab == tabLayout.getTabAt(4)) {
+                        getWindow().setStatusBarColor(getResources().getColor(R.color.darkOrange));
+
+                        int defaultColor = getResources().getColor(R.color.orange);
+                        for(int i = 0; i < 5; i++) {
+                            TabLayout.Tab t = tabLayout.getTabAt(i);
+                            t.getIcon().setColorFilter(defaultColor,  PorterDuff.Mode.SRC_IN);
+                            tabLayout.setTabTextColors(defaultColor, defaultColor);
+                            tabLayout.setSelectedTabIndicatorColor(defaultColor);
+                        }
+                    }
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+
+                }
+            });
+
+            tabLayout.getTabAt(0).select();
+        }
+        else {
+            int[] icons = {R.drawable.ic_baseline_search_24px, R.drawable.ic_baseline_event , R.drawable.ic_baseline_chat_bubble, R.drawable.ic_baseline_user};
+            int tabColor = getResources().getColor(R.color.orange);
+            for(int i = 0; i < 4; i++) {
+                TabLayout.Tab tab = tabLayout.getTabAt(i);
+                tab.setIcon(icons[i]);
+                tab.getIcon().setColorFilter(tabColor, PorterDuff.Mode.SRC_IN);
+            }
+
+            tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    if(tab == tabLayout.getTabAt(3)) {
+                        int statusBarColor = sharedPreferences.getInt("titleBarColor", getResources().getColor(R.color.darkOrange));
+                        getWindow().setStatusBarColor(statusBarColor);
+
+                        int userColor = sharedPreferences.getInt("userColor", getResources().getColor(R.color.orange));
+                        for(int i = 0; i < 4; i++) {
+                            TabLayout.Tab t = tabLayout.getTabAt(i);
+                            t.getIcon().setColorFilter(userColor, PorterDuff.Mode.SRC_IN);
+                            tabLayout.setTabTextColors(userColor, userColor);
+                            tabLayout.setSelectedTabIndicatorColor(userColor);
+                        }
+                    }
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+                    if(tab == tabLayout.getTabAt(3)) {
+                        getWindow().setStatusBarColor(getResources().getColor(R.color.darkOrange));
+
+                        int defaultColor = getResources().getColor(R.color.orange);
+                        for(int i = 0; i < 4; i++) {
+                            TabLayout.Tab t = tabLayout.getTabAt(i);
+                            t.getIcon().setColorFilter(defaultColor,  PorterDuff.Mode.SRC_IN);
+                            tabLayout.setTabTextColors(defaultColor, defaultColor);
+                            tabLayout.setSelectedTabIndicatorColor(defaultColor);
+                        }
+                    }
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+
+                }
+            });
+
+            tabLayout.getTabAt(0).select();
+        }
     }
 
     /**
@@ -43,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
         args.putString("idToken", idToken);
         sectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
 
-        if(false) {
+        if(user.equals("artist")) {
 
             ExploreFragment exploreFragment = new ExploreFragment();
             FavoritesFragment favoritesFragment = new FavoritesFragment();
