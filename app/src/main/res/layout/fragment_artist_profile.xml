@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".ArtistProfileActivity">
 
     <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/padding_default"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingRight="@dimen/padding_default"
+        android:paddingLeft="@dimen/padding_default"
+        android:scrollbarStyle="outsideInset">
 
         <LinearLayout
             android:id="@+id/profile_layout"
@@ -22,12 +19,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <ImageButton
-                android:id="@+id/profile_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_baseline_add_photo_alternate_24px"
-                android:layout_gravity="center"/>
+            <ImageView
+                android:id="@+id/profile_artist_profilePicture"
+                android:layout_width="@dimen/element_big"
+                android:layout_height="@dimen/element_big"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/padding_default"
+                android:src="@drawable/ic_baseline_add_photo"
+                android:tint="@color/darkGrey"
+                android:clickable="true"/>
 
             <TextView
                 android:id="@+id/profile_name"
@@ -105,5 +105,4 @@
 
         </LinearLayout>
     </ScrollView>
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
