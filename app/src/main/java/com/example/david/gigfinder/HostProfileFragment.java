@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.david.gigfinder.data.Artist;
@@ -36,7 +37,7 @@ public class HostProfileFragment extends Fragment {
 
     private int userID;
     private Button testDeleteBtn;
-    private ImageButton imageButton;
+    private ImageView imageButton;
     private TextView nameText;
     private TextView descriptionText;
     private TextView genresText;
@@ -48,7 +49,7 @@ public class HostProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        return inflater.inflate(R.layout.fragment_artist_profile, container, false);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class HostProfileFragment extends Fragment {
         artist = new Artist(1, Color.DKGRAY, "TestArtist", "Hallo, ich bin ein Test.", null, null, list);
 
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
-        imageButton = getView().findViewById(R.id.profile_image);
+        imageButton = getView().findViewById(R.id.profile_artist_profilePicture);
         nameText = getView().findViewById(R.id.profile_name);
         descriptionText = getView().findViewById(R.id.profile_description);
         genresText = getView().findViewById(R.id.profile_genres);
@@ -186,7 +187,7 @@ public class HostProfileFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/artists/"+userID);
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts/"+userID);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
