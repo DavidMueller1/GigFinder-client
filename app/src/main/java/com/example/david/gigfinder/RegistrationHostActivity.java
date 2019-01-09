@@ -183,11 +183,13 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 List<Address> addresses = null;
                 Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.GERMANY);
                 try {
-                    geocoder.getFromLocation(position.latitude, position.longitude, 1);
-                    address = addresses.get(0).getAddressLine(0);
+                    addresses = geocoder.getFromLocation(position.latitude, position.longitude, 1);
 
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+                if(addresses.size() > 0) {
+                    address = addresses.get(0).getAddressLine(0);
                 }
                 locationButtonText.setText(address);
             }
