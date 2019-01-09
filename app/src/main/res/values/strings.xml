@@ -58,4 +58,8 @@
     <string name="profile_social_media_links">Social Media Links:</string>
     <string name="profile_genre_single">Genre:</string>
     <string name="profile_genre_multiple">Genres:</string>
+
+    <!-- Gigs  -->
+    <string name="upcoming_gigs">Upcoming Gigs</string>
+    <string name="past_gigs">Past Gigs</string>
 </resources>
