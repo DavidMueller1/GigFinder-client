@@ -52,7 +52,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionsGranted = false;
-    private static final float DEFAULT_ZOOM = 15;
+    private static final float DEFAULT_ZOOM = 12;
 
     @Nullable
     @Override

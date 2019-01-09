@@ -257,13 +257,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
             SendRegisterHost sendRegisterHost = new SendRegisterHost();
             sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude); //TODO params
-
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra("idToken", idToken);
-            intent.putExtra("user", "host");
-            startActivity(intent);
-            finish();
         }
     }
 
@@ -369,7 +362,12 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-
+            Intent intent = new Intent(RegistrationHostActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.putExtra("idToken", idToken);
+            intent.putExtra("user", "host");
+            startActivity(intent);
+            finish();
         }
     }
 }
