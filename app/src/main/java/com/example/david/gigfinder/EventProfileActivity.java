@@ -63,12 +63,13 @@ public class EventProfileActivity extends AppCompatActivity {
             }
         });
 
-        try {
-            eventJson = new JSONObject(getIntent().getExtras().getString("Event"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(getIntent().hasExtra("Event")) {
+            try {
+                eventJson = new JSONObject(getIntent().getExtras().getString("Event"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-
         // TODO move the following code (including the callback method) to where the Event is generated
 
         // region Test Event

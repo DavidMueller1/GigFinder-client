@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.david.gigfinder.adapters.FavAdapter;
+import com.example.david.gigfinder.adapters.PastGigsAdapter;
 import com.example.david.gigfinder.adapters.UpcomingGigsAdapter;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class GigsFragment extends Fragment {
 
     private static final String TAG = "APPLOG - GigsFragment";
     private UpcomingGigsAdapter upcomingGigsAdapter;
-    //private PastGigsAdapter pastGigsAdapter;
+    private PastGigsAdapter pastGigsAdapter;
 
     @Nullable
     @Override
@@ -32,20 +33,27 @@ public class GigsFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        ListView upcomingListView = (ListView) getView().findViewById(R.id.upcomingGigsListView);
+        ListView pastListView = (ListView) getView().findViewById(R.id.pastGigsListView);
+
         ArrayList<String[]> placeholderStrings = new ArrayList<>();
         placeholderStrings.add(new String[]{"Event Name", "20.04.2019", "Geschwister-Scholl-Platz 1"});
         placeholderStrings.add(new String[]{"Event Name", "20.04.2019", "Geschwister-Scholl-Platz 1"});
 
-        upcomingGigsAdapter = new UpcomingGigsAdapter(this.getContext(), placeholderStrings);
-        ListView listView = (ListView) getView().findViewById(R.id.upcomingGigsListView);
-        listView.setAdapter(upcomingGigsAdapter);
+        ArrayList<String[]> placeholderStrings2 = new ArrayList<>();
+        placeholderStrings2.add(new String[]{"Event Name", "Geschwister-Scholl-Platz 1"});
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        upcomingGigsAdapter = new UpcomingGigsAdapter(this.getContext(), placeholderStrings);
+        upcomingListView.setAdapter(upcomingGigsAdapter);
+        upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), EventProfileActivity.class);
                 startActivity(intent);
             }
         });
+
+        pastGigsAdapter = new PastGigsAdapter(this.getContext(), placeholderStrings2);
+        pastListView.setAdapter(pastGigsAdapter);
     }
 }
