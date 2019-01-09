@@ -145,7 +145,7 @@ public class HostProfileFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
@@ -216,7 +216,7 @@ public class HostProfileFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            Log.d(TAG, "DELETE ARTIST: " + result);
+            Log.d(TAG, "DELETE HOST: " + result);
             getActivity().finish();
         }
     }
