@@ -18,11 +18,13 @@ import com.example.david.gigfinder.adapters.SectionsPageAdapter;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "APPLOG - MainActivity";
 
+    public static String idToken;
+    public static int userId;
+
     SharedPreferences sharedPreferences;
 
     private SectionsPageAdapter sectionsPageAdapter;
     private ViewPager mViewPager;
-    private String idToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

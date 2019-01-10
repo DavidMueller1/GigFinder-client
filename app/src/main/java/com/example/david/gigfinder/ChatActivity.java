@@ -86,8 +86,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 PostMessage postMessage = new PostMessage();
-                //postMessage.execute(); TODO: Parameters?
-                chatText.getText().clear();
+                //postMessage.execute(chatText.getText().toString());
             }
         });
 
@@ -116,7 +115,9 @@ public class ChatActivity extends AppCompatActivity {
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
-                //jsonObject.put("name", params[0]); TODO
+                jsonObject.put("AuthorId", "id"); //TODO
+                jsonObject.put("RecieverId", "id"); //TODO
+                jsonObject.put("Content", params[0]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
@@ -154,13 +155,15 @@ public class ChatActivity extends AppCompatActivity {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(String result) {
-
+            chatText.getText().clear();
         }
     }
 }
