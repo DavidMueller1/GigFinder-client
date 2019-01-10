@@ -79,6 +79,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
             public void onInfoWindowClick(Marker marker) {
                 JSONObject event = (JSONObject) marker.getTag();
                 Intent intent = new Intent(getActivity(), EventProfileActivity.class);
+                intent.putExtra("idToken", idToken);
                 intent.putExtra("Event", event.toString());
                 Log.d(TAG, event.toString());
                 startActivity(intent);

@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +25,7 @@ import java.net.URL;
 public class HostProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "HostProfileActivity";
+    Button sendMsgBtn;
     String idToken;
 
     @Override
@@ -31,6 +34,18 @@ public class HostProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_host_profile);
 
         idToken = getIntent().getExtras().getString("idToken");
+
+        sendMsgBtn = findViewById(R.id.sendMsgBtn);
+        sendMsgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HostProfileActivity.this, ChatActivity.class);
+                intent.putExtra("idToken", idToken);
+                intent.putExtra("Host", "todo"); //TODO
+                startActivity(intent);
+            }
+        });
+
     }
 
     class PostFavorite extends AsyncTask<String, Void, String> {
