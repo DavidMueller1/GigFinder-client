@@ -76,4 +76,13 @@
     <string name="add_event_pick_date">Datum auswählen</string>
     <string name="add_event_save_button">Event erstellen</string>
 
+    <!-- Error Messages -->
+    <string name="error_name">Namensfeld ist leer</string>
+    <string name="error_description">Bescreibung ist leer</string>
+    <string name="error_start_time">Die Startzeit fehlt</string>
+    <string name="error_start_date">Der Startdatum fehlt</string>
+    <string name="error_end_time">Die Endzeit fehlt</string>
+    <string name="error_end_date">Der Enddatum fehlt</string>
+    <string name="error_location">Die Location fehlt</string>
+
 </resources>
