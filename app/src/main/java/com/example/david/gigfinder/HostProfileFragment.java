@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
+import com.example.david.gigfinder.tools.GeoTools;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -63,6 +65,8 @@ public class HostProfileFragment extends Fragment {
     //private TextView genresLabel; // to change "Genre" to "Genres" if there are multiple
     private String idToken;
 
+    private FrameLayout progress;
+
 
     @Nullable
     @Override
@@ -93,6 +97,8 @@ public class HostProfileFragment extends Fragment {
         genresText = getView().findViewById(R.id.profile_host_genre);
         //genresLabel = getView().findViewById(R.id.profile_genres_label);
 
+        progress = getView().findViewById(R.id.progressBarHolder);
+
         testDeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,18 +123,10 @@ public class HostProfileFragment extends Fragment {
         genresText.setTextColor(fontColor);
         getView().findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(color);
 
-        float deltaValue = 0.15f;
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        if(hsv[2] < deltaValue) {
-            hsv[2] += deltaValue;
-        }
-        else {
-            hsv[2] -= deltaValue;
-        }
 
-        int titleBarColor = Color.HSVToColor(hsv);
-        getActivity().getWindow().setStatusBarColor(titleBarColor);
+        int titleBarColor = ColorTools.getSecondaryColor(color);
+        // happens in MainActivity, otherwise the statusBar chanhes on chat tab
+        //getActivity().getWindow().setStatusBarColor(titleBarColor);
 
         TextView descriptionLabel = getView().findViewById(R.id.profile_host_description_label);
         if(ColorTools.isBrightColorBool(color)) {
@@ -175,44 +173,31 @@ public class HostProfileFragment extends Fragment {
                 }
             });
 
-            String addressString = "Keine Addresse gefunden";
-
-            Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-
-            List<Address> addresses = null;
-
-            try {
-                addresses = geocoder.getFromLocation(lat, lng, 1);
-            } catch (IOException ioException) {
-                // Catch network or other I/O problems.
-                Log.d(TAG, "Network error");
-
-            } catch (IllegalArgumentException illegalArgumentException) {
-                // Catch invalid latitude or longitude values.
-                Log.d(TAG, "Coordinate error");
-
-            }
-
-            // Handle case where no address was found.
-            if (addresses == null || addresses.size()  == 0) {
-                Log.d(TAG, "No Address found");
-            }
-            else {
-                Address address = addresses.get(0);
-                ArrayList<String> addressFragments = new ArrayList<String>();
-
-                // Fetch the address lines using getAddressLine
-                for(int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-                    addressFragments.add(address.getAddressLine(i));
-                }
-
-                addressString = address.getAddressLine(0);
-                locationText.setText(addressString);
-            }
+            String address = GeoTools.getAddressFromLatLng(getContext(), new LatLng(lat, lng));
+            locationText.setText(address);
 
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void displayLoadingScreen(boolean isLoading) {
+        if(isLoading) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        else {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.GONE);
+                }
+            });
         }
     }
 
@@ -223,7 +208,7 @@ public class HostProfileFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {
-            getView().findViewById(R.id.progressBarHolder).setVisibility(View.GONE);
+            displayLoadingScreen(true);
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -255,7 +240,7 @@ public class HostProfileFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "USER PROFILE: " + result);
-            getView().findViewById(R.id.progressBarHolder).setVisibility(View.GONE);
+            displayLoadingScreen(false);
             updateProfile(result);
         }
     }
