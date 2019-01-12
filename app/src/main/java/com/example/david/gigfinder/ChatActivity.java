@@ -1,6 +1,7 @@
 package com.example.david.gigfinder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -111,6 +112,9 @@ public class ChatActivity extends AppCompatActivity {
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
+
+                SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+                int userId = prefs.getInt("userId", 0);
 
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
