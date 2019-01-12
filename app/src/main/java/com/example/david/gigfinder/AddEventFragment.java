@@ -3,6 +3,7 @@ package com.example.david.gigfinder;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.location.Address;
@@ -58,6 +59,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 
 public class AddEventFragment extends Fragment {
     private static final String TAG = "AddEventFragment";
@@ -92,6 +94,8 @@ public class AddEventFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        idToken = getArguments().getString("idToken");
 
         nameField = getView().findViewById(R.id.add_event_title);
         descriptionField = getView().findViewById(R.id.add_event_description);
@@ -218,7 +222,7 @@ public class AddEventFragment extends Fragment {
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 // TODO save the date
-                                dateFromText.setText(String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year));
+                                dateToText.setText(String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year));
 
                             }
                         }, mYear, mMonth, mDay);
@@ -235,7 +239,12 @@ public class AddEventFragment extends Fragment {
      *  called when the user presses the save-event-button
      */
     private void performAddEvent() {
-        // TODO save Event
+        if(checkUserInput()) {
+            PostEvent postEvent = new PostEvent();
+            postEvent.execute(nameField.getText().toString(), descriptionField.getText().toString(),
+                    String.valueOf(position.longitude), String.valueOf(position.latitude),
+                    timeFromText.getText().toString(), timeToText.getText().toString());
+        }
     }
 
     @Override
@@ -351,29 +360,75 @@ public class AddEventFragment extends Fragment {
         return true;
     }*/
 
-    /*class SendRegisterHost extends AsyncTask<String, Void, String> {
+    private boolean checkUserInput(){
+
+        if(nameField.getText().toString().equals("")) {
+            Toast.makeText(getContext(),getString(R.string.error_name),Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Namefield empty.");
+            return false;
+        }
+
+        if(descriptionField.getText().toString().equals("")) {
+            Toast.makeText(getContext(), getString(R.string.error_description), Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Description empty.");
+            return false;
+        }
+
+        if(timeFromText.getText().toString().equals(getString(R.string.add_event_time_hint))){
+            Toast.makeText(getContext(), getString(R.string.error_start_time), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if(dateFromText.getText().toString().equals(getString(R.string.add_event_date_hint))){
+            Toast.makeText(getContext(), getString(R.string.error_start_date), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if(timeToText.getText().toString().equals(getString(R.string.add_event_time_hint))){
+            Toast.makeText(getContext(), getString(R.string.error_end_time), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if(dateToText.getText().toString().equals(getString(R.string.add_event_date_hint))){
+            Toast.makeText(getContext(), getString(R.string.error_end_date), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if(position==null){
+            Toast.makeText(getContext(), getString(R.string.error_location), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    class PostEvent extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts");
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/events");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestProperty("Content-Type","application/json");
-                //urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
+                SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+                int hostID = prefs.getInt("userId", 0);
+
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("name", params[0]);
+                jsonObject.put("hostId", hostID);
+                jsonObject.put("title", params[0]);
                 jsonObject.put("description", params[1]);
-                jsonObject.put("backgroundColor", params[2]);
-                //jsonObject.put("genre", params[3]);
-                //jsonObject.put("image", params[4]);
+                jsonObject.put("longitude", params[2]);
+                jsonObject.put("latitude", params[3]);
+                jsonObject.put("start", params[4]);
+                jsonObject.put("end", params[5]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
@@ -387,8 +442,8 @@ public class AddEventFragment extends Fragment {
                         int statusCode = httpConn.getResponseCode();
                         if (statusCode != 200) {
                             is = httpConn.getErrorStream();
-                            Log.d(TAG, "SendRegisterHost: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "SendRegisterHost: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
+                            Log.d(TAG, "PostEvent: STATUS CODE: " + statusCode);
+                            Log.d(TAG, "PostEvent: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
                             Log.d(TAG, httpConn.getURL().toString());
                         }
                     }
@@ -403,7 +458,7 @@ public class AddEventFragment extends Fragment {
                 }
                 rd.close();
 
-                Log.d(TAG, "SendRegisterHost: RESPONSE:" + response.toString());
+                Log.d(TAG, "PostEvent: RESPONSE:" + response.toString());
 
                 return response.toString();
             } catch (ProtocolException e) {
@@ -423,5 +478,5 @@ public class AddEventFragment extends Fragment {
         protected void onPostExecute(String result) {
 
         }
-    }*/
+    }
 }

@@ -36,6 +36,11 @@ import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
 
+    private static final String TAG = "ChatActivity";
+
+    private int receiverId;
+    private int authorId;
+
     private RecyclerView mMessageRecycler;
     private MessageListAdapter mMessageAdapter;
     private ArrayList<Message> messageList = new ArrayList<Message>();
@@ -44,14 +49,17 @@ public class ChatActivity extends AppCompatActivity {
     private Button sendBtn;
     private EditText chatText;
     private String idToken;
-    private static final String TAG = "ChatActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+
         idToken = getIntent().getExtras().getString("idToken");
+        receiverId = getIntent().getExtras().getInt("host");
+        authorId = prefs.getInt("userId", 0);
 
         User testUser1 = new User();
         testUser1.setName("Friend");
@@ -87,7 +95,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 PostMessage postMessage = new PostMessage();
-                //postMessage.execute(chatText.getText().toString());
+                postMessage.execute(chatText.getText().toString());
             }
         });
 
@@ -119,8 +127,8 @@ public class ChatActivity extends AppCompatActivity {
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("AuthorId", "id"); //TODO
-                jsonObject.put("RecieverId", "id"); //TODO
+                jsonObject.put("AuthorId", authorId);
+                jsonObject.put("RecieverId", receiverId);
                 jsonObject.put("Content", params[0]);
                 os.writeBytes(jsonObject.toString());
                 os.close();

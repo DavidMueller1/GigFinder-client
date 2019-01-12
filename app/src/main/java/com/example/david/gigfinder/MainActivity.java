@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         if(user == null || user.equals("none")) {
             // TODO get user from server
             Toast.makeText(getApplicationContext(),"Using default user",Toast.LENGTH_SHORT).show();
-            user = "host";
+            user = "artist";
         }
 
 
@@ -203,17 +203,17 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             ExploreFragment exploreFragment = new ExploreFragment();
-            GigsFragment gigsFragment = new GigsFragment();
+            AddEventFragment addEventFragment = new AddEventFragment();
             ChatFragment chatFragment = new ChatFragment();
             HostProfileFragment hostProfileFragment = new HostProfileFragment();
 
             exploreFragment.setArguments(args);
             hostProfileFragment.setArguments(args);
-            gigsFragment.setArguments(args);
+            addEventFragment.setArguments(args);
             chatFragment.setArguments(args);
 
             sectionsPageAdapter.addFragment(exploreFragment, getString(R.string.nav_explore));
-            sectionsPageAdapter.addFragment(gigsFragment, getString(R.string.nav_events));
+            sectionsPageAdapter.addFragment(addEventFragment, getString(R.string.nav_events));
             sectionsPageAdapter.addFragment(chatFragment, getString(R.string.nav_chat));
             sectionsPageAdapter.addFragment(hostProfileFragment, getString(R.string.nav_profile));
         }

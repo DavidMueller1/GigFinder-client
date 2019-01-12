@@ -202,23 +202,14 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
 
     private void dropMarker(JSONObject event){
         try {
-            if(event.getInt("id") == 1) {
-                LatLng testMarker = new LatLng(48.150960, 11.580820);//TODO Get right Location
+                LatLng testMarker = new LatLng(event.getDouble("latitude"), event.getDouble("longitude"));//TODO Get right Location
                 Marker myMarker = mMap.addMarker(new MarkerOptions()
                         .position(testMarker)
                         .title(event.getString("title"))
                         .snippet(event.getString("description")));
                 myMarker.setTag(event);
-            } else {
-                LatLng testMarker = new LatLng(47.150960, 12.580820);//TODO Get right Location
-                Marker myMarker = mMap.addMarker(new MarkerOptions()
-                        .position(testMarker)
-                        .title(event.getString("title"))
-                        .snippet(event.getString("description")));
-                myMarker.setTag(event);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+            } catch (JSONException e1) {
+            e1.printStackTrace();
         }
     }
 
