@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.nfc.Tag;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,9 +25,17 @@ import com.google.android.gms.maps.model.RuntimeRemoteException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -36,6 +45,7 @@ public class EventProfileActivity extends AppCompatActivity {
 
     private Event event;
     private String idToken;
+    private JSONObject hostJson;
     private JSONObject eventJson;
 
     TextView titleText;
@@ -72,6 +82,8 @@ public class EventProfileActivity extends AppCompatActivity {
         if(getIntent().hasExtra("Event")) {
             try {
                 eventJson = new JSONObject(getIntent().getExtras().getString("Event"));
+                GetHost getHost = new GetHost();
+                getHost.execute();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -89,6 +101,7 @@ public class EventProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(EventProfileActivity.this, HostProfileActivity.class);
                 intent.putExtra("idToken", idToken);
+                intent.putExtra("host", hostJson.toString());
                 startActivity(intent);
             }
         });
@@ -169,6 +182,59 @@ public class EventProfileActivity extends AppCompatActivity {
         }
         catch (JSONException e) {
 
+        }
+    }
+
+    private void showHost(String result){
+        try {
+            hostJson = new JSONObject(result);
+            testBtn.setText("Hosted By: " + hostJson.getString("name"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     */
+    class GetHost extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts/" + eventJson.getInt("hostId"));
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "USER PROFILE: " + result);
+            showHost(result);
         }
     }
 

@@ -28,6 +28,8 @@ import java.net.URL;
 public class HostProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "HostProfileActivity";
+
+    private JSONObject hostJson;
     Button sendMsgBtn;
     String idToken;
 
@@ -37,6 +39,11 @@ public class HostProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_host_profile);
 
         idToken = getIntent().getExtras().getString("idToken");
+        try {
+            hostJson = new JSONObject(getIntent().getExtras().getString("host"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         sendMsgBtn = findViewById(R.id.sendMsgBtn);
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
@@ -44,7 +51,11 @@ public class HostProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(HostProfileActivity.this, ChatActivity.class);
                 intent.putExtra("idToken", idToken);
-                intent.putExtra("Host", "todo"); //TODO
+                try {
+                    intent.putExtra("receiver", hostJson.getInt("id")); //TODO
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 startActivity(intent);
             }
         });
