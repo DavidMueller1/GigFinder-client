@@ -48,8 +48,6 @@ public class FavoritesFragment extends Fragment {
         idToken = getArguments().getString("idToken");
 
         favorites = new ArrayList<>();
-        favorites.add(new String[]{"Artist Name", "Placeholder message..."});
-        favorites.add(new String[]{"Host Name", "Test message..."});
 
         favAdapter = new FavAdapter(this.getContext(), favorites);
         ListView listView = (ListView) getView().findViewById(R.id.favListView);
