@@ -30,7 +30,9 @@ public class HostProfileActivity extends AppCompatActivity {
     private static final String TAG = "HostProfileActivity";
 
     private JSONObject hostJson;
+    private int userId;
     Button sendMsgBtn;
+    Button addToFavsBtn;
     String idToken;
 
     @Override
@@ -45,6 +47,9 @@ public class HostProfileActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+        userId = prefs.getInt("userId", 0);
+
         sendMsgBtn = findViewById(R.id.sendMsgBtn);
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,11 +57,19 @@ public class HostProfileActivity extends AppCompatActivity {
                 Intent intent = new Intent(HostProfileActivity.this, ChatActivity.class);
                 intent.putExtra("idToken", idToken);
                 try {
-                    intent.putExtra("receiver", hostJson.getInt("id")); //TODO
+                    intent.putExtra("receiver", hostJson.getInt("id"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 startActivity(intent);
+            }
+        });
+
+        addToFavsBtn = findViewById(R.id.addToFavsBtn);
+        addToFavsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addToFavorites();
             }
         });
     }
@@ -66,7 +79,7 @@ public class HostProfileActivity extends AppCompatActivity {
      */
     private void addToFavorites() {
         PostFavorite postFavorite = new PostFavorite();
-        postFavorite.execute("my id", "host id"); //TODO Ids;
+        postFavorite.execute(); //TODO Ids;
     }
 
     /**
@@ -94,8 +107,8 @@ public class HostProfileActivity extends AppCompatActivity {
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("ArtistId", params[0]);
-                jsonObject.put("HostId", params[1]);
+                jsonObject.put("ArtistId", userId);
+                jsonObject.put("HostId", hostJson.getInt("id"));
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
