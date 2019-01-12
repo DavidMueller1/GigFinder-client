@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".HostProfileActivity">
 
-    <include layout="@layout/fragment_loading" />
+    <include layout="@layout/fragment_loading"/>
 
     <LinearLayout
         android:id="@+id/profile_host_title_bar_form"

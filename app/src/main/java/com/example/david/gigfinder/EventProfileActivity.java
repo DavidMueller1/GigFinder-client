@@ -2,6 +2,8 @@ package com.example.david.gigfinder;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +18,7 @@ import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.Event;
 import com.example.david.gigfinder.data.Host;
 import com.example.david.gigfinder.data.enums.Genre;
+import com.example.david.gigfinder.tools.GeoTools;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
@@ -27,8 +30,10 @@ import com.google.android.gms.tasks.Task;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class EventProfileActivity extends AppCompatActivity {
@@ -115,7 +120,7 @@ public class EventProfileActivity extends AppCompatActivity {
                 // Generate a Test Event
                 event = new Event(1, "Testevent in der gemütlichen Beispielbar",
                         "Suche talentierten Drehorgelspieler für Freitag Abend in meiner Bar. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-                        list, place, new Timestamp(2019, 1, 20, 20, 15, 0, 0),
+                        list, place.getLatLng(), new Timestamp(2019, 1, 20, 20, 15, 0, 0),
                         new Timestamp(2019, 1, 21, 3, 30, 0, 0), null);
 
                 displayEvent();
@@ -134,7 +139,7 @@ public class EventProfileActivity extends AppCompatActivity {
     /**
      * Displays the given Event in the Activity
      */
-    private void displayEvent() throws JSONException {
+    private void displayEvent() throws JSONException { // TODO handle with the jsonevent?
         titleText.setText(eventJson.getString("title"));
         descriptionText.setText(eventJson.getString("description"));
 
@@ -151,7 +156,7 @@ public class EventProfileActivity extends AppCompatActivity {
         timeText.setText(time);
         String date = event.getTimeFrom().getDate() + "." + event.getTimeFrom().getMonth() + "." + event.getTimeFrom().getYear();
         dateText.setText(date);
-        String placeName = event.getLocation().getName().toString();
+        String placeName = GeoTools.getAddressFromLatLng(this, event.getLocation());
         locationText.setText(placeName);
     }
 

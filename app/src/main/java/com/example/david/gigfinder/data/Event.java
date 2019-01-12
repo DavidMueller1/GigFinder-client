@@ -2,6 +2,7 @@ package com.example.david.gigfinder.data;
 
 import com.example.david.gigfinder.data.enums.Genre;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -12,12 +13,12 @@ public class Event {
     private int id;
     private String title, description;
     private ArrayList<Genre> genres;
-    private Place location;
+    private LatLng location;
     private Timestamp timeFrom;
     private Timestamp timeTo;
     private Host host;
 
-    public Event(int id, String title, String description, ArrayList<Genre> genres, Place location, Timestamp timeFrom, Timestamp timeTo, Host host) {
+    public Event(int id, String title, String description, ArrayList<Genre> genres, LatLng location, Timestamp timeFrom, Timestamp timeTo, Host host) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -58,11 +59,11 @@ public class Event {
         return genres;
     }
 
-    public Place getLocation() {
+    public LatLng getLocation() {
         return location;
     }
 
-    public void setLocation(Place location) {
+    public void setLocation(LatLng location) {
         this.location = location;
     }
 

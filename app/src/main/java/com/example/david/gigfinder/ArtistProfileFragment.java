@@ -14,7 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.david.gigfinder.data.Artist;
@@ -50,6 +52,8 @@ public class ArtistProfileFragment extends Fragment {
     //private TextView genresLabel; // to change "Genre" to "Genres" if there are multiple
     private String idToken;
 
+    private FrameLayout progress;
+
     //private Artist artist;
 
     @Nullable
@@ -62,7 +66,7 @@ public class ArtistProfileFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         idToken = getArguments().getString("idToken");
 
-        sharedPreferences = getContext().getSharedPreferences("List", Context.MODE_PRIVATE);
+        sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         // Test Artist
         /*ArrayList<Genre> list = new ArrayList<>();
@@ -76,6 +80,9 @@ public class ArtistProfileFragment extends Fragment {
         descriptionText = getView().findViewById(R.id.profile_artist_description);
         genresText = getView().findViewById(R.id.profile_artist_genre);
         //genresLabel = getView().findViewById(R.id.profile_genres_label);
+
+
+        progress = getView().findViewById(R.id.progressBarHolder);
 
         testDeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,18 +133,9 @@ public class ArtistProfileFragment extends Fragment {
         genresText.setTextColor(fontColor);
         getView().findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
 
-        float deltaValue = 0.15f;
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        if(hsv[2] < deltaValue) {
-            hsv[2] += deltaValue;
-        }
-        else {
-            hsv[2] -= deltaValue;
-        }
-
-        int titleBarColor = Color.HSVToColor(hsv);
-        getActivity().getWindow().setStatusBarColor(titleBarColor);
+        int titleBarColor = ColorTools.getSecondaryColor(color);
+        // happens in MainActivity, otherwise the statusBar chanhes on chat tab
+        //getActivity().getWindow().setStatusBarColor(titleBarColor);
 
         TextView descriptionLabel = getView().findViewById(R.id.profile_artist_description_label);
         if(ColorTools.isBrightColorBool(color)) {
@@ -187,6 +185,25 @@ public class ArtistProfileFragment extends Fragment {
         }
     }
 
+    private void displayLoadingScreen(boolean isLoading) {
+        if(isLoading) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        else {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.GONE);
+                }
+            });
+        }
+    }
+
     /**
      *
      */
@@ -194,7 +211,7 @@ public class ArtistProfileFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {
-            //getView().findViewById(R.id.progressBarHolder).setVisibility(View.VISIBLE); TODO: liefert error
+            displayLoadingScreen(true);
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -227,7 +244,7 @@ public class ArtistProfileFragment extends Fragment {
         protected void onPostExecute(String result) {
 
             Log.d(TAG, "USER PROFILE: " + result);
-            getView().findViewById(R.id.progressBarHolder).setVisibility(View.GONE);
+            displayLoadingScreen(false);
             updateProfile(result);
         }
     }
