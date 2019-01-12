@@ -34,6 +34,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class ArtistProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - ArtistProfileFragment";
 
@@ -174,6 +176,12 @@ public class ArtistProfileFragment extends Fragment {
             userID = userProfile.getInt("id");
             updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
+
+            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putInt("userId", userID);
+            editor.apply();
+            //TODO: We should probably cache everything here
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -186,7 +194,7 @@ public class ArtistProfileFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... params) {
-            getView().findViewById(R.id.progressBarHolder).setVisibility(View.VISIBLE);
+            //getView().findViewById(R.id.progressBarHolder).setVisibility(View.VISIBLE); TODO: liefert error
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -217,6 +225,7 @@ public class ArtistProfileFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
+
             Log.d(TAG, "USER PROFILE: " + result);
             getView().findViewById(R.id.progressBarHolder).setVisibility(View.GONE);
             updateProfile(result);

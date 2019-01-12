@@ -1,6 +1,7 @@
 package com.example.david.gigfinder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -257,13 +258,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
             SendRegisterHost sendRegisterHost = new SendRegisterHost();
             sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude); //TODO params
-
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra("idToken", idToken);
-            intent.putExtra("user", "host");
-            startActivity(intent);
-            finish();
         }
     }
 
@@ -370,6 +364,22 @@ public class RegistrationHostActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
 
+            try {
+                JSONObject user = new JSONObject(result);
+                SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+                editor.putInt("userId", user.getInt("id"));
+                editor.apply();
+                //TODO: We should probably cache everything here
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Intent intent = new Intent(RegistrationHostActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.putExtra("idToken", idToken);
+            intent.putExtra("user", "host");
+            startActivity(intent);
+            finish();
         }
     }
 }

@@ -4,6 +4,9 @@
     <!-- Sign-In -->
     <string name="server_client_id">998701200015-krr5qpgg3go6iol8b2oqv3l4jcttspom.apps.googleusercontent.com</string>
 
+    <!-- SharedPreferences -->
+    <string name="shared_prefs">AppPrefs</string>
+
     <string name="nav_explore">Explore</string>
     <string name="nav_favorites">Favoriten</string>
     <string name="nav_gigs">Gigs</string>
@@ -58,6 +61,10 @@
     <string name="profile_social_media_links">Social Media Links:</string>
     <string name="profile_genre_single">Genre:</string>
     <string name="profile_genre_multiple">Genres:</string>
+
+    <!-- Gigs  -->
+    <string name="upcoming_gigs">Upcoming Gigs</string>
+    <string name="past_gigs">Past Gigs</string>
 
     <!-- Add Event -->
     <string name="add_event_title_hint">Name des Events</string>

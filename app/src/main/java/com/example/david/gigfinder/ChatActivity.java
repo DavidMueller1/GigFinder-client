@@ -1,6 +1,7 @@
 package com.example.david.gigfinder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -85,9 +86,8 @@ public class ChatActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SendMessage sendMessage = new SendMessage();
-                //sendMessage.execute(); TODO: Parameters?
-                chatText.getText().clear();
+                PostMessage postMessage = new PostMessage();
+                //postMessage.execute(chatText.getText().toString());
             }
         });
 
@@ -99,7 +99,7 @@ public class ChatActivity extends AppCompatActivity {
         mMessageAdapter.notifyDataSetChanged();
     }
 
-    class SendMessage extends AsyncTask<String, Void, String> {
+    class PostMessage extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -109,15 +109,19 @@ public class ChatActivity extends AppCompatActivity {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestProperty("Content-Type","application/json");
-                //urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
+                SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+                int userId = prefs.getInt("userId", 0);
+
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
-                //jsonObject.put("name", params[0]); TODO
+                jsonObject.put("AuthorId", "id"); //TODO
+                jsonObject.put("RecieverId", "id"); //TODO
+                jsonObject.put("Content", params[0]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
@@ -131,9 +135,8 @@ public class ChatActivity extends AppCompatActivity {
                         int statusCode = httpConn.getResponseCode();
                         if (statusCode != 200) {
                             is = httpConn.getErrorStream();
-                            Log.d(TAG, "SendRegisterArtist: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "SendRegisterArtist: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
-                            Log.d(TAG, httpConn.getURL().toString());
+                            Log.d(TAG, "PostMessage: STATUS CODE: " + statusCode);
+                            Log.d(TAG, "PostMessage: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
                         }
                     }
                 }
@@ -147,7 +150,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
                 rd.close();
 
-                Log.d(TAG, "SendRegisterArtist: ERROR STREAM:" + response.toString());
+                Log.d(TAG, "PostMessage: RESPONSE:" + response.toString());
 
                 return response.toString();
             } catch (ProtocolException e) {
@@ -156,13 +159,15 @@ public class ChatActivity extends AppCompatActivity {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(String result) {
-
+            chatText.getText().clear();
         }
     }
 }
