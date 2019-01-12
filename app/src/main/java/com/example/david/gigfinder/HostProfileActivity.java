@@ -48,7 +48,6 @@ public class HostProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
     }
 
     /**

@@ -31,17 +31,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sharedPreferences = getSharedPreferences("List", Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         String user = "none";
         if (getIntent().hasExtra("user")){
             user = getIntent().getExtras().getString("user");
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("user", user);
-            editor.commit();
+            editor.apply();
         } else {
             user = sharedPreferences.getString("user", "none");
         }
+
         /*
         try {
             user = getIntent().getStringExtra("user");
