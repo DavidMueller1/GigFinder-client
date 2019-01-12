@@ -8,20 +8,24 @@
     tools:context=".RegistrationHostActivity">
 
     <LinearLayout
-        android:id="@+id/login_title_bar_form"
+        android:id="@+id/add_event_title_bar_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/orange">
+        android:background="@color/orange"
+        android:padding="@dimen/padding_smaller">
 
-        <TextView
-            android:id="@+id/registration_host_title"
+        <EditText
+            android:id="@+id/add_event_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/registration_host_title"
-            android:padding="@dimen/padding_default"
-            android:textColor="@color/white"
-            android:textSize="@dimen/font_bigger"/>
+            android:layout_marginBottom="@dimen/padding_small"
+            android:text=""
+            android:hint="@string/add_event_title_hint"
+            android:textSize="@dimen/font_big"
+            android:textAlignment="center"
+            android:textColor="@color/white"/>
+
     </LinearLayout>
 
     <ScrollView
@@ -32,12 +36,12 @@
         android:scrollbarStyle="outsideInset">
 
         <LinearLayout
-            android:id="@+id/registration_host_layout"
+            android:id="@+id/add_event_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <!--TextView
                 android:id="@+id/textView0"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,19 +91,20 @@
                 android:ems="10"
                 android:hint="@string/registration_host_name_hint"
                 android:inputType="textPersonName"
-                android:textSize="@dimen/font_bigger" />
+                android:textSize="@dimen/font_bigger" /-->
 
             <TextView
                 android:id="@+id/textView5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_default"
                 android:text="@string/registration_host_description"
                 android:textColor="@color/darkOrange"
                 android:textStyle="bold"
                 android:textSize="@dimen/font_default" />
 
             <EditText
-                android:id="@+id/registration_host_description"
+                android:id="@+id/add_event_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/padding_default"
@@ -109,8 +114,129 @@
                 android:singleLine="false"
                 android:textSize="@dimen/font_bigger" />
 
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_default"
+                android:text="@string/add_event_time_from"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
+                android:textSize="@dimen/font_default" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/add_event_time_from"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@+id/button_add_event_select_time_from"
+                    android:layout_marginTop="@dimen/padding_default"
+                    android:text="@string/add_event_time_hint"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/font_default" />
+
+                <Button
+                    android:id="@id/button_add_event_select_time_from"
+                    android:layout_width="@dimen/element_biggest"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/standart_button"
+                    android:text="@string/add_event_pick_time"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_default" />
+
+                <TextView
+                    android:id="@+id/add_event_date_from"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@+id/button_add_event_select_date_from"
+                    android:layout_below="@id/button_add_event_select_time_from"
+                    android:layout_marginTop="@dimen/padding_default"
+                    android:text="@string/add_event_date_hint"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/font_default" />
+
+                <Button
+                    android:id="@id/button_add_event_select_date_from"
+                    android:layout_width="@dimen/element_biggest"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_default"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@id/button_add_event_select_time_from"
+                    android:background="@drawable/standart_button"
+                    android:text="@string/add_event_pick_date"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_default" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_default"
+                android:text="@string/add_event_time_to"
+                android:textColor="@color/darkOrange"
+                android:textStyle="bold"
+                android:textSize="@dimen/font_default" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/add_event_time_to"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@+id/button_add_event_select_time_to"
+                    android:layout_marginTop="@dimen/padding_default"
+                    android:text="@string/add_event_time_hint"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/font_default" />
+
+                <Button
+                    android:id="@id/button_add_event_select_time_to"
+                    android:layout_width="@dimen/element_biggest"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/standart_button"
+                    android:text="@string/add_event_pick_time"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_default" />
+
+                <TextView
+                    android:id="@+id/add_event_date_to"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@+id/button_add_event_select_date_to"
+                    android:layout_below="@id/button_add_event_select_time_to"
+                    android:layout_marginTop="@dimen/padding_default"
+                    android:text="@string/add_event_date_hint"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/font_default" />
+
+                <Button
+                    android:id="@id/button_add_event_select_date_to"
+                    android:layout_width="@dimen/element_biggest"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_default"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@id/button_add_event_select_time_to"
+                    android:background="@drawable/standart_button"
+                    android:text="@string/add_event_pick_date"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_default" />
+
+            </RelativeLayout>
+
             <LinearLayout
-                android:id="@+id/registration_host_location_container"
+                android:id="@+id/add_event_location_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/padding_bigger"
@@ -120,7 +246,7 @@
                 android:background="@drawable/border">
 
                 <ImageView
-                    android:id="@+id/registration_host_location_icon"
+                    android:id="@+id/add_event_location_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/padding_smaller"
@@ -128,7 +254,7 @@
                     android:tint="@color/darkOrange"/>
 
                 <TextView
-                    android:id="@+id/registration_host_location_text"
+                    android:id="@+id/add_event_location_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/registration_host_location_icon"
@@ -148,28 +274,19 @@
                 android:textSize="@dimen/font_default" />
 
             <Spinner
-                android:id="@+id/registration_host_genre"
+                android:id="@+id/add_event_genre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/padding_default"
                 android:spinnerMode="dropdown" />
 
             <Button
-                android:id="@+id/button_registration_host_colorPicker"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_default"
-                android:text="@string/registration_host_color"
-                android:textColor="@color/black"
-                android:textSize="@dimen/font_default" />
-
-            <Button
-                android:id="@+id/button_host_registration"
+                android:id="@+id/button_add_event_save"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/padding_default"
                 android:background="@drawable/standart_button"
-                android:text="@string/registration_button"
+                android:text="@string/add_event_save_button"
                 android:textColor="@color/white"
                 android:textSize="@dimen/font_default" />
 
