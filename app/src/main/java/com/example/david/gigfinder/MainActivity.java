@@ -14,6 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.SectionsPageAdapter;
+import com.example.david.gigfinder.tools.ColorTools;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "APPLOG - MainActivity";
@@ -34,14 +35,14 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         String user = "none";
-        if (getIntent().hasExtra("user")){
+        /*if (getIntent().hasExtra("user")){
             user = getIntent().getExtras().getString("user");
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("user", user);
             editor.apply();
-        } else {
+        } else {*/
             user = sharedPreferences.getString("user", "none");
-        }
+        // }
 
         /*
         try {
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         idToken = getIntent().getExtras().getString("idToken");
 
         mViewPager = findViewById(R.id.viewpager);
+        mViewPager.setOffscreenPageLimit(1);
         setupViewPager(mViewPager, user);
 
         final TabLayout tabLayout = findViewById(R.id.tabs);
@@ -84,10 +86,10 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
                     if(tab == tabLayout.getTabAt(4)) {
-                        int statusBarColor = sharedPreferences.getInt("titleBarColor", getResources().getColor(R.color.darkOrange));
+                        int userColor = sharedPreferences.getInt("userColor", getResources().getColor(R.color.black));
+                        int statusBarColor = ColorTools.getSecondaryColor(userColor);
                         getWindow().setStatusBarColor(statusBarColor);
 
-                        int userColor = sharedPreferences.getInt("userColor", getResources().getColor(R.color.orange));
                         for(int i = 0; i < 5; i++) {
                             TabLayout.Tab t = tabLayout.getTabAt(i);
                             t.getIcon().setColorFilter(userColor, PorterDuff.Mode.SRC_IN);
@@ -133,10 +135,10 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
                     if(tab == tabLayout.getTabAt(3)) {
-                        int statusBarColor = sharedPreferences.getInt("titleBarColor", getResources().getColor(R.color.darkOrange));
+                        int userColor = sharedPreferences.getInt("userColor", getResources().getColor(R.color.orange));
+                        int statusBarColor = ColorTools.getSecondaryColor(userColor);
                         getWindow().setStatusBarColor(statusBarColor);
 
-                        int userColor = sharedPreferences.getInt("userColor", getResources().getColor(R.color.orange));
                         for(int i = 0; i < 4; i++) {
                             TabLayout.Tab t = tabLayout.getTabAt(i);
                             t.getIcon().setColorFilter(userColor, PorterDuff.Mode.SRC_IN);

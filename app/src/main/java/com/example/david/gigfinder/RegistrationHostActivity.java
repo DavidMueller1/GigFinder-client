@@ -2,6 +2,7 @@ package com.example.david.gigfinder;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -56,11 +57,16 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private static final int PICK_IMAGE = 1;
     private static final int PLACE_PICKER_REQUEST = 2;
 
+    private TextView profilePictureTitle;
     private ImageView profilePictureButton;
+    private TextView nameTitle;
     private EditText nameField;
+    private TextView descriptionTitle;
     private EditText descriptionField;
     private LinearLayout locationButton;
+    private ImageView locationButtonIcon;
     private TextView locationButtonText;
+    private TextView genreTitle;
     private Spinner genreSpinner;
     private Button backgroundColorPickerButton;
     private Button registrationButton;
@@ -82,6 +88,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
         host = new Host();
 
+        profilePictureTitle = findViewById(R.id.registration_host_image_title);
         profilePictureButton = findViewById(R.id.registration_host_profilePicture);
         profilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,8 +96,9 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 performProfilePictureSelection();
             }
         });
-
+        nameTitle = findViewById(R.id.registration_host_name_title);
         nameField = findViewById(R.id.registration_host_name);
+        descriptionTitle = findViewById(R.id.registration_host_description_title);
         descriptionField = findViewById(R.id.registration_host_description);
         locationButton = findViewById(R.id.registration_host_location_container);
         locationButton.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +108,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
             }
         });
         locationButtonText = findViewById(R.id.registration_host_location_text);
+        locationButtonIcon = findViewById(R.id.registration_host_location_icon);
+        genreTitle = findViewById(R.id.registration_host_genre_title);
         genreSpinner = findViewById(R.id.registration_host_genre);
         //Replaced the Strings with the Genre-Enum
         ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
@@ -122,7 +132,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
             }
         });
 
-        colorPicker = new ColorPicker(RegistrationHostActivity.this, 255, 255, 255);
+        colorPicker = new ColorPicker(RegistrationHostActivity.this, 214, 74, 31);
         colorPicker.enableAutoClose();
         colorPicker.setCallback(new ColorPickerCallback() {
             @Override
@@ -224,28 +234,22 @@ public class RegistrationHostActivity extends AppCompatActivity {
      * Called when the user chose a color
      */
     private void applyColor(int color) {
+        int textColor = ColorTools.isBrightColor(color);
         host.setColor(color);
-        findViewById(android.R.id.content).setBackgroundColor(host.getColor());
+        findViewById(R.id.registration_host_title_bar_form).setBackgroundColor(color);
+        TextView title = findViewById(R.id.registration_host_title);
+        title.setTextColor(textColor);
+        getWindow().setStatusBarColor(ColorTools.getSecondaryColor(color));
+        registrationButton.setBackgroundTintList(ColorStateList.valueOf(color));
+        registrationButton.setTextColor(textColor);
+        backgroundColorPickerButton.setBackgroundTintList(ColorStateList.valueOf(color));
+        backgroundColorPickerButton.setTextColor(textColor);
 
-        updateFontColor();
-    }
-
-    /**
-     * Updates the font color of all relevant elements
-     */
-    private void updateFontColor() {
-        int fontColor = ColorTools.isBrightColor(host.getColor());
-
-        ViewGroup layout = findViewById(R.id.registration_host_layout);
-        for(int index = 0; index < layout.getChildCount(); ++index) {
-            View child = layout.getChildAt(index);
-            if(child instanceof TextView) {
-                ((TextView) child).setTextColor(fontColor);
-            }
-            else if(child instanceof EditText) {
-                ((EditText) child).setTextColor(fontColor);
-            }
-        }
+        profilePictureTitle.setTextColor(color);
+        nameTitle.setTextColor(color);
+        descriptionTitle.setTextColor(color);
+        locationButtonIcon.setImageTintList(ColorStateList.valueOf(color));
+        genreTitle.setTextColor(color);
     }
 
     /**
@@ -368,6 +372,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 JSONObject user = new JSONObject(result);
                 SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
                 editor.putInt("userId", user.getInt("id"));
+                editor.putString("user", "host");
+                editor.putInt("userColor", user.getInt("backgroundColor"));
                 editor.apply();
                 //TODO: We should probably cache everything here
             } catch (JSONException e) {
