@@ -76,8 +76,8 @@ public class HostProfileFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        idToken = getArguments().getString("idToken");
 
+        idToken = getArguments().getString("idToken");
         sharedPreferences = getContext().getSharedPreferences("List", MODE_PRIVATE);
 
         // Test Artist
