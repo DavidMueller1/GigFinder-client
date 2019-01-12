@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class HostProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - HostProfileFragment";
 
@@ -72,7 +74,7 @@ public class HostProfileFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         idToken = getArguments().getString("idToken");
 
-        sharedPreferences = getContext().getSharedPreferences("List", Context.MODE_PRIVATE);
+        sharedPreferences = getContext().getSharedPreferences("List", MODE_PRIVATE);
 
         // Test Artist
         /*ArrayList<Genre> list = new ArrayList<>();
@@ -99,8 +101,8 @@ public class HostProfileFragment extends Fragment {
             }
         });
 
-        GetUser getUser = new GetUser();
-        getUser.execute();
+        GetHost getHost = new GetHost();
+        getHost.execute();
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -158,6 +160,12 @@ public class HostProfileFragment extends Fragment {
             testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             final float lat = Float.parseFloat(userProfile.getString("latitude"));
             final float lng = Float.parseFloat(userProfile.getString("longitude"));
+
+            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putInt("userId", userID);
+            editor.apply();
+            //TODO: We should probably cache everything here
+
             locationContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -211,7 +219,7 @@ public class HostProfileFragment extends Fragment {
     /**
      *
      */
-    class GetUser extends AsyncTask<String, Void, String> {
+    class GetHost extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {

@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -34,6 +35,7 @@ public class EventProfileActivity extends AppCompatActivity {
     private static final String TAG = "EventProfileActivity";
 
     private Event event;
+    private String idToken;
     private JSONObject eventJson;
 
     TextView titleText;
@@ -44,10 +46,14 @@ public class EventProfileActivity extends AppCompatActivity {
     TextView locationText;
     LinearLayout locationContainer;
 
+    Button testBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_profile);
+
+        idToken = getIntent().getExtras().getString("idToken");
 
         titleText = findViewById(R.id.event_title);
         genreText = findViewById(R.id.event_genre);
@@ -63,18 +69,29 @@ public class EventProfileActivity extends AppCompatActivity {
             }
         });
 
-        try {
-            eventJson = new JSONObject(getIntent().getExtras().getString("Event"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(getIntent().hasExtra("Event")) {
+            try {
+                eventJson = new JSONObject(getIntent().getExtras().getString("Event"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-
         // TODO move the following code (including the callback method) to where the Event is generated
 
         // region Test Event
         GeoDataClient mGeoDataClient = Places.getGeoDataClient(this);
         Task<PlaceBufferResponse> placeResult = mGeoDataClient.getPlaceById("ChIJQwJTzpl1nkcR2vIR4mH1Bfw");
         placeResult.addOnCompleteListener(mUpdatePlaceDetailsCallback);
+
+        testBtn = findViewById(R.id.testBtn);
+        testBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EventProfileActivity.this, HostProfileActivity.class);
+                intent.putExtra("idToken", idToken);
+                startActivity(intent);
+            }
+        });
     }
 
     /**

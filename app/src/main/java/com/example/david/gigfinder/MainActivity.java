@@ -18,20 +18,32 @@ import com.example.david.gigfinder.adapters.SectionsPageAdapter;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "APPLOG - MainActivity";
 
+    public static String idToken;
+    public static int userId;
+
     SharedPreferences sharedPreferences;
 
     private SectionsPageAdapter sectionsPageAdapter;
     private ViewPager mViewPager;
-    private String idToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sharedPreferences = getSharedPreferences("List", Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         String user = "none";
+        if (getIntent().hasExtra("user")){
+            user = getIntent().getExtras().getString("user");
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("user", user);
+            editor.apply();
+        } else {
+            user = sharedPreferences.getString("user", "none");
+        }
+
+        /*
         try {
             user = getIntent().getStringExtra("user");
 
@@ -43,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         catch (NullPointerException e) {
             user = sharedPreferences.getString("user", "none");
         }
-
+        */
         if(user == null || user.equals("none")) {
             // TODO get user from server
             Toast.makeText(getApplicationContext(),"Using default user",Toast.LENGTH_SHORT).show();
@@ -53,14 +65,11 @@ public class MainActivity extends AppCompatActivity {
 
         idToken = getIntent().getExtras().getString("idToken");
 
-
-
         mViewPager = findViewById(R.id.viewpager);
         setupViewPager(mViewPager, user);
 
         final TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
 
         if(user.equals("artist")) {
             int[] icons = {R.drawable.ic_baseline_search_24px, R.drawable.ic_baseline_star , R.drawable.ic_guitar, R.drawable.ic_baseline_chat_bubble, R.drawable.ic_baseline_user};
