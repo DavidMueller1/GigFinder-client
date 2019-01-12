@@ -1,7 +1,9 @@
 package com.example.david.gigfinder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -48,9 +50,13 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private static final String TAG = "MYLOG_RegistrationArtistActivity";
     private static final int PICK_IMAGE = 1;
 
+    private TextView profilePictureTitle;
     private ImageView profilePictureButton;
+    private TextView nameTitle;
     private EditText nameField;
+    private TextView descriptionTitle;
     private EditText descriptionField;
+    private TextView genreTitle;
     private Spinner genreSpinner;
     private Button backgroundColorPickerButton;
     private Button registrationButton;
@@ -68,11 +74,13 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
         idToken = getIntent().getExtras().getString("idToken");
 
+
         GetGenres getGenres = new GetGenres();
         //getGenres.execute();
 
         artist = new Artist();
 
+        profilePictureTitle = findViewById(R.id.registration_artist_image_title);
         profilePictureButton = findViewById(R.id.registration_artist_profilePicture);
         profilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,9 +88,11 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 performProfilePictureSelection();
             }
         });
-
+        nameTitle = findViewById(R.id.registration_artist_name_title);
         nameField = findViewById(R.id.registration_artist_name);
+        descriptionTitle = findViewById(R.id.registration_artist_description_title);
         descriptionField = findViewById(R.id.registration_artist_description);
+        genreTitle = findViewById(R.id.registration_artist_genre_title);
         genreSpinner = findViewById(R.id.registration_artist_genre);
         //Replaced the Strings with the Genre-Enum
         ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
@@ -105,7 +115,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             }
         });
 
-        colorPicker = new ColorPicker(RegistrationArtistActivity.this, 255, 255, 255);
+        colorPicker = new ColorPicker(RegistrationArtistActivity.this, 214, 74, 31);
         colorPicker.enableAutoClose();
         colorPicker.setCallback(new ColorPickerCallback() {
             @Override
@@ -169,28 +179,21 @@ public class RegistrationArtistActivity extends AppCompatActivity {
      * Called when the user chose a color
      */
     private void applyColor(int color) {
+        int textColor = ColorTools.isBrightColor(color);
         artist.setColor(color);
-        findViewById(android.R.id.content).setBackgroundColor(artist.getColor());
+        findViewById(R.id.registration_artist_title_bar_form).setBackgroundColor(color);
+        TextView title = findViewById(R.id.registration_artist_title);
+        title.setTextColor(textColor);
+        getWindow().setStatusBarColor(ColorTools.getSecondaryColor(color));
+        registrationButton.setBackgroundTintList(ColorStateList.valueOf(color));
+        registrationButton.setTextColor(textColor);
+        backgroundColorPickerButton.setBackgroundTintList(ColorStateList.valueOf(color));
+        backgroundColorPickerButton.setTextColor(textColor);
 
-        updateFontColor();
-    }
-
-    /**
-     * Updates the font color of all relevant elements
-     */
-    private void updateFontColor() {
-        int fontColor = ColorTools.isBrightColor(artist.getColor());
-
-        ViewGroup layout = findViewById(R.id.registration_artist_layout);
-        for(int index = 0; index < layout.getChildCount(); ++index) {
-            View child = layout.getChildAt(index);
-            if(child instanceof TextView) {
-                ((TextView) child).setTextColor(fontColor);
-            }
-            else if(child instanceof EditText) {
-                ((EditText) child).setTextColor(fontColor);
-            }
-        }
+        profilePictureTitle.setTextColor(color);
+        nameTitle.setTextColor(color);
+        descriptionTitle.setTextColor(color);
+        genreTitle.setTextColor(color);
     }
 
     /**
@@ -313,6 +316,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 JSONObject user = new JSONObject(result);
                 SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
                 editor.putInt("userId", user.getInt("id"));
+                editor.putString("user", "artist");
+                editor.putInt("userColor", user.getInt("backgroundColor"));
                 editor.apply();
                 //TODO: We should probably cache everything here
             } catch (JSONException e) {
