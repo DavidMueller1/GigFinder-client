@@ -1,5 +1,7 @@
 package com.example.david.gigfinder;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -18,11 +20,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.david.gigfinder.data.Host;
@@ -49,27 +53,32 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
 
 public class AddEventFragment extends Fragment {
-    private static final String TAG = "RegistrationHostActivity";
+    private static final String TAG = "AddEventFragment";
     private static final int PICK_IMAGE = 1;
     private static final int PLACE_PICKER_REQUEST = 2;
 
-    private ImageView profilePictureButton;
     private EditText nameField;
     private EditText descriptionField;
     private LinearLayout locationButton;
     private TextView locationButtonText;
     private Spinner genreSpinner;
-    private Button backgroundColorPickerButton;
-    private Button registrationButton;
+    private TextView timeFromText;
+    private Button pickTimeFromButton;
+    private TextView dateFromText;
+    private Button pickDateFromButton;
+    private TextView timeToText;
+    private Button pickTimeToButton;
+    private TextView dateToText;
+    private Button pickDateToButton;
+    private Button addEventButton;
 
-    private Host host;
-    private Bitmap profilePicture;
     private LatLng position;
 
     String idToken;
@@ -84,67 +93,149 @@ public class AddEventFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        idToken = getArguments().getString("idToken");
-
-        host = new Host();
-
-        profilePictureButton = getView().findViewById(R.id.registration_host_profilePicture);
-        profilePictureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                performProfilePictureSelection();
-            }
-        });
-
-        nameField = getView().findViewById(R.id.registration_host_name);
-        descriptionField = getView().findViewById(R.id.registration_host_description);
-        locationButton = getView().findViewById(R.id.registration_host_location_container);
+        nameField = getView().findViewById(R.id.add_event_title);
+        descriptionField = getView().findViewById(R.id.add_event_description);
+        locationButton = getView().findViewById(R.id.add_event_location_container);
         locationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 performLocationSelection();
             }
         });
-        locationButtonText = getView().findViewById(R.id.registration_host_location_text);
-        genreSpinner = getView().findViewById(R.id.registration_host_genre);
+        locationButtonText = getView().findViewById(R.id.add_event_location_text);
+        genreSpinner = getView().findViewById(R.id.add_event_genre);
         //Replaced the Strings with the Genre-Enum
         ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
         genreSpinner.setAdapter(adapter);
 
-        backgroundColorPickerButton = getView().findViewById(R.id.button_registration_host_colorPicker);
-        backgroundColorPickerButton.setOnClickListener(new View.OnClickListener() {
+
+        addEventButton = getView().findViewById(R.id.button_add_event_save);
+        addEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //performColorSelection();
+                performAddEvent();
             }
         });
 
-
-        registrationButton = getView().findViewById(R.id.button_host_registration);
-        registrationButton.setOnClickListener(new View.OnClickListener() {
+        // region Time and Date
+        // Time from
+        timeFromText = getView().findViewById(R.id.add_event_time_from);
+        pickTimeFromButton = getView().findViewById(R.id.button_add_event_select_time_from);
+        pickTimeFromButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //performRegistration();
+                // Get Current Time
+                final Calendar c = Calendar.getInstance();
+                int mHour = c.get(Calendar.HOUR_OF_DAY);
+                int mMinute = c.get(Calendar.MINUTE);
+
+                // Launch Time Picker Dialog
+                TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+                        new TimePickerDialog.OnTimeSetListener() {
+
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay,
+                                                  int minute) {
+                                // TODO save the time
+                                timeFromText.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
+                            }
+                        }, mHour, mMinute, false);
+                timePickerDialog.show();
             }
         });
+
+        // Date from
+        dateFromText = getView().findViewById(R.id.add_event_date_from);
+        pickDateFromButton = getView().findViewById(R.id.button_add_event_select_date_from);
+        pickDateFromButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get Current Date
+                final Calendar c = Calendar.getInstance();
+                final int mYear = c.get(Calendar.YEAR);
+                int mMonth = c.get(Calendar.MONTH);
+                int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // TODO save the date
+                                dateFromText.setText(String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year));
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+            }
+        });
+
+        // Time to
+        timeToText = getView().findViewById(R.id.add_event_time_to);
+        pickTimeToButton = getView().findViewById(R.id.button_add_event_select_time_to);
+        pickTimeToButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get Current Time
+                final Calendar c = Calendar.getInstance();
+                int mHour = c.get(Calendar.HOUR_OF_DAY);
+                int mMinute = c.get(Calendar.MINUTE);
+
+                // Launch Time Picker Dialog
+                TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+                        new TimePickerDialog.OnTimeSetListener() {
+
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay,
+                                                  int minute) {
+                                // TODO save the time
+                                timeToText.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
+                            }
+                        }, mHour, mMinute, false);
+                timePickerDialog.show();
+            }
+        });
+
+        // Date to
+        dateToText = getView().findViewById(R.id.add_event_date_to);
+        pickDateToButton = getView().findViewById(R.id.button_add_event_select_date_to);
+        pickDateToButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get Current Date
+                final Calendar c = Calendar.getInstance();
+                int mYear = c.get(Calendar.YEAR);
+                int mMonth = c.get(Calendar.MONTH);
+                int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                        new DatePickerDialog.OnDateSetListener() {
+
+                            @Override
+                            public void onDateSet(DatePicker view, int year,
+                                                  int monthOfYear, int dayOfMonth) {
+                                // TODO save the date
+                                dateFromText.setText(String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year));
+
+                            }
+                        }, mYear, mMonth, mDay);
+                datePickerDialog.show();
+            }
+        });
+
+        /// endregion
 
         position = null;
     }
 
     /**
-     * Called when the user presses the profile picture button
-     * User can choose between camera and gallery
+     *  called when the user presses the save-event-button
      */
-    private void performProfilePictureSelection() {
-        /*Intent pickIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Intent chooserIntent = Intent.createChooser(pickIntent, getResources().getString(R.string.pick_photo_intent));
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {takePhotoIntent});
-
-        startActivityForResult(chooserIntent, PICK_IMAGE);*/
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(pickIntent, PICK_IMAGE);
+    private void performAddEvent() {
+        // TODO save Event
     }
 
     @Override
@@ -260,7 +351,7 @@ public class AddEventFragment extends Fragment {
         return true;
     }*/
 
-    class SendRegisterHost extends AsyncTask<String, Void, String> {
+    /*class SendRegisterHost extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -332,5 +423,5 @@ public class AddEventFragment extends Fragment {
         protected void onPostExecute(String result) {
 
         }
-    }
+    }*/
 }

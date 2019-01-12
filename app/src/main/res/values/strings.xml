@@ -58,4 +58,15 @@
     <string name="profile_social_media_links">Social Media Links:</string>
     <string name="profile_genre_single">Genre:</string>
     <string name="profile_genre_multiple">Genres:</string>
+
+    <!-- Add Event -->
+    <string name="add_event_title_hint">Name des Events</string>
+    <string name="add_event_time_from">Start des Events</string>
+    <string name="add_event_time_to">Ende des Events</string>
+    <string name="add_event_time_hint">Bitte Zeit auswählen</string>
+    <string name="add_event_date_hint">Bitte Datum auswählen</string>
+    <string name="add_event_pick_time">Zeit auswählen</string>
+    <string name="add_event_pick_date">Datum auswählen</string>
+    <string name="add_event_save_button">Event erstellen</string>
+
 </resources>
