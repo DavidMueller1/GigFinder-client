@@ -5,11 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HostProfileActivity"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
     <Button
         android:id="@+id/sendMsgBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Send Message" />
+
+    <Button
+        android:id="@+id/addToFavsBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Add to Favorites" />
+
 </LinearLayout>

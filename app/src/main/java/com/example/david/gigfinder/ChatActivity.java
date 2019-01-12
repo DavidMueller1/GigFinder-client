@@ -58,7 +58,7 @@ public class ChatActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
         idToken = getIntent().getExtras().getString("idToken");
-        receiverId = getIntent().getExtras().getInt("host");
+        receiverId = getIntent().getExtras().getInt("receiver");
         authorId = prefs.getInt("userId", 0);
 
         User testUser1 = new User();
@@ -94,8 +94,10 @@ public class ChatActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PostMessage postMessage = new PostMessage();
-                postMessage.execute(chatText.getText().toString());
+                if(chatText.getText().toString() != "") {
+                    PostMessage postMessage = new PostMessage();
+                    postMessage.execute(chatText.getText().toString());
+                }
             }
         });
 
@@ -121,14 +123,15 @@ public class ChatActivity extends AppCompatActivity {
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
-                SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
-                int userId = prefs.getInt("userId", 0);
+                Log.d(TAG, String.valueOf(authorId));
+                Log.d(TAG, String.valueOf(receiverId));
+                Log.d(TAG, params[0]);
 
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("AuthorId", authorId);
-                jsonObject.put("RecieverId", receiverId);
+                jsonObject.put("ReceiverId", receiverId);
                 jsonObject.put("Content", params[0]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
