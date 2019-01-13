@@ -169,8 +169,7 @@ public class HostProfileActivity extends AppCompatActivity {
 
     private void updateProfile(String jsonString){
         try {
-            JSONArray jsonArray = new JSONArray(jsonString);
-            JSONObject userProfile = jsonArray.getJSONObject(0);
+            JSONObject userProfile = new JSONObject(jsonString);
 
             GetProfilePicture getProfilePicture = new GetProfilePicture();
             getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");

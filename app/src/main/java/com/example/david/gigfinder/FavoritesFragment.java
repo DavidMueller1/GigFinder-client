@@ -18,6 +18,7 @@ import com.example.david.gigfinder.adapters.FavAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,6 +64,12 @@ public class FavoritesFragment extends Fragment {
                 Intent intent = new Intent(getActivity(), HostProfileActivity.class);
                 intent.putExtra("idToken", idToken);
                 intent.putExtra("host", favorites.get(position)[2]);
+                try {
+                    JSONObject jsonObject = new JSONObject(favorites.get(position)[2]);
+                    intent.putExtra("profileUserId", String.valueOf(jsonObject.getInt("id")));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 startActivity(intent);
             }
         });
