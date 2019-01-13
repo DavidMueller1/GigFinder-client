@@ -2,14 +2,31 @@ package com.example.david.gigfinder;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.david.gigfinder.tools.ColorTools;
+import com.example.david.gigfinder.tools.GeoTools;
+import com.example.david.gigfinder.tools.ImageTools;
+import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.common.util.Strings;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,15 +41,29 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.Locale;
 
 public class HostProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "HostProfileActivity";
 
-    private JSONObject hostJson;
+    SharedPreferences sharedPreferences;
+
+    private ImageView imageButton;
+    private TextView nameText;
+    private TextView descriptionText;
+    private LinearLayout locationContainer;
+    private ImageView locationIcon;
+    private TextView locationText;
+    private TextView genresText;
+    private Button sendMsgBtn;
+    private Button addToFavsBtn;
+
+    private FrameLayout progress;
+
+    //private JSONObject hostJson;
     private int userId;
-    Button sendMsgBtn;
-    Button addToFavsBtn;
+    private int profileUserId;
     String idToken;
 
     @Override
@@ -40,27 +71,40 @@ public class HostProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host_profile);
 
+
+        sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+
         idToken = getIntent().getExtras().getString("idToken");
-        try {
+        /*try {
             hostJson = new JSONObject(getIntent().getExtras().getString("host"));
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
 
         SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
         userId = prefs.getInt("userId", 0);
 
+//        profileUserId = 28;
+        profileUserId = Integer.parseInt(getIntent().getExtras().getString("profileUserId"));
+
+        imageButton = findViewById(R.id.profile_host_profilePicture);
+        nameText = findViewById(R.id.profile_host_name);
+        descriptionText = findViewById(R.id.profile_host_description);
+        locationText = findViewById(R.id.profile_host_location_text);
+        locationIcon = findViewById(R.id.profile_host_location_icon);
+        locationContainer = findViewById(R.id.profile_host_location_container);
+        genresText = findViewById(R.id.profile_host_genre);
+
+        progress = findViewById(R.id.progressBarHolder);
         sendMsgBtn = findViewById(R.id.sendMsgBtn);
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(HostProfileActivity.this, ChatActivity.class);
                 intent.putExtra("idToken", idToken);
-                try {
-                    intent.putExtra("receiver", hostJson.getInt("id"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
+                intent.putExtra("receiver", profileUserId);
+
                 startActivity(intent);
             }
         });
@@ -70,8 +114,12 @@ public class HostProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addToFavorites();
+                // TODO check if already in favorites
             }
         });
+
+        GetHost getHost = new GetHost();
+        getHost.execute(profileUserId + "");
     }
 
     /**
@@ -89,6 +137,212 @@ public class HostProfileActivity extends AppCompatActivity {
         DeleteFavorite deleteFavorite = new DeleteFavorite();
         deleteFavorite.execute();
     }
+
+    /**
+     * Updates the color of all relevant elements
+     */
+    private void updateColor(int color) {
+        int fontColor = ColorTools.isBrightColor(color);
+        nameText.setTextColor(fontColor);
+        genresText.setTextColor(fontColor);
+        findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(color);
+        sendMsgBtn.setBackgroundColor(color);
+        addToFavsBtn.setBackgroundColor(color);
+
+
+        int titleBarColor = ColorTools.getSecondaryColor(color);
+        // happens in MainActivity, otherwise the statusBar changes on chat tab
+        getWindow().setStatusBarColor(titleBarColor);
+
+        TextView descriptionLabel = findViewById(R.id.profile_host_description_label);
+        if(ColorTools.isBrightColorBool(color)) {
+            descriptionLabel.setTextColor(titleBarColor);
+        }
+        else {
+            descriptionLabel.setTextColor(color);
+        }
+
+        descriptionLabel.setTextColor(color);
+        locationIcon.setImageTintList(ColorStateList.valueOf(color));
+
+    }
+
+    private void updateProfile(String jsonString){
+        try {
+            JSONArray jsonArray = new JSONArray(jsonString);
+            JSONObject userProfile = jsonArray.getJSONObject(0);
+
+            GetProfilePicture getProfilePicture = new GetProfilePicture();
+            getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+
+            final String name = userProfile.getString("name");
+            nameText.setText(name);
+            descriptionText.setText(userProfile.getString("description"));
+            updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
+            final float lat = Float.parseFloat(userProfile.getString("latitude"));
+            final float lng = Float.parseFloat(userProfile.getString("longitude"));
+
+            String myGenres = "(";
+            for(int i=0; i<userProfile.getJSONArray("hostGenres").length(); i++){
+                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("hostGenres").getJSONObject(i).getInt("genreId"), sharedPreferences.getString("genres", "x")));
+                if(i < userProfile.getJSONArray("hostGenres").length()-1){
+                    myGenres = myGenres.concat(", ");
+                }
+            }
+            myGenres = myGenres.concat(")");
+            genresText.setText(myGenres);
+
+            /*SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putInt("userId", userID);
+            editor.apply();*/
+            //TODO: We should probably cache everything here
+
+            locationContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String uri = String.format(Locale.ENGLISH, "geo:%f,%f?q=%f,%f(%s)", lat, lng, lat, lng, name);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    startActivity(intent);
+                }
+            });
+
+            String address = GeoTools.getAddressFromLatLng(getApplicationContext(), new LatLng(lat, lng));
+            locationText.setText(address);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void displayProfilePicture(String result) {
+        try {
+            JSONObject imageProfile = new JSONObject(result);
+
+            ViewGroup.LayoutParams params = imageButton.getLayoutParams();
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            imageButton.setBackground(null);
+            imageButton.setLayoutParams(params);
+            imageButton.setImageTintList(null);
+
+            RequestOptions options = new RequestOptions()
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_baseline_location_on_48px) // TODO default image
+                    .override(ImageTools.PROFILE_PICTURE_SIZE)
+                    .transforms(new CenterCrop(), new RoundedCorners(30));
+
+            Glide.with(getApplicationContext())
+                    .load(Base64.decode(imageProfile.getString("image"), Base64.DEFAULT))
+                    .apply(options)
+                    .into(imageButton);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void displayLoadingScreen(boolean isLoading) {
+        if(isLoading) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.GONE);
+                }
+            });
+        }
+    }
+
+    /**
+     *
+     */
+    class GetHost extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            displayLoadingScreen(true);
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts/" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "USER PROFILE: " + result);
+            updateProfile(result);
+        }
+    }
+
+    class GetProfilePicture extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            displayProfilePicture(result);
+            displayLoadingScreen(false);
+        }
+    }
+
 
     class PostFavorite extends AsyncTask<String, Void, String> {
 
@@ -108,7 +362,7 @@ public class HostProfileActivity extends AppCompatActivity {
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("ArtistId", userId);
-                jsonObject.put("HostId", hostJson.getInt("id"));
+                jsonObject.put("HostId", profileUserId);
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
