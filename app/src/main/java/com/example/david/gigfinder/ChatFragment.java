@@ -63,8 +63,6 @@ public class ChatFragment extends Fragment {
         getReceivers.execute();
 
         chatStrings = new ArrayList<>();
-        chatStrings.add(new String[]{"Artist Name", "Placeholder message...", "0"});
-        chatStrings.add(new String[]{"Host Name", "Test message...", "0"});
 
         chatAdapter = new ChatAdapter(this.getContext(), chatStrings);
         ListView listView = (ListView) getView().findViewById(R.id.chatListView);
@@ -75,6 +73,7 @@ public class ChatFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra("idToken", idToken);
+                intent.putExtra("receiver", Integer.valueOf(chatStrings.get(position)[2]));
                 startActivity(intent);
             }
         });
@@ -82,40 +81,23 @@ public class ChatFragment extends Fragment {
 
     private void showMessages(String result){
         try {
-            JSONArray msgJson = new JSONArray(result);
-            /*
-            for(int i=0; i<msgJson.length(); i++) {
-                if(msgJson.getJSONObject(i).getJSONObject("author").getString("googleIdToken") == idToken) {
-                    if(!containsMsgBy(msgJson.getJSONObject(i).getInt("receiverId"))){
-                        if(user=="host") {
-
-                        }else{
-
-                        }
-                        chatStrings.add(new String[]{})
-                    }else{
-                        //If msg is newer
-                    }
-                }else{
-                    if(containsMsgBy(msgJson.getJSONObject(i).getInt("authorId"))){
-
-                    }else{
-                        //if msg is newer
-                    }
-                }
+            String chatpartner;
+            if(user=="host"){
+                chatpartner = "artist";
+            }else{
+                chatpartner = "host";
             }
-            */
+            JSONArray msgJson = new JSONArray(result);
+            for(int i = 0; i<msgJson.length(); i++){
+                String name = msgJson.getJSONObject(i).getJSONObject(chatpartner).getString("name");
+                String lastmsg = msgJson.getJSONObject(i).getJSONObject("lastMessage").getString("content");
+                String id = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("id"));
+                chatStrings.add(new String[]{name, lastmsg, id});
+            }
+            chatAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    private boolean containsMsgBy(int id){
-        for(int i=0; i<chatStrings.size(); i++){
-            if(Integer.parseInt(chatStrings.get(i)[3]) == id)
-                return true;
-        }
-        return false;
     }
 
     /**

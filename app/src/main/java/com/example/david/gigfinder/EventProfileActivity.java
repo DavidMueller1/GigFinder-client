@@ -267,7 +267,6 @@ public class EventProfileActivity extends AppCompatActivity {
         }
     }
 
-
     class PostParticipation extends AsyncTask<String, Void, String> {
 
         @Override
