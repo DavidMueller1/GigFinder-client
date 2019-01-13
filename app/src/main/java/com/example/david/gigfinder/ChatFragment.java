@@ -76,7 +76,8 @@ public class ChatFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra("idToken", idToken);
-                intent.putExtra("profileUserId", Integer.valueOf(chatStrings.get(position)[2]));
+                intent.putExtra("name", chatStrings.get(position)[0]);
+                intent.putExtra("profileUserId", Integer.parseInt(chatStrings.get(position)[2]));
                 startActivity(intent);
             }
         });
