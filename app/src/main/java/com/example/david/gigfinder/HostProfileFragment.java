@@ -125,7 +125,7 @@ public class HostProfileFragment extends Fragment {
 
 
         int titleBarColor = ColorTools.getSecondaryColor(color);
-        // happens in MainActivity, otherwise the statusBar chanhes on chat tab
+        // happens in MainActivity, otherwise the statusBar changes on chat tab
         //getActivity().getWindow().setStatusBarColor(titleBarColor);
 
         TextView descriptionLabel = getView().findViewById(R.id.profile_host_description_label);
