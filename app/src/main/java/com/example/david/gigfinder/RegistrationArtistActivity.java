@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +68,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private Bitmap profilePicture;
     private String idToken;
 
+    private ArrayAdapter<String> adapter;
+    private JSONArray genres;
+    private String[] genreStrings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,9 +79,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
         idToken = getIntent().getExtras().getString("idToken");
 
-
         GetGenres getGenres = new GetGenres();
-        //getGenres.execute();
+        getGenres.execute();
 
         artist = new Artist();
 
@@ -95,8 +99,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         genreTitle = findViewById(R.id.registration_artist_genre_title);
         genreSpinner = findViewById(R.id.registration_artist_genre);
         //Replaced the Strings with the Genre-Enum
-        ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
-        genreSpinner.setAdapter(adapter);
 
         backgroundColorPickerButton = findViewById(R.id.button_registration_colorPicker);
         backgroundColorPickerButton.setOnClickListener(new View.OnClickListener() {
@@ -205,8 +207,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             Log.d(TAG, "User input ok");
 
             SendRegisterArtist sendRegisterArtist = new SendRegisterArtist();
-            sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()),
-                    artist.getGenres().get(0).toString());
+            sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()));
         }
     }
 
@@ -226,16 +227,40 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         artist.setDescription(descriptionField.getText().toString());
 
         // TODO multiple genres selectable
-        ArrayList genres = new ArrayList();
-        genres.add((Genre)genreSpinner.getSelectedItem());
-        artist.setGenres(genres);
-        if(artist.getGenres().get(0).equals(getResources().getString(R.string.artist_genre_choose))) {
-            Toast.makeText(getApplicationContext(),"Kein Genre ausgewählt",Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "No genre selected.");
-            return false;
-        }
+        genreStrings = new String[1]; //Change length to num of selected genres
+        genreStrings[0] = genreSpinner.getSelectedItem().toString();
+        //TODO just fill this list with selected genres
 
         return true;
+    }
+
+    private void showGenres(String result){
+        try {
+            genres = new JSONArray(result);
+            String[] genreStrings = new String[genres.length()];
+            for(int i=0; i<genres.length(); i++){
+                genreStrings[i] = genres.getJSONObject(i).getString("value");
+            }
+            adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, genreStrings);
+            genreSpinner.setAdapter(adapter);
+        } catch (JSONException e) {
+             e.printStackTrace();
+        }
+    }
+
+    private JSONArray genresToJson(String[] genreStrings) throws JSONException {
+        JSONArray genresJson = new JSONArray();
+        for(String i : genreStrings){
+           for(int j=0; j<genres.length(); j++){
+               if(genres.getJSONObject(j).getString("value").equals(i)){
+                   JSONObject genreObject = new JSONObject();
+                   genreObject.put("genreId", genres.getJSONObject(j).getInt("id"));
+                   genresJson.put(genreObject);
+               }
+           }
+        }
+        Log.d(TAG, genresJson.toString());
+        return genresJson;
     }
 
     class SendRegisterArtist extends AsyncTask<String, Void, String> {
@@ -244,12 +269,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
-                //URL url = new URL("https://87.153.82.101:44386/api/artists");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestProperty("Content-Type","application/json");
-                //urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
@@ -260,9 +283,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 jsonObject.put("name", params[0]);
                 jsonObject.put("description", params[1]);
                 jsonObject.put("backgroundColor", params[2]);
-                JSONArray genres = new JSONArray();
-                genres.put(params[3]);
-                //jsonObject.put("genres", genres);
+                jsonObject.put("artistGenres", genresToJson(genreStrings));
                 //jsonObject.put("image", params[4]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
@@ -311,25 +332,26 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
+            if(!result.equals("")) {
+                try {
+                    JSONObject user = new JSONObject(result);
+                    SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+                    editor.putInt("userId", user.getInt("id"));
+                    editor.putString("user", "artist");
+                    editor.putInt("userColor", user.getInt("backgroundColor"));
+                    editor.apply();
+                    //TODO: We should probably cache everything here
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                JSONObject user = new JSONObject(result);
-                SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
-                editor.putInt("userId", user.getInt("id"));
-                editor.putString("user", "artist");
-                editor.putInt("userColor", user.getInt("backgroundColor"));
-                editor.apply();
-                //TODO: We should probably cache everything here
-            } catch (JSONException e) {
-                e.printStackTrace();
+                Intent intent = new Intent(RegistrationArtistActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("idToken", idToken);
+                intent.putExtra("user", "artist");
+                startActivity(intent);
+                finish();
             }
-
-            Intent intent = new Intent(RegistrationArtistActivity.this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra("idToken", idToken);
-            intent.putExtra("user", "artist");
-            startActivity(intent);
-            finish();
         }
     }
 
@@ -368,6 +390,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "GENRES: " + result);
+            SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putString("genres", result);
+            editor.apply();
+            showGenres(result);
         }
     }
 }
