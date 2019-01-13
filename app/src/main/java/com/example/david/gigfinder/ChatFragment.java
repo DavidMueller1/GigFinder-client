@@ -1,6 +1,7 @@
 package com.example.david.gigfinder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,6 +20,8 @@ import android.widget.ListView;
 
 import com.example.david.gigfinder.adapters.ChatAdapter;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -30,6 +33,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class ChatFragment extends Fragment {
 
     private static final String TAG = "APPLOG - ChatFragment";
@@ -37,6 +42,7 @@ public class ChatFragment extends Fragment {
     private FloatingActionButton chatfab;
     ArrayList<String[]> chatStrings;
     String idToken;
+    String user;
 
     @Nullable
     @Override
@@ -48,16 +54,15 @@ public class ChatFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+
         idToken = getArguments().getString("idToken");
+        user = prefs.getString("user", "host");
 
-        GetMessages getMessages = new GetMessages();
-        getMessages.execute();
-
-        chatfab = (FloatingActionButton) getView().findViewById(R.id.chatfab);
+        GetReceivers getReceivers = new GetReceivers();
+        getReceivers.execute();
 
         chatStrings = new ArrayList<>();
-        chatStrings.add(new String[]{"Artist Name", "Placeholder message..."});
-        chatStrings.add(new String[]{"Host Name", "Test message..."});
 
         chatAdapter = new ChatAdapter(this.getContext(), chatStrings);
         ListView listView = (ListView) getView().findViewById(R.id.chatListView);
@@ -68,27 +73,126 @@ public class ChatFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra("idToken", idToken);
+                intent.putExtra("receiver", Integer.valueOf(chatStrings.get(position)[2]));
                 startActivity(intent);
             }
         });
     }
 
     private void showMessages(String result){
-        String name = null;
-        String lastmsg = null;
-        //chatStrings.add(new String[]{name, lastmsg});
-        //chatAdapter.notifyDataSetChanged();
+        try {
+            String chatpartner;
+            if(user=="host"){
+                chatpartner = "artist";
+            }else{
+                chatpartner = "host";
+            }
+            JSONArray msgJson = new JSONArray(result);
+            for(int i = 0; i<msgJson.length(); i++){
+                String name = msgJson.getJSONObject(i).getJSONObject(chatpartner).getString("name");
+                String lastmsg = msgJson.getJSONObject(i).getJSONObject("lastMessage").getString("content");
+                String id = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("id"));
+                chatStrings.add(new String[]{name, lastmsg, id});
+            }
+            chatAdapter.notifyDataSetChanged();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      *
      */
-    class GetMessages extends AsyncTask<String, Void, String> {
+    class GetHost extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/messages");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            Log.d(TAG, "MESSAGES: " + result);
+            showMessages(result);
+        }
+    }
+
+    /**
+     *
+     */
+    class GetArtist extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/messages");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            Log.d(TAG, "MESSAGES: " + result);
+            showMessages(result);
+        }
+    }
+
+    /**
+     *
+     */
+    class GetReceivers extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/receivers");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);

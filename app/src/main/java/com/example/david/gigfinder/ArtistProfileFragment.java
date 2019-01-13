@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
+import com.example.david.gigfinder.tools.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,12 +69,11 @@ public class ArtistProfileFragment extends Fragment {
 
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
-        // Test Artist
-        /*ArrayList<Genre> list = new ArrayList<>();
-        list.add(Genre.ROCK);
-        list.add(Genre.HOUSE);
-        artist = new Artist(1, Color.DKGRAY, "TestArtist", "Hallo, ich bin ein Test.", null, null, list);
-           */
+        if(sharedPreferences.getString("genres","x").equals("x")){
+            GetGenres getGenres = new GetGenres();
+            getGenres.execute();
+        }
+
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
         imageButton = getView().findViewById(R.id.profile_artist_profilePicture);
         nameText = getView().findViewById(R.id.profile_artist_name);
@@ -166,6 +166,9 @@ public class ArtistProfileFragment extends Fragment {
 
     private void updateProfile(String jsonString){
         try {
+            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+
             JSONArray jsonArray = new JSONArray(jsonString);
             JSONObject userProfile = jsonArray.getJSONObject(0);
             Log.d(TAG, userProfile.toString());
@@ -175,7 +178,18 @@ public class ArtistProfileFragment extends Fragment {
             updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
 
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+
+            String myGenres = "(";
+            for(int i=0; i<userProfile.getJSONArray("artistGenres").length(); i++){
+                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("artistGenres").getJSONObject(i).getInt("genreId"), sharedPreferences.getString("genres", "x")));
+                if(i < userProfile.getJSONArray("artistGenres").length()-1){
+                    myGenres = myGenres.concat(", ");
+                }
+            }
+            myGenres = myGenres.concat(")");
+            genresText.setText(myGenres);
+
+
             editor.putInt("userId", userID);
             editor.apply();
             //TODO: We should probably cache everything here
@@ -291,6 +305,47 @@ public class ArtistProfileFragment extends Fragment {
             editor.commit();
             Log.d(TAG, "DELETE ARTIST: " + result);
             getActivity().finish();
+        }
+    }
+
+    class GetGenres extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/genres");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "GENRES: " + result);
+            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putString("genres", result);
+            editor.apply();
         }
     }
 

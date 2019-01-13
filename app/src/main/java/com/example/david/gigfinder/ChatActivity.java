@@ -19,6 +19,7 @@ import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.Message;
 import com.example.david.gigfinder.data.User;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,7 +32,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
@@ -50,6 +56,9 @@ public class ChatActivity extends AppCompatActivity {
     private EditText chatText;
     private String idToken;
 
+    User chatpartner;
+    User me;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,18 +67,18 @@ public class ChatActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
         idToken = getIntent().getExtras().getString("idToken");
-        receiverId = getIntent().getExtras().getInt("host");
+        receiverId = getIntent().getExtras().getInt("receiver");
         authorId = prefs.getInt("userId", 0);
 
-        User testUser1 = new User();
-        testUser1.setName("Friend");
-        testUser1.setId(2);
+        GetMessages getMessages = new GetMessages();
+        getMessages.execute();
 
-        User testUser2 = new User();
-        testUser2.setId(1);
+        chatpartner = new User();
+        chatpartner.setName("Friend");
+        chatpartner.setId(2);
 
-        messageList.add(new Message("Hi how are you? This is just a test Message", testUser2, 1355270400000L));
-        messageList.add(new Message("Reply Test Message",testUser1, 1355270400000L));
+        me = new User();
+        me.setId(1);
 
         chatText = (EditText) findViewById(R.id.edittext_chatbox);
 
@@ -94,8 +103,10 @@ public class ChatActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PostMessage postMessage = new PostMessage();
-                postMessage.execute(chatText.getText().toString());
+                if(chatText.getText().toString() != "") {
+                    PostMessage postMessage = new PostMessage();
+                    postMessage.execute(chatText.getText().toString());
+                }
             }
         });
 
@@ -105,6 +116,27 @@ public class ChatActivity extends AppCompatActivity {
         mMessageRecycler.setAdapter(mMessageAdapter);
 
         mMessageAdapter.notifyDataSetChanged();
+    }
+
+    private void showMessages(String messages){
+        try {
+            JSONArray messagesArray = new JSONArray(messages);
+            for(int i=0; i<messagesArray.length();i++){
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                Date date = format.parse(messagesArray.getJSONObject(i).getString("created"));
+                long l = date.getTime();
+                if(messagesArray.getJSONObject(i).getInt("authorId")==receiverId){
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), chatpartner, l));
+                }else{
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), me, l));
+                }
+            }
+            mMessageAdapter.notifyDataSetChanged();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     class PostMessage extends AsyncTask<String, Void, String> {
@@ -121,14 +153,11 @@ public class ChatActivity extends AppCompatActivity {
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
-                SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
-                int userId = prefs.getInt("userId", 0);
-
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("AuthorId", authorId);
-                jsonObject.put("RecieverId", receiverId);
+                jsonObject.put("ReceiverId", receiverId);
                 jsonObject.put("Content", params[0]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
@@ -176,6 +205,61 @@ public class ChatActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             chatText.getText().clear();
+            JSONObject msg = null;
+            try {
+                msg = new JSONObject(result);
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                Date date = format.parse(msg.getString("created"));
+                long l = date.getTime();
+                messageList.add(new Message(msg.getString("content"), me, l));
+                mMessageAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    class GetMessages extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/messages?receiver=" + receiverId);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            Log.d(TAG, "MESSAGES: " + result);
+            showMessages(result);
         }
     }
 }
