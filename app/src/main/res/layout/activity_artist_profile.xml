@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    tools:context=".ArtistProfileActivity">
+    android:layout_width="match_parent">
 
-</android.support.constraint.ConstraintLayout>
+    <!-- TODO give the fragment an id token fragment
+        android:id="@+id/activity_profile_artist_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.example.david.gigfinder.ArtistProfileFragment"/-->
+
+</LinearLayout>

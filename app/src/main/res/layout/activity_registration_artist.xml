@@ -7,6 +7,8 @@
     android:layout_height="match_parent"
     tools:context=".RegistrationArtistActivity">
 
+    <include layout="@layout/fragment_loading"/>
+
     <LinearLayout
         android:id="@+id/registration_artist_title_bar_form"
         android:layout_width="match_parent"

@@ -12,12 +12,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -25,6 +27,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.david.gigfinder.data.Host;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
@@ -73,11 +79,15 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private Button backgroundColorPickerButton;
     private Button registrationButton;
 
+    private FrameLayout progress;
+
     private ColorPicker colorPicker;
 
     private Host host;
-    private Bitmap profilePicture;
+    private Uri profilePictureUri;
     private LatLng position;
+
+    private boolean pictureChosen;
 
     String idToken;
 
@@ -91,6 +101,9 @@ public class RegistrationHostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration_host);
 
         idToken = getIntent().getExtras().getString("idToken");
+
+        pictureChosen = false;
+        progress = findViewById(R.id.progressBarHolder);
 
         GetGenres getGenres = new GetGenres();
         getGenres.execute();
@@ -175,18 +188,29 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 Uri path = data.getData();
 
                 try {
-                    profilePicture = ImageTools.decodeUri(path, getContentResolver());
+                    profilePictureUri = path;
 
                     ViewGroup.LayoutParams params = profilePictureButton.getLayoutParams();
                     params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                     params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
                     profilePictureButton.setBackground(null);
                     profilePictureButton.setLayoutParams(params);
-                    profilePictureButton.setImageBitmap(profilePicture);
+                    /*profilePictureButton.setImageBitmap(profilePicture);*/
                     profilePictureButton.setImageTintList(null);
+                    RequestOptions options = new RequestOptions()
+                            .centerCrop()
+                            .placeholder(R.drawable.ic_baseline_location_on_48px)
+                            .override(ImageTools.PROFILE_PICTURE_SIZE)
+                            .transforms(new CenterCrop(), new RoundedCorners(30));
+
+                    Glide.with(getApplicationContext())
+                            .load(path)
+                            .apply(options)
+                            .into(profilePictureButton);
 
                     findViewById(R.id.registration_host_image_hint).setVisibility(View.VISIBLE);
-                } catch (FileNotFoundException e) {
+                    pictureChosen = true;
+                } catch (Exception e) {
                     Log.d(TAG, "File not found");
                 }
 
@@ -268,8 +292,17 @@ public class RegistrationHostActivity extends AppCompatActivity {
         if(checkUserInputBasic()) {
             Log.d(TAG, "User input ok");
 
+            byte[] imageByteArray = null;
+            try {
+                imageByteArray = ImageTools.uriToByteArray(profilePictureUri, getApplicationContext());
+            } catch (IOException e) {
+                Log.d(TAG, "Uri not found");
+                Toast.makeText(getApplicationContext(),"Uri not found",Toast.LENGTH_SHORT).show();
+
+            }
+
             SendRegisterHost sendRegisterHost = new SendRegisterHost();
-            sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude); //TODO params
+            sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude, Base64.encodeToString(imageByteArray, Base64.DEFAULT)); //TODO params
         }
     }
 
@@ -328,10 +361,30 @@ public class RegistrationHostActivity extends AppCompatActivity {
         return genresJson;
     }
 
+    private void displayLoadingScreen(boolean isLoading) {
+        if(isLoading) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.GONE);
+                }
+            });
+        }
+    }
+
     class SendRegisterHost extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
+            displayLoadingScreen(true);
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -344,13 +397,15 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
-                JSONObject jsonObject = new JSONObject();
+                JSONObject jsonObject = new JSONObject();JSONObject imageJson = new JSONObject();
+                imageJson.put("Image", params[5]);
                 jsonObject.put("name", params[0]);
                 jsonObject.put("description", params[1]);
                 jsonObject.put("backgroundColor", params[2]);
                 jsonObject.put("latitude", params[3]);
                 jsonObject.put("longitude", params[4]);
                 jsonObject.put("hostGenres", genresToJson(genreStrings));
+                jsonObject.put("profilePicture", imageJson);
                 //jsonObject.put("image", params[4]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
@@ -360,6 +415,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 try {
                     is = urlConnection.getInputStream();
                 } catch (IOException ioe) {
+                    displayLoadingScreen(false);
                     if (urlConnection instanceof HttpURLConnection) {
                         HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
                         int statusCode = httpConn.getResponseCode();
@@ -385,12 +441,16 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
                 return response.toString();
             } catch (ProtocolException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             } catch (MalformedURLException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             } catch (IOException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             } catch (JSONException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             }
 
@@ -399,7 +459,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-
+            displayLoadingScreen(false);
             try {
                 JSONObject user = new JSONObject(result);
                 SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();

@@ -1,13 +1,19 @@
 package com.example.david.gigfinder.tools;
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 
 public abstract class ImageTools {
+    public static final int PROFILE_PICTURE_SIZE = 800;
 
     /**
      * @param selectedImage
@@ -39,5 +45,24 @@ public abstract class ImageTools {
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
         return BitmapFactory.decodeStream(contentResolver.openInputStream(selectedImage), null, o2);
+    }
+
+    public static byte[] bitmapToByteArray(Bitmap image) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        return stream.toByteArray();
+    }
+
+    public static byte[] uriToByteArray(Uri path, Context context) throws IOException {
+        InputStream iStream = context.getContentResolver().openInputStream(path);
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = iStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
     }
 }
