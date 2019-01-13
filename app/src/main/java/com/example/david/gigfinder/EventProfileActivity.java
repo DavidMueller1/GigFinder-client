@@ -21,6 +21,7 @@ import com.example.david.gigfinder.data.Event;
 import com.example.david.gigfinder.data.Host;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.GeoTools;
+import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
@@ -50,6 +51,8 @@ import java.util.Locale;
 public class EventProfileActivity extends AppCompatActivity {
     private static final String TAG = "EventProfileActivity";
 
+    SharedPreferences prefs;
+
     private Event event;
     private String idToken;
     private String user;
@@ -73,7 +76,7 @@ public class EventProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_profile);
 
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+        prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
         idToken = getIntent().getExtras().getString("idToken");
         userId = prefs.getInt("userId", 0);
@@ -177,15 +180,15 @@ public class EventProfileActivity extends AppCompatActivity {
         titleText.setText(eventJson.getString("title"));
         descriptionText.setText(eventJson.getString("description"));
 
-        String genreString = "(";
-        for(Genre g : event.getGenres()) {
-            if(!genreString.equals("(")) {
-                genreString += ", ";
+        String myGenres = "(";
+        for(int i=0; i<eventJson.getJSONArray("eventGenres").length(); i++){
+            myGenres = myGenres.concat(Utils.genreIdToString(eventJson.getJSONArray("eventGenres").getJSONObject(i).getInt("genreId"), prefs.getString("genres", "x")));
+            if(i < eventJson.getJSONArray("eventGenres").length()-1){
+                myGenres = myGenres.concat(", ");
             }
-            genreString += g.toString();
         }
-        genreString += ")";
-        genreText.setText(genreString);
+        myGenres = myGenres.concat(")");
+        genreText.setText(myGenres);
         String time = event.getTimeFrom().getHours() + ":" + event.getTimeFrom().getMinutes() + " Uhr - " + event.getTimeTo().getHours() + ":" + event.getTimeTo().getMinutes() + " Uhr";
         timeText.setText(time);
         String date = event.getTimeFrom().getDate() + "." + event.getTimeFrom().getMonth() + "." + event.getTimeFrom().getYear();
