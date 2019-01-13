@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.david.gigfinder.adapters.ChatAdapter;
 
@@ -39,7 +40,7 @@ public class ChatFragment extends Fragment {
 
     private static final String TAG = "APPLOG - ChatFragment";
     private ChatAdapter chatAdapter;
-    private FloatingActionButton chatfab;
+    private TextView noChatsText;
     ArrayList<String[]> chatStrings;
     String idToken;
     String user;
@@ -59,6 +60,8 @@ public class ChatFragment extends Fragment {
         idToken = getArguments().getString("idToken");
         user = prefs.getString("user", "host");
 
+        noChatsText = getView().findViewById(R.id.noChatText);
+
         GetReceivers getReceivers = new GetReceivers();
         getReceivers.execute();
 
@@ -73,7 +76,7 @@ public class ChatFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra("idToken", idToken);
-                intent.putExtra("receiver", Integer.valueOf(chatStrings.get(position)[2]));
+                intent.putExtra("profileUserId", Integer.valueOf(chatStrings.get(position)[2]));
                 startActivity(intent);
             }
         });
@@ -97,90 +100,6 @@ public class ChatFragment extends Fragment {
             chatAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     *
-     */
-    class GetHost extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/messages");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result){
-            Log.d(TAG, "MESSAGES: " + result);
-            showMessages(result);
-        }
-    }
-
-    /**
-     *
-     */
-    class GetArtist extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/messages");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result){
-            Log.d(TAG, "MESSAGES: " + result);
-            showMessages(result);
         }
     }
 
@@ -222,7 +141,12 @@ public class ChatFragment extends Fragment {
         @Override
         protected void onPostExecute(String result){
             Log.d(TAG, "MESSAGES: " + result);
-            showMessages(result);
+            if(result.equals("[]")) {
+
+            }else{
+                showMessages(result);
+                noChatsText.setVisibility(View.GONE);
+            }
         }
     }
 }

@@ -81,8 +81,8 @@ public class HostProfileActivity extends AppCompatActivity {
             e.printStackTrace();
         }*/
 
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
-        userId = prefs.getInt("userId", 0);
+        //SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+        userId = sharedPreferences.getInt("userId", 0);
 
 //        profileUserId = 28;
         profileUserId = Integer.parseInt(getIntent().getExtras().getString("profileUserId"));
