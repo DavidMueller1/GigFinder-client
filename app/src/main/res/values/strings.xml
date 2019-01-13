@@ -85,6 +85,9 @@
     <string name="error_end_date">Der Enddatum fehlt</string>
     <string name="error_location">Die Location fehlt</string>
 
+    <string name="missing_favorites">Du hast noch keine Favoriten :(</string>
+    <string name="missing_chat">Du hast noch keine Nachrichten erhalten :(</string>
+
     <!-- Buttons -->
     <string name="button_add_to_favorites">Zu Favoriten hinzufügen</string>
     <string name="button_send_message">Nachricht schreiben</string>

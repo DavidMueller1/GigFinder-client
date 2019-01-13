@@ -2,12 +2,14 @@ package com.example.david.gigfinder.data;
 
 public class Message {
     String message;
-    User sender;
     long createdAt;
+    String name;
+    boolean me;
 
-    public Message(String message, User sender, long createdAt) {
+    public Message(String message, String name, boolean me, long createdAt) {
         this.message = message;
-        this.sender = sender;
+        this.name = name;
+        this.me = me;
         this.createdAt = createdAt;
     }
 
@@ -19,7 +21,11 @@ public class Message {
         return createdAt;
     }
 
-    public User getSender() {
-        return sender;
+    public String getName() {
+        return name;
+    }
+
+    public boolean isMe() {
+        return me;
     }
 }
