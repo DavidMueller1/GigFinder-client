@@ -135,5 +135,11 @@
         android:layout_height="wrap_content"
         android:text="Hosted By (Testbtn)" />
 
+    <Button
+        android:id="@+id/applyBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bewerben" />
+
 
 </LinearLayout>
