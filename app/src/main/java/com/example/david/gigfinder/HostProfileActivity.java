@@ -40,14 +40,19 @@ public class HostProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host_profile);
 
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
         idToken = getIntent().getExtras().getString("idToken");
-        try {
-            hostJson = new JSONObject(getIntent().getExtras().getString("host"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+
+        if(getIntent().hasExtra("host")) {
+            try {
+                hostJson = new JSONObject(getIntent().getExtras().getString("host"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d(TAG, "No host information");
         }
 
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
         userId = prefs.getInt("userId", 0);
 
         sendMsgBtn = findViewById(R.id.sendMsgBtn);

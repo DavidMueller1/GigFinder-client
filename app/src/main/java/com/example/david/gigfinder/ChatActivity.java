@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.david.gigfinder.adapters.MessageListAdapter;
 import com.example.david.gigfinder.data.Artist;
@@ -52,12 +53,12 @@ public class ChatActivity extends AppCompatActivity {
     private ArrayList<Message> messageList = new ArrayList<Message>();
     private LinearLayout nameboxLayout;
     private ImageView backBtn;
+    private ImageView chatImg;
     private Button sendBtn;
     private EditText chatText;
+    private TextView chatName;
     private String idToken;
-
-    User chatpartner;
-    User me;
+    private String user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,30 +68,16 @@ public class ChatActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
         idToken = getIntent().getExtras().getString("idToken");
-        receiverId = getIntent().getExtras().getInt("receiver");
+        receiverId = getIntent().getExtras().getInt("profileUserId");
         authorId = prefs.getInt("userId", 0);
+        user = prefs.getString("user", "host");
 
         GetMessages getMessages = new GetMessages();
         getMessages.execute();
 
-        chatpartner = new User();
-        chatpartner.setName("Friend");
-        chatpartner.setId(2);
-
-        me = new User();
-        me.setId(1);
-
         chatText = (EditText) findViewById(R.id.edittext_chatbox);
-
-        nameboxLayout = (LinearLayout) findViewById(R.id.layout_namebox);
-        nameboxLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ChatActivity.this, ArtistProfileActivity.class);
-                //intent.putExtra("comingFrom", "chat");
-                startActivity(intent);
-            }
-        });
+        chatName = (TextView) findViewById(R.id.chatName);
+        chatImg = (ImageView) findViewById(R.id.chatImg);
 
         backBtn = (ImageView) findViewById(R.id.backImg);
         backBtn.setOnClickListener(new View.OnClickListener() {
@@ -111,12 +98,27 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        nameboxLayout = (LinearLayout) findViewById(R.id.layout_namebox);
+        nameboxLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(user=="host") {
+                    Intent intent = new Intent(ChatActivity.this, ArtistProfileActivity.class);
+                    intent.putExtra("artist", receiverId);
+                    startActivity(intent);
+                }else{
+                    Intent intent = new Intent(ChatActivity.this, HostProfileActivity.class);
+                    intent.putExtra("host", receiverId);
+                    startActivity(intent);
+                }
+            }
+        });
+
         mMessageRecycler = (RecyclerView) findViewById(R.id.reyclerview_message_list);
         mMessageAdapter = new MessageListAdapter(this, messageList);
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this));
         mMessageRecycler.setAdapter(mMessageAdapter);
 
-        mMessageAdapter.notifyDataSetChanged();
     }
 
     private void showMessages(String messages){
@@ -127,9 +129,9 @@ public class ChatActivity extends AppCompatActivity {
                 Date date = format.parse(messagesArray.getJSONObject(i).getString("created"));
                 long l = date.getTime();
                 if(messagesArray.getJSONObject(i).getInt("authorId")==receiverId){
-                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), chatpartner, l));
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "chatpartner", false, l));
                 }else{
-                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), me, l));
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "me", true, l));
                 }
             }
             mMessageAdapter.notifyDataSetChanged();
@@ -140,6 +142,9 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     *
+     */
     class PostMessage extends AsyncTask<String, Void, String> {
 
         @Override
@@ -212,7 +217,7 @@ public class ChatActivity extends AppCompatActivity {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 Date date = format.parse(msg.getString("created"));
                 long l = date.getTime();
-                messageList.add(new Message(msg.getString("content"), me, l));
+                messageList.add(new Message(msg.getString("content"), "me", true, l));
                 mMessageAdapter.notifyDataSetChanged();
             } catch (JSONException e) {
                 e.printStackTrace();
