@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.david.gigfinder.adapters.FavAdapter;
 
@@ -33,6 +34,7 @@ public class FavoritesFragment extends Fragment {
 
     private FavAdapter favAdapter;
     private String idToken;
+    private TextView noFavsText;
     ArrayList<String[]> favorites;
 
     @Nullable
@@ -46,6 +48,8 @@ public class FavoritesFragment extends Fragment {
         super.onStart();
 
         idToken = getArguments().getString("idToken");
+
+        noFavsText = getView().findViewById(R.id.noFavsText);
 
         favorites = new ArrayList<>();
 
@@ -119,7 +123,12 @@ public class FavoritesFragment extends Fragment {
         @Override
         protected void onPostExecute(String result){
             Log.d(TAG, "FAVORITES: " + result);
-            showFavorites(result);
+            if(result.equals("[]")){
+
+            }else{
+                noFavsText.setVisibility(View.GONE);
+                showFavorites(result);
+            }
         }
     }
 }

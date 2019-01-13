@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.david.gigfinder.adapters.ChatAdapter;
 
@@ -39,6 +40,7 @@ public class ChatFragment extends Fragment {
 
     private static final String TAG = "APPLOG - ChatFragment";
     private ChatAdapter chatAdapter;
+    private TextView noChatsText;
     ArrayList<String[]> chatStrings;
     String idToken;
     String user;
@@ -57,6 +59,8 @@ public class ChatFragment extends Fragment {
 
         idToken = getArguments().getString("idToken");
         user = prefs.getString("user", "host");
+
+        noChatsText = getView().findViewById(R.id.noChatText);
 
         GetReceivers getReceivers = new GetReceivers();
         getReceivers.execute();
@@ -137,7 +141,12 @@ public class ChatFragment extends Fragment {
         @Override
         protected void onPostExecute(String result){
             Log.d(TAG, "MESSAGES: " + result);
-            showMessages(result);
+            if(result.equals("[]")) {
+
+            }else{
+                showMessages(result);
+                noChatsText.setVisibility(View.GONE);
+            }
         }
     }
 }

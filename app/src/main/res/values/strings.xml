@@ -85,4 +85,7 @@
     <string name="error_end_date">Der Enddatum fehlt</string>
     <string name="error_location">Die Location fehlt</string>
 
+    <string name="missing_favorites">Du hast noch keine Favoriten :(</string>
+    <string name="missing_chat">Du hast noch keine Nachrichten erhalten :(</string>
+
 </resources>
