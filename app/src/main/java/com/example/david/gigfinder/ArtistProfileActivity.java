@@ -217,7 +217,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
             RequestOptions options = new RequestOptions()
                     .centerCrop()
-                    .placeholder(R.drawable.ic_baseline_location_on_48px) // TODO default image
+                    .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER)
                     .override(ImageTools.PROFILE_PICTURE_SIZE)
                     .transforms(new CenterCrop(), new RoundedCorners(30));
 
