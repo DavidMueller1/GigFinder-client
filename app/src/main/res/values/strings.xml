@@ -85,4 +85,9 @@
     <string name="error_end_date">Der Enddatum fehlt</string>
     <string name="error_location">Die Location fehlt</string>
 
+    <!-- Buttons -->
+    <string name="button_add_to_favorites">Zu Favoriten hinzufügen</string>
+    <string name="button_send_message">Nachricht schreiben</string>
+
+
 </resources>
