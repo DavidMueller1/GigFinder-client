@@ -257,7 +257,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
      */
     private boolean checkUserInputBasic() {
         // Check whether a profile picture is selected
-        if(pictureChosen) {
+        if(!pictureChosen) {
             Toast.makeText(getApplicationContext(),"Bitte ein Profilbild wählen.",Toast.LENGTH_SHORT).show();
             Log.d(TAG, "No profile picture");
             return false;

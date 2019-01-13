@@ -103,7 +103,7 @@ public class HostProfileActivity extends AppCompatActivity {
                 Intent intent = new Intent(HostProfileActivity.this, ChatActivity.class);
                 intent.putExtra("idToken", idToken);
 
-                intent.putExtra("receiver", profileUserId);
+                intent.putExtra("profileUserId", profileUserId);
 
                 startActivity(intent);
             }

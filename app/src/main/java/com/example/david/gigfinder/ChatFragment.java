@@ -85,7 +85,7 @@ public class ChatFragment extends Fragment {
     private void showMessages(String result){
         try {
             String chatpartner;
-            if(user=="host"){
+            if(user.equals("host")){
                 chatpartner = "artist";
             }else{
                 chatpartner = "host";
