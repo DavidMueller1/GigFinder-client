@@ -87,6 +87,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ChatActivity.this, ArtistProfileActivity.class);
+                //intent.putExtra("comingFrom", "chat");
                 startActivity(intent);
             }
         });

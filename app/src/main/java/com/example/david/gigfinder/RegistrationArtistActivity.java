@@ -10,19 +10,26 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.JsonReader;
+import android.util.JsonWriter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
@@ -36,6 +43,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +53,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class RegistrationArtistActivity extends AppCompatActivity {
 
@@ -52,6 +61,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private static final int PICK_IMAGE = 1;
 
     private TextView profilePictureTitle;
+    private TextView profilePictureHint;
     private ImageView profilePictureButton;
     private TextView nameTitle;
     private EditText nameField;
@@ -62,11 +72,15 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private Button backgroundColorPickerButton;
     private Button registrationButton;
 
+    private FrameLayout progress;
+
     private ColorPicker colorPicker;
 
     private Artist artist;
-    private Bitmap profilePicture;
+    private Uri profilePictureUri;
     private String idToken;
+
+    private boolean pictureChosen;
 
     private ArrayAdapter<String> adapter;
     private JSONArray genres;
@@ -79,12 +93,16 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
         idToken = getIntent().getExtras().getString("idToken");
 
+        pictureChosen = false;
+        progress = findViewById(R.id.progressBarHolder);
+
         GetGenres getGenres = new GetGenres();
         getGenres.execute();
 
         artist = new Artist();
 
         profilePictureTitle = findViewById(R.id.registration_artist_image_title);
+        profilePictureHint = findViewById(R.id.registration_artist_image_hint);
         profilePictureButton = findViewById(R.id.registration_artist_profilePicture);
         profilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,18 +169,31 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 Uri path = data.getData();
 
                 try {
-                    profilePicture = ImageTools.decodeUri(path, getContentResolver());
+                    //profilePicture = ImageTools.decodeUri(path, getContentResolver());
+                    //profilePictureFile = new File(path.getPath());
+                    profilePictureUri = path;
 
                     ViewGroup.LayoutParams params = profilePictureButton.getLayoutParams();
                     params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                     params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
                     profilePictureButton.setBackground(null);
                     profilePictureButton.setLayoutParams(params);
-                    profilePictureButton.setImageBitmap(profilePicture);
+                    /*profilePictureButton.setImageBitmap(profilePicture);*/
                     profilePictureButton.setImageTintList(null);
+                    RequestOptions options = new RequestOptions()
+                            .centerCrop()
+                            .placeholder(R.drawable.ic_baseline_location_on_48px)
+                            .override(ImageTools.PROFILE_PICTURE_SIZE)
+                            .transforms(new CenterCrop(), new RoundedCorners(30));
+
+                    Glide.with(getApplicationContext())
+                            .load(path)
+                            .apply(options)
+                            .into(profilePictureButton);
 
                     findViewById(R.id.registration_artist_image_hint).setVisibility(View.VISIBLE);
-                } catch (FileNotFoundException e) {
+                    pictureChosen = true;
+                } catch (Exception e) {
                     Log.d(TAG, "File not found");
                 }
             }
@@ -193,6 +224,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         backgroundColorPickerButton.setTextColor(textColor);
 
         profilePictureTitle.setTextColor(color);
+        profilePictureHint.setTextColor(color);
         nameTitle.setTextColor(color);
         descriptionTitle.setTextColor(color);
         genreTitle.setTextColor(color);
@@ -206,8 +238,17 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         if(checkUserInputBasic()) {
             Log.d(TAG, "User input ok");
 
+            byte[] imageByteArray = null;
+            try {
+                imageByteArray = ImageTools.uriToByteArray(profilePictureUri, getApplicationContext());
+            } catch (IOException e) {
+                Log.d(TAG, "Uri not found");
+                Toast.makeText(getApplicationContext(),"Uri not found",Toast.LENGTH_SHORT).show();
+
+            }
+
             SendRegisterArtist sendRegisterArtist = new SendRegisterArtist();
-            sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()));
+            sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()), Base64.encodeToString(imageByteArray, Base64.DEFAULT));
         }
     }
 
@@ -263,10 +304,30 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         return genresJson;
     }
 
+    private void displayLoadingScreen(boolean isLoading) {
+        if(isLoading) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.GONE);
+                }
+            });
+        }
+    }
+
     class SendRegisterArtist extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
+            displayLoadingScreen(true);
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -277,13 +338,17 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
+
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
+                JSONObject imageJson = new JSONObject();
+                imageJson.put("Image", params[3]);
                 jsonObject.put("name", params[0]);
                 jsonObject.put("description", params[1]);
                 jsonObject.put("backgroundColor", params[2]);
                 jsonObject.put("artistGenres", genresToJson(genreStrings));
+                jsonObject.put("profilePicture", imageJson);
                 //jsonObject.put("image", params[4]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
@@ -293,13 +358,14 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 try {
                     is = urlConnection.getInputStream();
                 } catch (IOException ioe) {
+                    displayLoadingScreen(false);
                     if (urlConnection instanceof HttpURLConnection) {
                         HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
                         int statusCode = httpConn.getResponseCode();
                         if (statusCode != 200) {
                             is = httpConn.getErrorStream();
                             Log.d(TAG, "SendRegisterArtist: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "SendRegisterArtist: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
+                            Log.d(TAG, "SendRegisterArtist: RESPONSE MESSAGE: " + httpConn.getResponseMessage());
                             Log.d(TAG, httpConn.getURL().toString());
                         }
                     }
@@ -318,12 +384,16 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
                 return response.toString();
             } catch (ProtocolException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             } catch (MalformedURLException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             } catch (IOException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             } catch (JSONException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             }
 
@@ -332,6 +402,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
+            displayLoadingScreen(false);
             if(!result.equals("")) {
                 try {
                     JSONObject user = new JSONObject(result);

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +20,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
+import com.example.david.gigfinder.tools.ImageTools;
 import com.example.david.gigfinder.tools.Utils;
 
 import org.json.JSONArray;
@@ -54,6 +60,7 @@ public class ArtistProfileFragment extends Fragment {
     private String idToken;
 
     private FrameLayout progress;
+    private byte[] imageByteArray;
 
     //private Artist artist;
 
@@ -172,6 +179,10 @@ public class ArtistProfileFragment extends Fragment {
             JSONArray jsonArray = new JSONArray(jsonString);
             JSONObject userProfile = jsonArray.getJSONObject(0);
             Log.d(TAG, userProfile.toString());
+
+            GetProfilePicture getProfilePicture = new GetProfilePicture();
+            getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+
             nameText.setText(userProfile.getString("name"));
             descriptionText.setText(userProfile.getString("description"));
             userID = userProfile.getInt("id");
@@ -193,6 +204,35 @@ public class ArtistProfileFragment extends Fragment {
             editor.putInt("userId", userID);
             editor.apply();
             //TODO: We should probably cache everything here
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private void displayProfilePicture(String result) {
+        try {
+            JSONObject imageProfile = new JSONObject(result);
+
+            ViewGroup.LayoutParams params = imageButton.getLayoutParams();
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            imageButton.setBackground(null);
+            imageButton.setLayoutParams(params);
+            imageButton.setImageTintList(null);
+
+            RequestOptions options = new RequestOptions()
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_baseline_location_on_48px) // TODO default image
+                    .override(ImageTools.PROFILE_PICTURE_SIZE)
+                    .transforms(new CenterCrop(), new RoundedCorners(30));
+
+            Glide.with(getContext())
+                    .load(Base64.decode(imageProfile.getString("image"), Base64.DEFAULT))
+                    .apply(options)
+                    .into(imageButton);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -258,8 +298,46 @@ public class ArtistProfileFragment extends Fragment {
         protected void onPostExecute(String result) {
 
             Log.d(TAG, "USER PROFILE: " + result);
-            displayLoadingScreen(false);
             updateProfile(result);
+        }
+    }
+
+    class GetProfilePicture extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            displayProfilePicture(result);
+            displayLoadingScreen(false);
         }
     }
 
