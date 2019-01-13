@@ -159,9 +159,6 @@ public class ChatActivity extends AppCompatActivity {
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
-                Log.d(TAG, String.valueOf(authorId));
-                Log.d(TAG, String.valueOf(receiverId));
-
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();

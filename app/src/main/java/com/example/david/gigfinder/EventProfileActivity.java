@@ -26,6 +26,7 @@ import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.RuntimeRemoteException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -45,6 +46,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -193,11 +195,15 @@ public class EventProfileActivity extends AppCompatActivity {
         }
         myGenres = myGenres.concat(")");
         genreText.setText(myGenres);
-        String time = event.getTimeFrom().getHours() + ":" + event.getTimeFrom().getMinutes() + " Uhr - " + event.getTimeTo().getHours() + ":" + event.getTimeTo().getMinutes() + " Uhr";
+
+        Date start = Utils.dateToString(eventJson.getString("start"));
+        Date end = Utils.dateToString(eventJson.getString("end"));
+        String time = start.getHours() + ":" + start.getMinutes() + " Uhr - " + end.getHours() + ":" + end.getMinutes() + " Uhr";
         timeText.setText(time);
-        String date = event.getTimeFrom().getDate() + "." + event.getTimeFrom().getMonth() + "." + event.getTimeFrom().getYear();
+        String date = start.getDate() + "." + start.getMonth() + "." + start.getYear();
         dateText.setText(date);
-        String placeName = GeoTools.getAddressFromLatLng(this, event.getLocation());
+
+        String placeName = GeoTools.getAddressFromLatLng(this, new LatLng(eventJson.getDouble("latitude"), eventJson.getDouble("longitude")));
         locationText.setText(placeName);
     }
 
