@@ -134,7 +134,7 @@ public class ArtistProfileFragment extends Fragment {
         getView().findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
 
         int titleBarColor = ColorTools.getSecondaryColor(color);
-        // happens in MainActivity, otherwise the statusBar chanhes on chat tab
+        // happens in MainActivity, otherwise the statusBar changes on chat tab
         //getActivity().getWindow().setStatusBarColor(titleBarColor);
 
         TextView descriptionLabel = getView().findViewById(R.id.profile_artist_description_label);

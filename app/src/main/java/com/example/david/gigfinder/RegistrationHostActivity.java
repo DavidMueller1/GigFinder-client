@@ -58,6 +58,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private static final int PLACE_PICKER_REQUEST = 2;
 
     private TextView profilePictureTitle;
+    private TextView profilePictureHint;
     private ImageView profilePictureButton;
     private TextView nameTitle;
     private EditText nameField;
@@ -89,6 +90,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
         host = new Host();
 
         profilePictureTitle = findViewById(R.id.registration_host_image_title);
+        profilePictureHint = findViewById(R.id.registration_host_image_hint);
         profilePictureButton = findViewById(R.id.registration_host_profilePicture);
         profilePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -246,6 +248,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
         backgroundColorPickerButton.setTextColor(textColor);
 
         profilePictureTitle.setTextColor(color);
+        profilePictureHint.setTextColor(color);
         nameTitle.setTextColor(color);
         descriptionTitle.setTextColor(color);
         locationButtonIcon.setImageTintList(ColorStateList.valueOf(color));
