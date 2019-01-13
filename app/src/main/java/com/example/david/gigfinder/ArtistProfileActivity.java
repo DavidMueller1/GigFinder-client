@@ -185,6 +185,15 @@ public class ArtistProfileActivity extends AppCompatActivity {
             myGenres = myGenres.concat(")");
             genresText.setText(myGenres);
 
+            if(sharedPreferences.getString("user", "").equals("artist")) {
+                sendMsgBtn.setVisibility(View.GONE);
+                addToFavsBtn.setVisibility(View.GONE);
+            }
+            else {
+                sendMsgBtn.setVisibility(View.VISIBLE);
+                addToFavsBtn.setVisibility(View.VISIBLE);
+            }
+
             /*SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
             editor.putInt("userId", userID);
             editor.apply();*/

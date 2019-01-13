@@ -192,6 +192,14 @@ public class HostProfileActivity extends AppCompatActivity {
             myGenres = myGenres.concat(")");
             genresText.setText(myGenres);
 
+            addToFavsBtn.setVisibility(View.GONE);
+            if(sharedPreferences.getString("user", "").equals("artist")) {
+                sendMsgBtn.setVisibility(View.VISIBLE);
+            }
+            else {
+                sendMsgBtn.setVisibility(View.GONE);
+            }
+
             /*SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
             editor.putInt("userId", userID);
             editor.apply();*/
