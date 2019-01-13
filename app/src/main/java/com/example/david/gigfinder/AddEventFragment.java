@@ -2,6 +2,7 @@ package com.example.david.gigfinder;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -40,6 +41,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -66,6 +68,8 @@ public class AddEventFragment extends Fragment {
     private static final int PICK_IMAGE = 1;
     private static final int PLACE_PICKER_REQUEST = 2;
 
+    SharedPreferences sharedPreferences;
+
     private EditText nameField;
     private EditText descriptionField;
     private LinearLayout locationButton;
@@ -85,6 +89,10 @@ public class AddEventFragment extends Fragment {
 
     String idToken;
 
+    private ArrayAdapter<String> adapter;
+    private JSONArray genres;
+    private String[] genreStrings;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -97,6 +105,17 @@ public class AddEventFragment extends Fragment {
 
         idToken = getArguments().getString("idToken");
 
+        sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
+
+        genreSpinner = getView().findViewById(R.id.add_event_genre);
+
+        if(sharedPreferences.getString("genres","x").equals("x")){
+            GetGenres getGenres = new GetGenres();
+            getGenres.execute();
+        }else{
+            showGenres(sharedPreferences.getString("genres","x"));
+        }
+
         nameField = getView().findViewById(R.id.add_event_title);
         descriptionField = getView().findViewById(R.id.add_event_description);
         locationButton = getView().findViewById(R.id.add_event_location_container);
@@ -107,10 +126,7 @@ public class AddEventFragment extends Fragment {
             }
         });
         locationButtonText = getView().findViewById(R.id.add_event_location_text);
-        genreSpinner = getView().findViewById(R.id.add_event_genre);
         //Replaced the Strings with the Genre-Enum
-        ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
-        genreSpinner.setAdapter(adapter);
 
 
         addEventButton = getView().findViewById(R.id.button_add_event_save);
@@ -399,7 +415,41 @@ public class AddEventFragment extends Fragment {
             return false;
         }
 
+        // TODO multiple genres selectable
+        genreStrings = new String[1]; //Change length to num of selected genres
+        genreStrings[0] = genreSpinner.getSelectedItem().toString();
+        //TODO just fill this list with selected genres
+
         return true;
+    }
+
+    private void showGenres(String result){
+        try {
+            genres = new JSONArray(result);
+            String[] genreStrings = new String[genres.length()];
+            for(int i=0; i<genres.length(); i++){
+                genreStrings[i] = genres.getJSONObject(i).getString("value");
+            }
+            adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, genreStrings);
+            genreSpinner.setAdapter(adapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private JSONArray genresToJson(String[] genreStrings) throws JSONException {
+        JSONArray genresJson = new JSONArray();
+        for(String i : genreStrings){
+            for(int j=0; j<genres.length(); j++){
+                if(genres.getJSONObject(j).getString("value").equals(i)){
+                    JSONObject genreObject = new JSONObject();
+                    genreObject.put("genreId", genres.getJSONObject(j).getInt("id"));
+                    genresJson.put(genreObject);
+                }
+            }
+        }
+        Log.d(TAG, genresJson.toString());
+        return genresJson;
     }
 
     class PostEvent extends AsyncTask<String, Void, String> {
@@ -429,6 +479,7 @@ public class AddEventFragment extends Fragment {
                 jsonObject.put("latitude", params[3]);
                 jsonObject.put("start", params[4]);
                 jsonObject.put("end", params[5]);
+                jsonObject.put("eventGenres", genresToJson(genreStrings));
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
@@ -477,6 +528,47 @@ public class AddEventFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
 
+        }
+    }
+
+    class GetGenres extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/genres");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "GENRES: " + result);
+            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putString("genres", result);
+            editor.apply();
         }
     }
 }
