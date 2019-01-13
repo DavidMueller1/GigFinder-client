@@ -182,7 +182,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                     profilePictureButton.setImageTintList(null);
                     RequestOptions options = new RequestOptions()
                             .centerCrop()
-                            .placeholder(R.drawable.ic_baseline_location_on_48px)
+                            .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER)
                             .override(ImageTools.PROFILE_PICTURE_SIZE)
                             .transforms(new CenterCrop(), new RoundedCorners(30));
 
@@ -256,6 +256,13 @@ public class RegistrationArtistActivity extends AppCompatActivity {
      * Checks whether the user input is valid (ex. name not empty)
      */
     private boolean checkUserInputBasic() {
+        // Check whether a profile picture is selected
+        if(pictureChosen) {
+            Toast.makeText(getApplicationContext(),"Bitte ein Profilbild wählen.",Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "No profile picture");
+            return false;
+        }
+
         // Check whether name field is empty
         artist.setName(nameField.getText().toString());
         if(artist.getName().equals("")) {

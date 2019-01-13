@@ -74,6 +74,7 @@ public class HostProfileActivity extends AppCompatActivity {
 
         sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
+        profileUserId = Integer.parseInt(getIntent().getExtras().getString("profileUserId"));
         idToken = getIntent().getExtras().getString("idToken");
         /*try {
             hostJson = new JSONObject(getIntent().getExtras().getString("host"));
@@ -82,10 +83,9 @@ public class HostProfileActivity extends AppCompatActivity {
         }*/
 
         //SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
-        userId = sharedPreferences.getInt("userId", 0);
+        userId = sharedPreferences.getInt("userId", -1);
 
 //        profileUserId = 28;
-        profileUserId = Integer.parseInt(getIntent().getExtras().getString("profileUserId"));
 
         imageButton = findViewById(R.id.profile_host_profilePicture);
         nameText = findViewById(R.id.profile_host_name);
@@ -235,7 +235,7 @@ public class HostProfileActivity extends AppCompatActivity {
 
             RequestOptions options = new RequestOptions()
                     .centerCrop()
-                    .placeholder(R.drawable.ic_baseline_location_on_48px) // TODO default image
+                    .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER) // TODO default image
                     .override(ImageTools.PROFILE_PICTURE_SIZE)
                     .transforms(new CenterCrop(), new RoundedCorners(30));
 

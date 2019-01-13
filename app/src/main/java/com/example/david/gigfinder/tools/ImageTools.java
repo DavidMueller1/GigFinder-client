@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
+import com.example.david.gigfinder.R;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.net.URI;
 
 public abstract class ImageTools {
     public static final int PROFILE_PICTURE_SIZE = 800;
+    public static final int PROFILE_PICTURE_PLACEHOLDER = R.drawable.ic_baseline_add_photo;
 
     /**
      * @param selectedImage
