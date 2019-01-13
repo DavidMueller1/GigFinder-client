@@ -121,7 +121,7 @@ public class EventProfileActivity extends AppCompatActivity {
                 Intent intent = new Intent(EventProfileActivity.this, HostProfileActivity.class);
                 intent.putExtra("idToken", idToken);
                 try {
-                    intent.putExtra("profileUserId", String.valueOf(hostJson.getInt("id")));
+                    intent.putExtra("profileUserId", hostJson.getInt("id"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

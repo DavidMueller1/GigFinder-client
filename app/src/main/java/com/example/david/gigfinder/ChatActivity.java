@@ -75,9 +75,11 @@ public class ChatActivity extends AppCompatActivity {
         GetMessages getMessages = new GetMessages();
         getMessages.execute();
 
-        chatText = (EditText) findViewById(R.id.edittext_chatbox);
         chatName = (TextView) findViewById(R.id.chatName);
+        chatName.setText(getIntent().getExtras().getString("name"));
+
         chatImg = (ImageView) findViewById(R.id.chatImg);
+        chatText = (EditText) findViewById(R.id.edittext_chatbox);
 
         backBtn = (ImageView) findViewById(R.id.backImg);
         backBtn.setOnClickListener(new View.OnClickListener() {
@@ -104,11 +106,13 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(user=="host") {
                     Intent intent = new Intent(ChatActivity.this, ArtistProfileActivity.class);
-                    intent.putExtra("artist", receiverId);
+                    intent.putExtra("profileUserId", receiverId);
+                    intent.putExtra("idToken", idToken);
                     startActivity(intent);
                 }else{
                     Intent intent = new Intent(ChatActivity.this, HostProfileActivity.class);
-                    intent.putExtra("host", receiverId);
+                    intent.putExtra("profileUserId", receiverId);
+                    intent.putExtra("idToken", idToken);
                     startActivity(intent);
                 }
             }
