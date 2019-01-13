@@ -29,6 +29,7 @@ import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.GeoTools;
+import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -78,14 +79,12 @@ public class HostProfileFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 
         idToken = getArguments().getString("idToken");
-        sharedPreferences = getContext().getSharedPreferences("List", MODE_PRIVATE);
+        sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
-        // Test Artist
-        /*ArrayList<Genre> list = new ArrayList<>();
-        list.add(Genre.ROCK);
-        list.add(Genre.HOUSE);
-        artist = new Artist(1, Color.DKGRAY, "TestArtist", "Hallo, ich bin ein Test.", null, null, list);
-           */
+        if(sharedPreferences.getString("genres","x").equals("x")){
+            GetGenres getGenres = new GetGenres();
+            getGenres.execute();
+        }
 
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
         imageButton = getView().findViewById(R.id.profile_host_profilePicture);
@@ -159,6 +158,16 @@ public class HostProfileFragment extends Fragment {
             final float lat = Float.parseFloat(userProfile.getString("latitude"));
             final float lng = Float.parseFloat(userProfile.getString("longitude"));
 
+            String myGenres = "(";
+            for(int i=0; i<userProfile.getJSONArray("hostGenres").length(); i++){
+                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("hostGenres").getJSONObject(i).getInt("genreId"), sharedPreferences.getString("genres", "x")));
+                if(i < userProfile.getJSONArray("hostGenres").length()-1){
+                    myGenres = myGenres.concat(", ");
+                }
+            }
+            myGenres = myGenres.concat(")");
+            genresText.setText(myGenres);
+
             SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
             editor.putInt("userId", userID);
             editor.apply();
@@ -175,7 +184,6 @@ public class HostProfileFragment extends Fragment {
 
             String address = GeoTools.getAddressFromLatLng(getContext(), new LatLng(lat, lng));
             locationText.setText(address);
-
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -287,6 +295,47 @@ public class HostProfileFragment extends Fragment {
             editor.commit();
             Log.d(TAG, "DELETE HOST: " + result);
             getActivity().finish();
+        }
+    }
+
+    class GetGenres extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/genres");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "GENRES: " + result);
+            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putString("genres", result);
+            editor.apply();
         }
     }
 

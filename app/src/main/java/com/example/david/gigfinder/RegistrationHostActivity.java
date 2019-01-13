@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -79,12 +80,19 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
     String idToken;
 
+    private ArrayAdapter<String> adapter;
+    private JSONArray genres;
+    private String[] genreStrings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_host);
 
         idToken = getIntent().getExtras().getString("idToken");
+
+        GetGenres getGenres = new GetGenres();
+        getGenres.execute();
 
         host = new Host();
 
@@ -111,9 +119,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
         locationButtonIcon = findViewById(R.id.registration_host_location_icon);
         genreTitle = findViewById(R.id.registration_host_genre_title);
         genreSpinner = findViewById(R.id.registration_host_genre);
-        //Replaced the Strings with the Genre-Enum
-        ArrayAdapter<Genre> adapter = new ArrayAdapter<Genre>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, Genre.values());
-        genreSpinner.setAdapter(adapter);
 
         backgroundColorPickerButton = findViewById(R.id.button_registration_host_colorPicker);
         backgroundColorPickerButton.setOnClickListener(new View.OnClickListener() {
@@ -283,16 +288,41 @@ public class RegistrationHostActivity extends AppCompatActivity {
             return false;
         }
 
-        ArrayList genres = new ArrayList();
-        genres.add((Genre)genreSpinner.getSelectedItem());
-        host.setGenres(genres);
-        if(host.getGenres().get(0).equals(getResources().getString(R.string.artist_genre_choose))) {
-            Toast.makeText(getApplicationContext(),"Kein Genre ausgewählt",Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "No genre selected.");
-            return false;
-        }
+        // TODO multiple genres selectable
+        genreStrings = new String[1]; //Change length to num of selected genres
+        genreStrings[0] = genreSpinner.getSelectedItem().toString();
+        //TODO just fill this list with selected genres
 
         return true;
+    }
+
+    private void showGenres(String result){
+        try {
+            genres = new JSONArray(result);
+            String[] genreStrings = new String[genres.length()];
+            for(int i=0; i<genres.length(); i++){
+                genreStrings[i] = genres.getJSONObject(i).getString("value");
+            }
+            adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, genreStrings);
+            genreSpinner.setAdapter(adapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private JSONArray genresToJson(String[] genreStrings) throws JSONException {
+        JSONArray genresJson = new JSONArray();
+        for(String i : genreStrings){
+            for(int j=0; j<genres.length(); j++){
+                if(genres.getJSONObject(j).getString("value").equals(i)){
+                    JSONObject genreObject = new JSONObject();
+                    genreObject.put("genreId", genres.getJSONObject(j).getInt("id"));
+                    genresJson.put(genreObject);
+                }
+            }
+        }
+        Log.d(TAG, genresJson.toString());
+        return genresJson;
     }
 
     class SendRegisterHost extends AsyncTask<String, Void, String> {
@@ -305,7 +335,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestProperty("Content-Type","application/json");
-                //urlConnection.setRequestProperty("Accept", "application/json");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
@@ -318,7 +347,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 jsonObject.put("backgroundColor", params[2]);
                 jsonObject.put("latitude", params[3]);
                 jsonObject.put("longitude", params[4]);
-                //jsonObject.put("genre", params[3]);
+                jsonObject.put("hostGenres", genresToJson(genreStrings));
                 //jsonObject.put("image", params[4]);
                 os.writeBytes(jsonObject.toString());
                 os.close();
@@ -386,6 +415,48 @@ public class RegistrationHostActivity extends AppCompatActivity {
             intent.putExtra("user", "host");
             startActivity(intent);
             finish();
+        }
+    }
+
+    class GetGenres extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/genres");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "GENRES: " + result);
+            SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putString("genres", result);
+            editor.apply();
+            showGenres(result);
         }
     }
 }
