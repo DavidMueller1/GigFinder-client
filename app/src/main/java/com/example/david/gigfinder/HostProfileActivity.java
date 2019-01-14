@@ -71,11 +71,10 @@ public class HostProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host_profile);
 
+        idToken = getIntent().getExtras().getString("idToken");
 
         sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
-
-        profileUserId = Integer.parseInt(getIntent().getExtras().getString("profileUserId"));
-        idToken = getIntent().getExtras().getString("idToken");
+        profileUserId = getIntent().getExtras().getInt("profileUserId");
         /*try {
             hostJson = new JSONObject(getIntent().getExtras().getString("host"));
         } catch (JSONException e) {
@@ -102,9 +101,8 @@ public class HostProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(HostProfileActivity.this, ChatActivity.class);
                 intent.putExtra("idToken", idToken);
-
                 intent.putExtra("profileUserId", profileUserId);
-
+                intent.putExtra("name", nameText.getText().toString());
                 startActivity(intent);
             }
         });
@@ -119,7 +117,7 @@ public class HostProfileActivity extends AppCompatActivity {
         });
 
         GetHost getHost = new GetHost();
-        getHost.execute(profileUserId + "");
+        getHost.execute(String.valueOf(profileUserId));
     }
 
     /**
