@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -28,5 +31,15 @@ public abstract class Utils {
         return null;
     }
 
+    public static Date dateToString(String dateString){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Date date = null;
+        try {
+            date = format.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
 
 }
