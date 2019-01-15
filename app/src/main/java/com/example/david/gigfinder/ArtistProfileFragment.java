@@ -56,7 +56,6 @@ public class ArtistProfileFragment extends Fragment {
     private TextView nameText;
     private TextView descriptionText;
     private TextView genresText;
-    //private TextView genresLabel; // to change "Genre" to "Genres" if there are multiple
     private String idToken;
 
     private FrameLayout progress;
@@ -76,17 +75,11 @@ public class ArtistProfileFragment extends Fragment {
 
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
-        if(sharedPreferences.getString("genres","x").equals("x")){
-            GetGenres getGenres = new GetGenres();
-            getGenres.execute();
-        }
-
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
         imageButton = getView().findViewById(R.id.profile_artist_profilePicture);
         nameText = getView().findViewById(R.id.profile_artist_name);
         descriptionText = getView().findViewById(R.id.profile_artist_description);
         genresText = getView().findViewById(R.id.profile_artist_genre);
-        //genresLabel = getView().findViewById(R.id.profile_genres_label);
 
 
         progress = getView().findViewById(R.id.progressBarHolder);
@@ -99,37 +92,10 @@ public class ArtistProfileFragment extends Fragment {
             }
         });
 
-        //
-        //initProfile();
-
-        GetUser getUser = new GetUser();
-        getUser.execute();
+        updateProfile(sharedPreferences.getString("userProfile", "x"));
 
         super.onActivityCreated(savedInstanceState);
     }
-
-    /*private void initProfile() {
-        //updateColor();
-
-        nameText.setText(artist.getName());
-        descriptionText.setText(artist.getDescription());
-
-        String genreString = "";
-        for(Genre g : artist.getGenres()) {
-            if(!genreString.equals("")) {
-                genreString += ", ";
-            }
-            genreString += g.toString();
-        }
-        genresText.setText(genreString);
-
-        /*if(artist.getGenres().size() > 1) {
-            genresLabel.setText(getResources().getString(R.string.profile_genre_multiple));
-        }
-        else {
-            genresLabel.setText(getResources().getString(R.string.profile_genre_single));
-        }
-    }*/
 
     /**
      * Updates the color of all relevant elements
@@ -173,8 +139,6 @@ public class ArtistProfileFragment extends Fragment {
 
     private void updateProfile(String jsonString){
         try {
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
-            SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
             JSONArray jsonArray = new JSONArray(jsonString);
             JSONObject userProfile = jsonArray.getJSONObject(0);
@@ -192,18 +156,14 @@ public class ArtistProfileFragment extends Fragment {
 
             String myGenres = "(";
             for(int i=0; i<userProfile.getJSONArray("artistGenres").length(); i++){
-                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("artistGenres").getJSONObject(i).getInt("genreId"), sharedPreferences.getString("genres", "x")));
+                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("artistGenres").getJSONObject(i).getInt("genreId"),
+                        sharedPreferences.getString("genres", "x")));
                 if(i < userProfile.getJSONArray("artistGenres").length()-1){
                     myGenres = myGenres.concat(", ");
                 }
             }
             myGenres = myGenres.concat(")");
             genresText.setText(myGenres);
-
-
-            editor.putInt("userId", userID);
-            editor.apply();
-            //TODO: We should probably cache everything here
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -255,50 +215,6 @@ public class ArtistProfileFragment extends Fragment {
                     progress.setVisibility(View.GONE);
                 }
             });
-        }
-    }
-
-    /**
-     *
-     */
-    class GetUser extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            displayLoadingScreen(true);
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            Log.d(TAG, "USER PROFILE: " + result);
-            updateProfile(result);
         }
     }
 
@@ -383,47 +299,6 @@ public class ArtistProfileFragment extends Fragment {
             editor.commit();
             Log.d(TAG, "DELETE ARTIST: " + result);
             getActivity().finish();
-        }
-    }
-
-    class GetGenres extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/genres");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d(TAG, "GENRES: " + result);
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
-            editor.putString("genres", result);
-            editor.apply();
         }
     }
 
