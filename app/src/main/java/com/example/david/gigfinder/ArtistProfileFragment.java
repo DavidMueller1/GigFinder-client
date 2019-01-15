@@ -296,7 +296,7 @@ public class ArtistProfileFragment extends Fragment {
         protected void onPostExecute(String result) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.clear();
-            editor.commit();
+            editor.apply();
             Log.d(TAG, "DELETE ARTIST: " + result);
             getActivity().finish();
         }
