@@ -1,8 +1,11 @@
 package com.example.david.gigfinder.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +13,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.david.gigfinder.R;
+import com.example.david.gigfinder.tools.ImageTools;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -41,14 +52,20 @@ public class ChatAdapter extends ArrayAdapter<String[]> {
         chatImgs.add(chatImg);
         chatNames.add(chatName);
 
+        if(!getItem(position)[4].equals("empty")) {
+            try {
+                JSONObject imageProfile = new JSONObject(getItem(position)[4]);
+
+                byte[] decodedString = Base64.decode(imageProfile.getString("image"), Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+                chatImg.setImageBitmap(decodedByte);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         return customView;
-    }
-
-    public ArrayList<ImageView> getChatImgs() {
-        return chatImgs;
-    }
-
-    public ArrayList<TextView> getChatNames() {
-        return chatNames;
     }
 }

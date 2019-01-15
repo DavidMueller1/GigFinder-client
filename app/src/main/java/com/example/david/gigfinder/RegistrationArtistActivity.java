@@ -413,9 +413,11 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             if(!result.equals("")) {
                 try {
                     JSONObject user = new JSONObject(result);
+                    JSONArray jsonArray = new JSONArray();
+                    jsonArray.put(user);
                     SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
                     editor.putInt("userId", user.getInt("id"));
-                    editor.putString("userProfile", result);
+                    editor.putString("userProfile", jsonArray.toString());
                     editor.putString("user", "artist");
                     editor.putInt("userColor", user.getInt("backgroundColor"));
                     editor.apply();
