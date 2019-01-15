@@ -466,7 +466,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            displayLoadingScreen(false);
             try {
                 JSONObject user = new JSONObject(result);
                 SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
@@ -484,6 +483,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
             intent.putExtra("idToken", idToken);
             intent.putExtra("user", "host");
             startActivity(intent);
+            displayLoadingScreen(false);
             finish();
         }
     }
