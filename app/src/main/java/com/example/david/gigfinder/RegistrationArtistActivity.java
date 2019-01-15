@@ -409,7 +409,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            displayLoadingScreen(false);
             if(!result.equals("")) {
                 try {
                     JSONObject user = new JSONObject(result);
@@ -427,9 +426,11 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.putExtra("idToken", idToken);
                 intent.putExtra("user", "artist");
+                displayLoadingScreen(false);
                 startActivity(intent);
                 finish();
             }
+            displayLoadingScreen(false);
         }
     }
 
