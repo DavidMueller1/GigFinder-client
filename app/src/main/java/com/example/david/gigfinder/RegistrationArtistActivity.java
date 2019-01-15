@@ -412,8 +412,11 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             if(!result.equals("")) {
                 try {
                     JSONObject user = new JSONObject(result);
+                    JSONArray jsonArray = new JSONArray();
+                    jsonArray.put(user);
                     SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
                     editor.putInt("userId", user.getInt("id"));
+                    editor.putString("userProfile", jsonArray.toString());
                     editor.putString("user", "artist");
                     editor.putInt("userColor", user.getInt("backgroundColor"));
                     editor.apply();
@@ -425,7 +428,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 Intent intent = new Intent(RegistrationArtistActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.putExtra("idToken", idToken);
-                intent.putExtra("user", "artist");
                 displayLoadingScreen(false);
                 startActivity(intent);
                 finish();

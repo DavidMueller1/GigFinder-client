@@ -69,7 +69,6 @@ public class HostProfileFragment extends Fragment {
     private ImageView locationIcon;
     private TextView locationText;
     private TextView genresText;
-    //private TextView genresLabel; // to change "Genre" to "Genres" if there are multiple
     private String idToken;
 
     private FrameLayout progress;
@@ -87,11 +86,6 @@ public class HostProfileFragment extends Fragment {
         idToken = getArguments().getString("idToken");
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
-        if(sharedPreferences.getString("genres","x").equals("x")){
-            GetGenres getGenres = new GetGenres();
-            getGenres.execute();
-        }
-
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
         imageButton = getView().findViewById(R.id.profile_host_profilePicture);
         nameText = getView().findViewById(R.id.profile_host_name);
@@ -100,7 +94,6 @@ public class HostProfileFragment extends Fragment {
         locationIcon = getView().findViewById(R.id.profile_host_location_icon);
         locationContainer = getView().findViewById(R.id.profile_host_location_container);
         genresText = getView().findViewById(R.id.profile_host_genre);
-        //genresLabel = getView().findViewById(R.id.profile_genres_label);
 
         progress = getView().findViewById(R.id.progressBarHolder);
 
@@ -112,8 +105,7 @@ public class HostProfileFragment extends Fragment {
             }
         });
 
-        GetHost getHost = new GetHost();
-        getHost.execute();
+        updateProfile(sharedPreferences.getString("userProfile", "x"));
 
         super.onActivityCreated(savedInstanceState);
     }
@@ -170,7 +162,8 @@ public class HostProfileFragment extends Fragment {
 
             String myGenres = "(";
             for(int i=0; i<userProfile.getJSONArray("hostGenres").length(); i++){
-                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("hostGenres").getJSONObject(i).getInt("genreId"), sharedPreferences.getString("genres", "x")));
+                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("hostGenres").getJSONObject(i).getInt("genreId"),
+                        sharedPreferences.getString("genres", "x")));
                 if(i < userProfile.getJSONArray("hostGenres").length()-1){
                     myGenres = myGenres.concat(", ");
                 }
@@ -243,49 +236,6 @@ public class HostProfileFragment extends Fragment {
                     progress.setVisibility(View.GONE);
                 }
             });
-        }
-    }
-
-    /**
-     *
-     */
-    class GetHost extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            displayLoadingScreen(true);
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d(TAG, "USER PROFILE: " + result);
-            updateProfile(result);
         }
     }
 
@@ -370,47 +320,6 @@ public class HostProfileFragment extends Fragment {
             editor.commit();
             Log.d(TAG, "DELETE HOST: " + result);
             getActivity().finish();
-        }
-    }
-
-    class GetGenres extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/genres");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d(TAG, "GENRES: " + result);
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
-            editor.putString("genres", result);
-            editor.apply();
         }
     }
 
