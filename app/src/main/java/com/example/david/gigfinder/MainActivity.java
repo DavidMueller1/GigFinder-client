@@ -2,12 +2,10 @@ package com.example.david.gigfinder;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,6 +13,14 @@ import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.SectionsPageAdapter;
 import com.example.david.gigfinder.tools.ColorTools;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "APPLOG - MainActivity";
@@ -33,38 +39,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
+        idToken = getIntent().getExtras().getString("idToken");
 
-        String user = "none";
-        /*if (getIntent().hasExtra("user")){
-            user = getIntent().getExtras().getString("user");
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("user", user);
-            editor.apply();
-        } else {*/
-            user = sharedPreferences.getString("user", "none");
-        // }
+        String user = sharedPreferences.getString("user", "none");
 
-        /*
-        try {
-            user = getIntent().getStringExtra("user");
-
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            //editor.clear();
-            editor.putString("user", user);
-            editor.commit();
-        }
-        catch (NullPointerException e) {
-            user = sharedPreferences.getString("user", "none");
-        }
-        */
         if(user == null || user.equals("none")) {
             // TODO get user from server
+            Log.d(TAG, "User is NONE!");
             Toast.makeText(getApplicationContext(),"Using default user",Toast.LENGTH_SHORT).show();
             user = "artist";
         }
 
-
-        idToken = getIntent().getExtras().getString("idToken");
+        checkSharedPrefs(user);
 
         mViewPager = findViewById(R.id.viewpager);
         mViewPager.setOffscreenPageLimit(1);
@@ -173,6 +159,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void checkSharedPrefs(String user){
+
+        //Check if UserProfile is missing
+        if(sharedPreferences.getString("userProfile", "x").equals("x")){
+            if(user.equals("artist")) {
+                GetArtist getArtist = new GetArtist();
+                getArtist.execute();
+            }else{
+                GetHost getHost = new GetHost();
+                getHost.execute();
+            }
+        }
+
+        //Check if Genres is missing
+        if(sharedPreferences.getString("genres", "x").equals("x")){
+            GetGenres getgenres = new GetGenres();
+            getgenres.execute();
+        }
+    }
+
     /**
      * Adds the Fragments which will be selectable by the Tabs and their Titles to a SectionsPageAdapter and passes it to the ViewPager
      */
@@ -221,5 +227,129 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPageAdapter);
     }
 
+    /**
+     *
+     */
+    class GetArtist extends AsyncTask<String, Void, String> {
 
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/artists");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "USER PROFILE: " + result);
+            sharedPreferences.edit().putString("userProfile", result).apply();
+        }
+    }
+
+    /**
+     *
+     */
+    class GetHost extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "USER PROFILE: " + result);
+            sharedPreferences.edit().putString("userProfile", result).apply();
+        }
+    }
+
+    /**
+     *
+     */
+    class GetGenres extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/genres");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "GENRES: " + result);
+            sharedPreferences.edit().putString("genres", result).apply();
+        }
+    }
 }

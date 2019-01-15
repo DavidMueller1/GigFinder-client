@@ -469,12 +469,14 @@ public class RegistrationHostActivity extends AppCompatActivity {
             displayLoadingScreen(false);
             try {
                 JSONObject user = new JSONObject(result);
+                JSONArray jsonArray = new JSONArray();
+                jsonArray.put(user);
                 SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
                 editor.putInt("userId", user.getInt("id"));
+                editor.putString("userProfile", jsonArray.toString());
                 editor.putString("user", "host");
                 editor.putInt("userColor", user.getInt("backgroundColor"));
                 editor.apply();
-                //TODO: We should probably cache everything here
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -482,7 +484,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
             Intent intent = new Intent(RegistrationHostActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtra("idToken", idToken);
-            intent.putExtra("user", "host");
             startActivity(intent);
             finish();
         }
