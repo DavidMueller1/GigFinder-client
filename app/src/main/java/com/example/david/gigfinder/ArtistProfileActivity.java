@@ -333,7 +333,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
         }
     }
 
-
     class PostFavorite extends AsyncTask<String, Void, String> {
 
         @Override

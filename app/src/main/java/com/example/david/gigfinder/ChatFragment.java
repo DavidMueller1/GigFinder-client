@@ -96,11 +96,22 @@ public class ChatFragment extends Fragment {
                 String name = msgJson.getJSONObject(i).getJSONObject(chatpartner).getString("name");
                 String lastmsg = msgJson.getJSONObject(i).getJSONObject("lastMessage").getString("content");
                 String id = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("id"));
-                chatStrings.add(new String[]{name, lastmsg, id});
+                String profilePicId = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("profilePictureId"));
+                chatStrings.add(new String[]{name, lastmsg, id, profilePicId, "empty"});
             }
             chatAdapter.notifyDataSetChanged();
+
+            updateProfilePictures();
+
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void updateProfilePictures(){
+        for(int i=0; i<chatStrings.size(); i++){
+            GetProfilePicture getProfilePicture = new GetProfilePicture();
+            getProfilePicture.execute(chatStrings.get(i)[3], String.valueOf(i));
         }
     }
 
@@ -148,6 +159,49 @@ public class ChatFragment extends Fragment {
                 showMessages(result);
                 noChatsText.setVisibility(View.GONE);
             }
+        }
+    }
+
+    class GetProfilePicture extends AsyncTask<String, Void, String> {
+
+        int id;
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                id = Integer.parseInt(params[1]);
+
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            chatStrings.get(id)[4] = result;
+            chatAdapter.notifyDataSetChanged();
         }
     }
 }
