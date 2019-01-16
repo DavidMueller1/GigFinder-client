@@ -108,6 +108,9 @@ public class RegistrationHostActivity extends AppCompatActivity {
         GetGenres getGenres = new GetGenres();
         getGenres.execute();
 
+        GetSocialMedias getSocialMedias = new GetSocialMedias();
+        getSocialMedias.execute();
+
         host = new Host();
 
         profilePictureTitle = findViewById(R.id.registration_host_image_title);
@@ -530,4 +533,44 @@ public class RegistrationHostActivity extends AppCompatActivity {
             showGenres(result);
         }
     }
+
+    class GetSocialMedias extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/socialmedias");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "Social Medias: " + result);
+
+        }
+    }
+
 }
