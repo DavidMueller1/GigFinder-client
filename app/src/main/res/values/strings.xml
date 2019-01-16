@@ -66,6 +66,10 @@
     <string name="upcoming_gigs">Upcoming Gigs</string>
     <string name="past_gigs">Past Gigs</string>
 
+    <!-- Events  -->
+    <string name="upcoming_events">Upcoming Events</string>
+    <string name="past_events">Past Events</string>
+
     <!-- Add Event -->
     <string name="add_event_title_hint">Name des Events</string>
     <string name="add_event_time_from">Start des Events</string>
