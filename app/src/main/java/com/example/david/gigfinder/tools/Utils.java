@@ -2,6 +2,7 @@ package com.example.david.gigfinder.tools;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.example.david.gigfinder.R;
 
@@ -9,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
+import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +19,7 @@ import java.util.Date;
 import static android.content.Context.MODE_PRIVATE;
 
 public abstract class Utils {
+    private static final String TAG = "Utils";
 
     public static String genreIdToString(int id, String genres){
         try {
@@ -40,6 +44,23 @@ public abstract class Utils {
             e.printStackTrace();
         }
         return date;
+    }
+
+    public static Timestamp convertStringToTimestamp(String str_date) {
+        try {
+            String modifiedString = str_date.replace("T", " ");
+            Log.d(TAG, "Modified String: " + modifiedString);
+
+            DateFormat formatter;
+            formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            Date date = (Date) formatter.parse(modifiedString);
+            java.sql.Timestamp timeStampDate = new Timestamp(date.getTime());
+
+            return timeStampDate;
+        } catch (ParseException e) {
+            System.out.println("Exception :" + e);
+            return null;
+        }
     }
 
 }

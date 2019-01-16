@@ -37,6 +37,7 @@
         <activity android:name=".ChatActivity" />
         <activity android:name=".HostProfileActivity" />
         <activity android:name=".EventProfileActivity" />
+        <activity android:name=".AddEventActivity" />
         <activity android:name=".ArtistProfileActivity" />
         <activity android:name=".RegistrationHostActivity"></activity>
     </application>

@@ -221,7 +221,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/events?location=" + 48.150960 + "," + 11.580820 + "&radius=5000.0"); //TODO: latlng
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/events?location=" + 48.150960 + "," + 11.580820 + "&radius=10000.0"); //TODO: latlng
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestProperty("Authorization", idToken); //TODO idToken
                 urlConnection.setRequestMethod("GET");

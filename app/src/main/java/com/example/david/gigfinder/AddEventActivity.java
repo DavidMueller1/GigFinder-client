@@ -63,8 +63,8 @@ import java.util.Locale;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
-public class AddEventFragment extends Fragment {
-    private static final String TAG = "AddEventFragment";
+public class AddEventActivity extends AppCompatActivity {
+    private static final String TAG = "AddEventActivity";
     private static final int PICK_IMAGE = 1;
     private static final int PLACE_PICKER_REQUEST = 2;
 
@@ -85,6 +85,8 @@ public class AddEventFragment extends Fragment {
     private Button pickDateToButton;
     private Button addEventButton;
 
+    String[] timeStrings = new String[4];
+
     private LatLng position;
 
     String idToken;
@@ -93,21 +95,24 @@ public class AddEventFragment extends Fragment {
     private JSONArray genres;
     private String[] genreStrings;
 
-    @Nullable
+    /*@Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_event_add, container, false);
-    }
+    }*/
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_event_add);
+        //super.onActivityCreated(savedInstanceState);
 
-        idToken = getArguments().getString("idToken");
+        //idToken = getArguments().getString("idToken");
+        idToken = getIntent().getExtras().getString("idToken");
 
-        sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
+        sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
-        genreSpinner = getView().findViewById(R.id.add_event_genre);
+        genreSpinner = findViewById(R.id.add_event_genre);
 
         if(sharedPreferences.getString("genres","x").equals("x")){
             GetGenres getGenres = new GetGenres();
@@ -116,20 +121,20 @@ public class AddEventFragment extends Fragment {
             showGenres(sharedPreferences.getString("genres","x"));
         }
 
-        nameField = getView().findViewById(R.id.add_event_title);
-        descriptionField = getView().findViewById(R.id.add_event_description);
-        locationButton = getView().findViewById(R.id.add_event_location_container);
+        nameField = findViewById(R.id.add_event_title);
+        descriptionField = findViewById(R.id.add_event_description);
+        locationButton = findViewById(R.id.add_event_location_container);
         locationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 performLocationSelection();
             }
         });
-        locationButtonText = getView().findViewById(R.id.add_event_location_text);
+        locationButtonText = findViewById(R.id.add_event_location_text);
         //Replaced the Strings with the Genre-Enum
 
 
-        addEventButton = getView().findViewById(R.id.button_add_event_save);
+        addEventButton = findViewById(R.id.button_add_event_save);
         addEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,8 +144,8 @@ public class AddEventFragment extends Fragment {
 
         // region Time and Date
         // Time from
-        timeFromText = getView().findViewById(R.id.add_event_time_from);
-        pickTimeFromButton = getView().findViewById(R.id.button_add_event_select_time_from);
+        timeFromText = findViewById(R.id.add_event_time_from);
+        pickTimeFromButton = findViewById(R.id.button_add_event_select_time_from);
         pickTimeFromButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,14 +155,14 @@ public class AddEventFragment extends Fragment {
                 int mMinute = c.get(Calendar.MINUTE);
 
                 // Launch Time Picker Dialog
-                TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+                TimePickerDialog timePickerDialog = new TimePickerDialog(AddEventActivity.this,
                         new TimePickerDialog.OnTimeSetListener() {
 
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay,
                                                   int minute) {
-                                // TODO save the time
-                                timeFromText.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
+                                timeStrings[0] = String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute);
+                                timeFromText.setText(timeStrings[0]);
                             }
                         }, mHour, mMinute, false);
                 timePickerDialog.show();
@@ -165,8 +170,8 @@ public class AddEventFragment extends Fragment {
         });
 
         // Date from
-        dateFromText = getView().findViewById(R.id.add_event_date_from);
-        pickDateFromButton = getView().findViewById(R.id.button_add_event_select_date_from);
+        dateFromText = findViewById(R.id.add_event_date_from);
+        pickDateFromButton = findViewById(R.id.button_add_event_select_date_from);
         pickDateFromButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,14 +182,14 @@ public class AddEventFragment extends Fragment {
                 int mDay = c.get(Calendar.DAY_OF_MONTH);
 
 
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                DatePickerDialog datePickerDialog = new DatePickerDialog(AddEventActivity.this,
                         new DatePickerDialog.OnDateSetListener() {
 
                             @Override
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
-                                // TODO save the date
-                                dateFromText.setText(String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year));
+                                timeStrings[1] = String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year);
+                                dateFromText.setText(timeStrings[1]);
 
                             }
                         }, mYear, mMonth, mDay);
@@ -193,8 +198,8 @@ public class AddEventFragment extends Fragment {
         });
 
         // Time to
-        timeToText = getView().findViewById(R.id.add_event_time_to);
-        pickTimeToButton = getView().findViewById(R.id.button_add_event_select_time_to);
+        timeToText = findViewById(R.id.add_event_time_to);
+        pickTimeToButton = findViewById(R.id.button_add_event_select_time_to);
         pickTimeToButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -204,14 +209,14 @@ public class AddEventFragment extends Fragment {
                 int mMinute = c.get(Calendar.MINUTE);
 
                 // Launch Time Picker Dialog
-                TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),
+                TimePickerDialog timePickerDialog = new TimePickerDialog(AddEventActivity.this,
                         new TimePickerDialog.OnTimeSetListener() {
 
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay,
                                                   int minute) {
-                                // TODO save the time
-                                timeToText.setText(String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute));
+                                timeStrings[2] = String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute);
+                                timeToText.setText(timeStrings[2]);
                             }
                         }, mHour, mMinute, false);
                 timePickerDialog.show();
@@ -219,8 +224,8 @@ public class AddEventFragment extends Fragment {
         });
 
         // Date to
-        dateToText = getView().findViewById(R.id.add_event_date_to);
-        pickDateToButton = getView().findViewById(R.id.button_add_event_select_date_to);
+        dateToText = findViewById(R.id.add_event_date_to);
+        pickDateToButton = findViewById(R.id.button_add_event_select_date_to);
         pickDateToButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -231,14 +236,14 @@ public class AddEventFragment extends Fragment {
                 int mDay = c.get(Calendar.DAY_OF_MONTH);
 
 
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(),
+                DatePickerDialog datePickerDialog = new DatePickerDialog(AddEventActivity.this,
                         new DatePickerDialog.OnDateSetListener() {
 
                             @Override
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
-                                // TODO save the date
-                                dateToText.setText(String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year));
+                                timeStrings[3] = String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year);
+                                dateToText.setText(timeStrings[3]);
 
                             }
                         }, mYear, mMonth, mDay);
@@ -259,7 +264,7 @@ public class AddEventFragment extends Fragment {
             PostEvent postEvent = new PostEvent();
             postEvent.execute(nameField.getText().toString(), descriptionField.getText().toString(),
                     String.valueOf(position.longitude), String.valueOf(position.latitude),
-                    timeFromText.getText().toString(), timeToText.getText().toString());
+                    timeStrings[0] + " " + timeStrings[1], timeStrings[2] + " " + timeStrings[3]);
         }
     }
 
@@ -291,12 +296,12 @@ public class AddEventFragment extends Fragment {
         }*/
         if(requestCode == PLACE_PICKER_REQUEST) {
             if(resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(data, getContext());
+                Place place = PlacePicker.getPlace(data, getApplicationContext());
                 position = place.getLatLng();
 
                 String address = position.toString();
                 List<Address> addresses = null;
-                Geocoder geocoder = new Geocoder(getContext(), Locale.GERMANY);
+                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.GERMANY);
                 try {
                     addresses = geocoder.getFromLocation(position.latitude, position.longitude, 1);
 
@@ -319,7 +324,7 @@ public class AddEventFragment extends Fragment {
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
 
         try {
-            startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
+            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("MYLOG", e.getMessage());
@@ -379,39 +384,39 @@ public class AddEventFragment extends Fragment {
     private boolean checkUserInput(){
 
         if(nameField.getText().toString().equals("")) {
-            Toast.makeText(getContext(),getString(R.string.error_name),Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),getString(R.string.error_name),Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Namefield empty.");
             return false;
         }
 
         if(descriptionField.getText().toString().equals("")) {
-            Toast.makeText(getContext(), getString(R.string.error_description), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.error_description), Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Description empty.");
             return false;
         }
 
         if(timeFromText.getText().toString().equals(getString(R.string.add_event_time_hint))){
-            Toast.makeText(getContext(), getString(R.string.error_start_time), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.error_start_time), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if(dateFromText.getText().toString().equals(getString(R.string.add_event_date_hint))){
-            Toast.makeText(getContext(), getString(R.string.error_start_date), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.error_start_date), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if(timeToText.getText().toString().equals(getString(R.string.add_event_time_hint))){
-            Toast.makeText(getContext(), getString(R.string.error_end_time), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.error_end_time), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if(dateToText.getText().toString().equals(getString(R.string.add_event_date_hint))){
-            Toast.makeText(getContext(), getString(R.string.error_end_date), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.error_end_date), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if(position==null){
-            Toast.makeText(getContext(), getString(R.string.error_location), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.error_location), Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -430,7 +435,7 @@ public class AddEventFragment extends Fragment {
             for(int i=0; i<genres.length(); i++){
                 genreStrings[i] = genres.getJSONObject(i).getString("value");
             }
-            adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, genreStrings);
+            adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, genreStrings);
             genreSpinner.setAdapter(adapter);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -466,7 +471,7 @@ public class AddEventFragment extends Fragment {
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
-                SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
+                SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
                 int hostID = prefs.getInt("userId", 0);
 
                 //Send data
@@ -527,7 +532,7 @@ public class AddEventFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-
+            finish();
         }
     }
 
@@ -566,7 +571,7 @@ public class AddEventFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "GENRES: " + result);
-            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
             editor.putString("genres", result);
             editor.apply();
         }

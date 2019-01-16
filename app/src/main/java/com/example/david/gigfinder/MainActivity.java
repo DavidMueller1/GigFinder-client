@@ -209,17 +209,17 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             ExploreFragment exploreFragment = new ExploreFragment();
-            AddEventFragment addEventFragment = new AddEventFragment();
+            EventsFragment eventsFragment = new EventsFragment();
             ChatFragment chatFragment = new ChatFragment();
             HostProfileFragment hostProfileFragment = new HostProfileFragment();
 
             exploreFragment.setArguments(args);
             hostProfileFragment.setArguments(args);
-            addEventFragment.setArguments(args);
+            eventsFragment.setArguments(args);
             chatFragment.setArguments(args);
 
             sectionsPageAdapter.addFragment(exploreFragment, getString(R.string.nav_explore));
-            sectionsPageAdapter.addFragment(addEventFragment, getString(R.string.nav_events));
+            sectionsPageAdapter.addFragment(eventsFragment, getString(R.string.nav_events));
             sectionsPageAdapter.addFragment(chatFragment, getString(R.string.nav_chat));
             sectionsPageAdapter.addFragment(hostProfileFragment, getString(R.string.nav_profile));
         }
