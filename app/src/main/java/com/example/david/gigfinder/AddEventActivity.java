@@ -161,8 +161,10 @@ public class AddEventActivity extends AppCompatActivity {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay,
                                                   int minute) {
-                                timeStrings[0] = String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute);
-                                timeFromText.setText(timeStrings[0]);
+                                String hourString = String.format("%02d", hourOfDay);
+                                String minuteString = String.format("%02d", minute);
+                                timeStrings[0] = hourString + ":" + minuteString + ":00";
+                                timeFromText.setText(hourString + ":" + minuteString + " Uhr");
                             }
                         }, mHour, mMinute, false);
                 timePickerDialog.show();
@@ -188,8 +190,11 @@ public class AddEventActivity extends AppCompatActivity {
                             @Override
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
-                                timeStrings[1] = String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year);
-                                dateFromText.setText(timeStrings[1]);
+                                String dayString = String.format("%02d", dayOfMonth);
+                                String monthString = String.format("%02d", (monthOfYear + 1));
+                                String yearString = String.format("%04d", year);
+                                timeStrings[1] = yearString + "-" + monthString + "-" + dayString;
+                                dateFromText.setText(dayString + "." + monthString + "." + yearString);
 
                             }
                         }, mYear, mMonth, mDay);
@@ -215,8 +220,10 @@ public class AddEventActivity extends AppCompatActivity {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay,
                                                   int minute) {
-                                timeStrings[2] = String.format("%02d", hourOfDay) + ":" + String.format("%02d", minute);
-                                timeToText.setText(timeStrings[2]);
+                                String hourString = String.format("%02d", hourOfDay);
+                                String minuteString = String.format("%02d", minute);
+                                timeStrings[2] = hourString + ":" + minuteString + ":00";
+                                timeToText.setText(hourString + ":" + minuteString + " Uhr");
                             }
                         }, mHour, mMinute, false);
                 timePickerDialog.show();
@@ -242,8 +249,11 @@ public class AddEventActivity extends AppCompatActivity {
                             @Override
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
-                                timeStrings[3] = String.format("%02d", dayOfMonth) + "." + String.format("%02d", (monthOfYear + 1)) + "." + String.format("%04d", year);
-                                dateToText.setText(timeStrings[3]);
+                                String dayString = String.format("%02d", dayOfMonth);
+                                String monthString = String.format("%02d", (monthOfYear + 1));
+                                String yearString = String.format("%04d", year);
+                                timeStrings[3] = yearString + "-" + monthString + "-" + dayString;
+                                dateToText.setText(dayString + "." + monthString + "." + yearString);
 
                             }
                         }, mYear, mMonth, mDay);
@@ -264,7 +274,7 @@ public class AddEventActivity extends AppCompatActivity {
             PostEvent postEvent = new PostEvent();
             postEvent.execute(nameField.getText().toString(), descriptionField.getText().toString(),
                     String.valueOf(position.longitude), String.valueOf(position.latitude),
-                    timeStrings[0] + " " + timeStrings[1], timeStrings[2] + " " + timeStrings[3]);
+                    timeStrings[1] + "T" + timeStrings[0], timeStrings[3] + "T" + timeStrings[2]);
         }
     }
 

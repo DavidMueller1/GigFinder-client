@@ -196,11 +196,14 @@ public class EventProfileActivity extends AppCompatActivity {
         myGenres = myGenres.concat(")");
         genreText.setText(myGenres);
 
-        Date start = Utils.dateToString(eventJson.getString("start"));
-        Date end = Utils.dateToString(eventJson.getString("end"));
-        String time = start.getHours() + ":" + start.getMinutes() + " Uhr - " + end.getHours() + ":" + end.getMinutes() + " Uhr";
+        String time = Utils.getTimeStringFromServerFormat(eventJson.getString("start")) + " Uhr bis " + Utils.getTimeStringFromServerFormat(eventJson.getString("end"));
         timeText.setText(time);
-        String date = start.getDate() + "." + start.getMonth() + "." + start.getYear();
+        String startDate = Utils.getDateStringFromServerFormat(eventJson.getString("start"));
+        String endDate = Utils.getDateStringFromServerFormat(eventJson.getString("end"));
+        String date = startDate;
+        if(!endDate.equals(startDate)) {
+            date += " bis " + endDate;
+        }
         dateText.setText(date);
 
         String placeName = GeoTools.getAddressFromLatLng(this, new LatLng(eventJson.getDouble("latitude"), eventJson.getDouble("longitude")));

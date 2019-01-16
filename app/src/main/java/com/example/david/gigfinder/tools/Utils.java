@@ -55,12 +55,27 @@ public abstract class Utils {
             formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
             Date date = (Date) formatter.parse(modifiedString);
             java.sql.Timestamp timeStampDate = new Timestamp(date.getTime());
+            Log.d(TAG, "Timetsamp out: " + timeStampDate.toString());
 
             return timeStampDate;
         } catch (ParseException e) {
             System.out.println("Exception :" + e);
             return null;
         }
+    }
+
+    public static String getTimeStringFromServerFormat(String time) {
+        Timestamp timestamp = convertStringToTimestamp(time);
+        Date date = new Date();
+        date.setTime(timestamp.getTime());
+        return new SimpleDateFormat("kk:mm").format(date);
+    }
+
+    public static String getDateStringFromServerFormat(String time) {
+        Timestamp timestamp = convertStringToTimestamp(time);
+        Date date = new Date();
+        date.setTime(timestamp.getTime());
+        return new SimpleDateFormat("dd.MM.yyyy").format(date);
     }
 
 }

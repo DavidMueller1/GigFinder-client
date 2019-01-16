@@ -89,26 +89,6 @@ public class EventsFragment extends Fragment {
                 startActivityForResult(intent, ADD_EVENT);
             }
         });
-
-        /*ArrayList<String[]> placeholderStrings = new ArrayList<>();
-        placeholderStrings.add(new String[]{"Event Name", "20.04.2019", "Geschwister-Scholl-Platz 1"});
-        placeholderStrings.add(new String[]{"Event Name", "20.04.2019", "Geschwister-Scholl-Platz 1"});
-
-        ArrayList<String[]> placeholderStrings2 = new ArrayList<>();
-        placeholderStrings2.add(new String[]{"Event Name", "Geschwister-Scholl-Platz 1"});*/
-
-        /*upcomingGigsAdapter = new UpcomingGigsAdapter(this.getContext(), placeholderStrings);
-        upcomingListView.setAdapter(upcomingGigsAdapter);
-        upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), EventProfileActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        pastGigsAdapter = new PastGigsAdapter(this.getContext(), placeholderStrings2);
-        pastListView.setAdapter(pastGigsAdapter);*/
     }
 
     private void updateList(String result) {
@@ -122,9 +102,8 @@ public class EventsFragment extends Fragment {
                     // event is in the future
                     futureEventObjects.add(event);
                     Log.d(TAG, "Event in the future: " + event.toString());
-                    long lat = event.getLong("latitude");
-                    long lng = event.getLong("longitude");
-                    futureEvents.add(new String[] {event.getString("title"), event.getString("start"), GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude")))});
+                    String time = Utils.getDateStringFromServerFormat(event.getString("start")) + " um " + Utils.getTimeStringFromServerFormat(event.getString("start")) + " Uhr";
+                    futureEvents.add(new String[] {event.getString("title"), time, GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude")))});
                 }
                 else {
                     // event is in the past
