@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.example.david.gigfinder.adapters.PastGigsAdapter;
@@ -49,6 +50,7 @@ public class EventsFragment extends Fragment {
 
     private ListView upcomingListView;
     private ListView pastListView;
+    private FrameLayout progress;
 
     int userId;
 
@@ -74,6 +76,8 @@ public class EventsFragment extends Fragment {
 
         GetEvents getEvents = new GetEvents();
         getEvents.execute();
+
+        progress = getView().findViewById(R.id.progressBarHolder);
 
         upcomingListView = getView().findViewById(R.id.upcomingEventsListView);
         pastListView = getView().findViewById(R.id.pastEventsListView);
@@ -142,12 +146,33 @@ public class EventsFragment extends Fragment {
             }
         });
 
+        displayLoadingScreen(false);
+    }
+
+    private void displayLoadingScreen(boolean isLoading) {
+        if(isLoading) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        else {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
     class GetEvents extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
+            displayLoadingScreen(true);
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/events?host="+userId);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -166,10 +191,13 @@ public class EventsFragment extends Fragment {
 
                 return response.toString();
             } catch (ProtocolException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             } catch (MalformedURLException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             } catch (IOException e) {
+                displayLoadingScreen(false);
                 e.printStackTrace();
             }
 

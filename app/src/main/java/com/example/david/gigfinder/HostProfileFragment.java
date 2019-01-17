@@ -82,6 +82,8 @@ public class HostProfileFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        progress = getView().findViewById(R.id.progressBarHolder);
+        displayLoadingScreen(true);
 
         idToken = getArguments().getString("idToken");
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
@@ -95,7 +97,6 @@ public class HostProfileFragment extends Fragment {
         locationContainer = getView().findViewById(R.id.profile_host_location_container);
         genresText = getView().findViewById(R.id.profile_host_genre);
 
-        progress = getView().findViewById(R.id.progressBarHolder);
 
         testDeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,6 +219,7 @@ public class HostProfileFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        displayLoadingScreen(false);
     }
 
     private void displayLoadingScreen(boolean isLoading) {
@@ -274,7 +276,6 @@ public class HostProfileFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             displayProfilePicture(result);
-            displayLoadingScreen(false);
         }
     }
 

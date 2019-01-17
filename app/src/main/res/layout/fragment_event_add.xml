@@ -24,7 +24,8 @@
             android:hint="@string/add_event_title_hint"
             android:textSize="@dimen/font_big"
             android:textAlignment="center"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white"
+            android:textCursorDrawable="@null"/>
 
     </LinearLayout>
 
