@@ -135,7 +135,7 @@
             </LinearLayout>
 
             <TextView
-                android:visibility="gone"
+                android:visibility="visible"
                 android:id="@+id/textView7"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -143,6 +143,228 @@
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/font_bigger"
                 android:fontFeatureSettings="smcp" />
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/profile_soundcloud"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_small"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:background="@drawable/border"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small">
+
+                <ImageView
+                    android:layout_width="@dimen/element_bigger"
+                    android:layout_height="@dimen/element_bigger"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:layout_marginLeft="@dimen/padding_small"
+                    android:src="@drawable/ic_iconmonstr_soundcloud"
+                    android:tint="@color/soundcloud"/>
+
+                <TextView
+                    android:id="@+id/profile_soundcloud_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/event_location_icon"
+                    android:text="Soundcloud"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/soundcloud"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/profile_facebook"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_small"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:background="@drawable/border"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small">
+
+                <ImageView
+                    android:layout_width="@dimen/element_bigger"
+                    android:layout_height="@dimen/element_bigger"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:layout_marginLeft="@dimen/padding_small"
+                    android:src="@drawable/ic_iconmonstr_facebook"
+                    android:tint="@color/facebook"/>
+
+                <TextView
+                    android:id="@+id/profile_facebook_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/event_location_icon"
+                    android:text="Facebook"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/facebook"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/profile_twitter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_small"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:background="@drawable/border"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small">
+
+                <ImageView
+                    android:layout_width="@dimen/element_bigger"
+                    android:layout_height="@dimen/element_bigger"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:layout_marginLeft="@dimen/padding_small"
+                    android:src="@drawable/ic_iconmonstr_twitter"
+                    android:tint="@color/twitter"/>
+
+                <TextView
+                    android:id="@+id/profile_twitter_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/event_location_icon"
+                    android:text="Twitter"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/twitter"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/profile_youtube"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_small"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:background="@drawable/border"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small">
+
+                <ImageView
+                    android:layout_width="@dimen/element_bigger"
+                    android:layout_height="@dimen/element_bigger"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:layout_marginLeft="@dimen/padding_small"
+                    android:src="@drawable/ic_iconmonstr_youtube"
+                    android:tint="@color/youtube"/>
+
+                <TextView
+                    android:id="@+id/profile_youtube_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/event_location_icon"
+                    android:text="YouTube"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/youtube"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/profile_instagram"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_small"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:background="@drawable/border"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small">
+
+                <ImageView
+                    android:layout_width="@dimen/element_bigger"
+                    android:layout_height="@dimen/element_bigger"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:layout_marginLeft="@dimen/padding_small"
+                    android:src="@drawable/ic_iconmonstr_instagram"
+                    android:tint="@color/instagram"/>
+
+                <TextView
+                    android:id="@+id/profile_instagram_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/event_location_icon"
+                    android:text="YouTube"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/instagram"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/profile_spotify"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_small"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:background="@drawable/border"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small">
+
+                <ImageView
+                    android:layout_width="@dimen/element_bigger"
+                    android:layout_height="@dimen/element_bigger"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:layout_marginLeft="@dimen/padding_small"
+                    android:src="@drawable/ic_iconmonstr_spotify"
+                    android:tint="@color/spotify"/>
+
+                <TextView
+                    android:id="@+id/profile_spotify_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/event_location_icon"
+                    android:text="Spotify"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/spotify"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/profile_web"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_small"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:background="@drawable/border"
+                android:paddingTop="@dimen/padding_small"
+                android:paddingBottom="@dimen/padding_small">
+
+                <ImageView
+                    android:layout_width="@dimen/element_bigger"
+                    android:layout_height="@dimen/element_bigger"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:layout_marginLeft="@dimen/padding_small"
+                    android:src="@drawable/ic_iconmonstr_web"
+                    android:tint="@color/black"/>
+
+                <TextView
+                    android:id="@+id/profile_web_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/event_location_icon"
+                    android:text="Web"
+                    android:textSize="@dimen/font_bigger"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/padding_default" />
+
 
             <TextView
                 android:visibility="gone"

@@ -58,6 +58,14 @@ import static android.content.Context.MODE_PRIVATE;
 public class HostProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - HostProfileFragment";
 
+    private static final int ID_SOUNDCLOUD = 0;
+    private static final int ID_FACEBOOK = 1;
+    private static final int ID_TWITTER = 2;
+    private static final int ID_YOUTUBE = 3;
+    private static final int ID_INSTAGRAM = 4;
+    private static final int ID_SPOTIFY = 5;
+    private static final int ID_WEB = 6;
+
     SharedPreferences sharedPreferences;
 
     private int userID;
@@ -70,6 +78,15 @@ public class HostProfileFragment extends Fragment {
     private TextView locationText;
     private TextView genresText;
     private String idToken;
+
+    // Social Media
+    private TextView soundcloudText;
+    private TextView facebookText;
+    private TextView twitterText;
+    private TextView youtubeText;
+    private TextView instagramText;
+    private TextView spotifyText;
+    private TextView webText;
 
     private FrameLayout progress;
 
@@ -96,6 +113,14 @@ public class HostProfileFragment extends Fragment {
         locationIcon = getView().findViewById(R.id.profile_host_location_icon);
         locationContainer = getView().findViewById(R.id.profile_host_location_container);
         genresText = getView().findViewById(R.id.profile_host_genre);
+
+        soundcloudText = getView().findViewById(R.id.profile_soundcloud_text);
+        facebookText = getView().findViewById(R.id.profile_facebook_text);
+        twitterText = getView().findViewById(R.id.profile_twitter_text);
+        youtubeText = getView().findViewById(R.id.profile_youtube_text);
+        instagramText = getView().findViewById(R.id.profile_instagram_text);
+        spotifyText = getView().findViewById(R.id.profile_spotify_text);
+        webText = getView().findViewById(R.id.profile_web_text);
 
 
         testDeleteBtn.setOnClickListener(new View.OnClickListener() {
@@ -193,6 +218,105 @@ public class HostProfileFragment extends Fragment {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Displays a SocialMediaLink
+     * @param socialMediaId
+     * @param text
+     * @param socialMediaLink
+     */
+    private void displaySocialMedia(int socialMediaId, String text, final String socialMediaLink) {
+        LinearLayout container;
+
+        switch(socialMediaId) {
+            case ID_SOUNDCLOUD:
+                soundcloudText.setText(text);
+                container = getView().findViewById(R.id.profile_soundcloud);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_FACEBOOK:
+                facebookText.setText(text);
+                container = getView().findViewById(R.id.profile_facebook);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_TWITTER:
+                twitterText.setText(text);
+                container = getView().findViewById(R.id.profile_twitter);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_YOUTUBE:
+                youtubeText.setText(text);
+                container = getView().findViewById(R.id.profile_youtube);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_INSTAGRAM:
+                instagramText.setText(text);
+                container = getView().findViewById(R.id.profile_instagram);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_SPOTIFY:
+                spotifyText.setText(text);
+                container = getView().findViewById(R.id.profile_spotify);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_WEB:
+                webText.setText(text);
+                container = getView().findViewById(R.id.profile_web);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+
+        }
+
+    };
 
     private void displayProfilePicture(String result) {
         try {

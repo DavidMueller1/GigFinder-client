@@ -47,6 +47,14 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "ArtistProfileActivity";
 
+    private static final int ID_SOUNDCLOUD = 0;
+    private static final int ID_FACEBOOK = 1;
+    private static final int ID_TWITTER = 2;
+    private static final int ID_YOUTUBE = 3;
+    private static final int ID_INSTAGRAM = 4;
+    private static final int ID_SPOTIFY = 5;
+    private static final int ID_WEB = 6;
+
     SharedPreferences sharedPreferences;
 
     private ImageView imageButton;
@@ -55,6 +63,15 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private TextView genresText;
     private Button sendMsgBtn;
     private Button addToFavsBtn;
+
+    // Social Media
+    private TextView soundcloudText;
+    private TextView facebookText;
+    private TextView twitterText;
+    private TextView youtubeText;
+    private TextView instagramText;
+    private TextView spotifyText;
+    private TextView webText;
 
     private FrameLayout progress;
 
@@ -88,6 +105,14 @@ public class ArtistProfileActivity extends AppCompatActivity {
         nameText = findViewById(R.id.profile_artist_name);
         descriptionText = findViewById(R.id.profile_artist_description);
         genresText = findViewById(R.id.profile_artist_genre);
+
+        soundcloudText = findViewById(R.id.profile_soundcloud_text);
+        facebookText = findViewById(R.id.profile_facebook_text);
+        twitterText = findViewById(R.id.profile_twitter_text);
+        youtubeText = findViewById(R.id.profile_youtube_text);
+        instagramText = findViewById(R.id.profile_instagram_text);
+        spotifyText = findViewById(R.id.profile_spotify_text);
+        webText = findViewById(R.id.profile_web_text);
 
         progress = findViewById(R.id.progressBarHolder);
         sendMsgBtn = findViewById(R.id.sendMsgBtn);
@@ -203,6 +228,105 @@ public class ArtistProfileActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Displays a SocialMediaLink
+     * @param socialMediaId
+     * @param text
+     * @param socialMediaLink
+     */
+    private void displaySocialMedia(int socialMediaId, String text, final String socialMediaLink) {
+        LinearLayout container;
+
+        switch(socialMediaId) {
+            case ID_SOUNDCLOUD:
+                soundcloudText.setText(text);
+                container = findViewById(R.id.profile_soundcloud);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_FACEBOOK:
+                facebookText.setText(text);
+                container = findViewById(R.id.profile_facebook);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_TWITTER:
+                twitterText.setText(text);
+                container = findViewById(R.id.profile_twitter);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_YOUTUBE:
+                youtubeText.setText(text);
+                container = findViewById(R.id.profile_youtube);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_INSTAGRAM:
+                instagramText.setText(text);
+                container = findViewById(R.id.profile_instagram);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_SPOTIFY:
+                spotifyText.setText(text);
+                container = findViewById(R.id.profile_spotify);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+            case ID_WEB:
+                webText.setText(text);
+                container = findViewById(R.id.profile_web);
+                container.setVisibility(View.VISIBLE);
+                container.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        startActivity(browserIntent);
+                    }
+                });
+                break;
+
+        }
+
+    };
 
     private void displayProfilePicture(String result) {
         try {
