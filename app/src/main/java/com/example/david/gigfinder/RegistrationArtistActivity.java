@@ -70,6 +70,13 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private TextView genreTitle;
     private Spinner genreSpinner;
     private TextView socialMediaTitle;
+    private EditText soundcloudField;
+    private EditText facebookField;
+    private EditText twitterField;
+    private EditText youtubeField;
+    private EditText instagramField;
+    private EditText spotifyField;
+    private EditText webField;
     private Button backgroundColorPickerButton;
     private Button registrationButton;
 
@@ -123,6 +130,13 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         //Replaced the Strings with the Genre-Enum
 
         socialMediaTitle = findViewById(R.id.registration_artist_social_media_title);
+        soundcloudField = findViewById(R.id.registration_soundcloud);
+        facebookField = findViewById(R.id.registration_facebook);
+        twitterField = findViewById(R.id.registration_twitter);
+        youtubeField = findViewById(R.id.registration_youtube);
+        instagramField = findViewById(R.id.registration_instagram);
+        spotifyField = findViewById(R.id.registration_spotify);
+        webField = findViewById(R.id.registration_web);
 
         backgroundColorPickerButton = findViewById(R.id.button_registration_colorPicker);
         backgroundColorPickerButton.setOnClickListener(new View.OnClickListener() {
@@ -253,6 +267,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"Uri not found",Toast.LENGTH_SHORT).show();
 
             }
+
+            // TODO get social media content
 
             SendRegisterArtist sendRegisterArtist = new SendRegisterArtist();
             sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()), Base64.encodeToString(imageByteArray, Base64.DEFAULT));

@@ -76,6 +76,14 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private TextView locationButtonText;
     private TextView genreTitle;
     private Spinner genreSpinner;
+    private TextView socialMediaTitle;
+    private EditText soundcloudField;
+    private EditText facebookField;
+    private EditText twitterField;
+    private EditText youtubeField;
+    private EditText instagramField;
+    private EditText spotifyField;
+    private EditText webField;
     private Button backgroundColorPickerButton;
     private Button registrationButton;
 
@@ -137,6 +145,15 @@ public class RegistrationHostActivity extends AppCompatActivity {
         locationButtonIcon = findViewById(R.id.registration_host_location_icon);
         genreTitle = findViewById(R.id.registration_host_genre_title);
         genreSpinner = findViewById(R.id.registration_host_genre);
+
+        socialMediaTitle = findViewById(R.id.registration_host_social_media_title);
+        soundcloudField = findViewById(R.id.registration_soundcloud);
+        facebookField = findViewById(R.id.registration_facebook);
+        twitterField = findViewById(R.id.registration_twitter);
+        youtubeField = findViewById(R.id.registration_youtube);
+        instagramField = findViewById(R.id.registration_instagram);
+        spotifyField = findViewById(R.id.registration_spotify);
+        webField = findViewById(R.id.registration_web);
 
         backgroundColorPickerButton = findViewById(R.id.button_registration_host_colorPicker);
         backgroundColorPickerButton.setOnClickListener(new View.OnClickListener() {
@@ -285,6 +302,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
         descriptionTitle.setTextColor(color);
         locationButtonIcon.setImageTintList(ColorStateList.valueOf(color));
         genreTitle.setTextColor(color);
+        socialMediaTitle.setTextColor(color);
     }
 
     /**
@@ -292,6 +310,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
      */
     private void performRegistration() {
         Log.d(TAG, "Checking user input...");
+
+
         if(checkUserInputBasic()) {
             Log.d(TAG, "User input ok");
 
@@ -303,6 +323,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"Uri not found",Toast.LENGTH_SHORT).show();
 
             }
+
+            // TODO get social media content
 
             SendRegisterHost sendRegisterHost = new SendRegisterHost();
             sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude, Base64.encodeToString(imageByteArray, Base64.DEFAULT)); //TODO params
