@@ -31,6 +31,7 @@
     <string name="registration_artist_color">Hintergrundfarbe wählen</string>
     <string name="registration_artist_color_hint">Platzhalter für ColorPicker (hexcode)</string>
     <string name="registration_artist_genre">Genre</string>
+    <string name="registration_artist_social_media">Social Media (Benutzername)</string>
 
     <!-- Registrierung Host  -->
     <string name="registration_host_title">Registrieren - Location Host</string>
