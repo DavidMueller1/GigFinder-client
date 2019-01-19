@@ -12,4 +12,12 @@
     <color name="grey">#9c9c9c</color>
     <color name="darkGrey">#4e4e4e</color>
 
+    <!-- Social Media -->
+    <color name="soundcloud">#ff7700</color>
+    <color name="facebook">#3b5998</color>
+    <color name="twitter">#00aced</color>
+    <color name="youtube">#ff0000</color>
+    <color name="instagram">#8a3ab9</color>
+    <color name="spotify">#1db954</color>
+
 </resources>

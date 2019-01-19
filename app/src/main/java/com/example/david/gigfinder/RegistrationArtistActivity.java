@@ -69,6 +69,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private EditText descriptionField;
     private TextView genreTitle;
     private Spinner genreSpinner;
+    private TextView socialMediaTitle;
     private Button backgroundColorPickerButton;
     private Button registrationButton;
 
@@ -120,6 +121,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         genreTitle = findViewById(R.id.registration_artist_genre_title);
         genreSpinner = findViewById(R.id.registration_artist_genre);
         //Replaced the Strings with the Genre-Enum
+
+        socialMediaTitle = findViewById(R.id.registration_artist_social_media_title);
 
         backgroundColorPickerButton = findViewById(R.id.button_registration_colorPicker);
         backgroundColorPickerButton.setOnClickListener(new View.OnClickListener() {
@@ -231,6 +234,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         nameTitle.setTextColor(color);
         descriptionTitle.setTextColor(color);
         genreTitle.setTextColor(color);
+        socialMediaTitle.setTextColor(color);
     }
 
     /**
