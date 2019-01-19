@@ -152,7 +152,8 @@
                 <EditText
                     android:id="@+id/registration_soundcloud"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_soundcloud"/>
 
             </LinearLayout>
 
@@ -171,7 +172,8 @@
                 <EditText
                     android:id="@+id/registration_facebook"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_facebook"/>
 
             </LinearLayout>
 
@@ -190,7 +192,8 @@
                 <EditText
                     android:id="@+id/registration_twitter"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_twitter"/>
 
             </LinearLayout>
 
@@ -209,7 +212,8 @@
                 <EditText
                     android:id="@+id/registration_youtube"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_youtube"/>
 
             </LinearLayout>
 
@@ -228,7 +232,8 @@
                 <EditText
                     android:id="@+id/registration_instagram"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_instagram"/>
 
             </LinearLayout>
 
@@ -247,7 +252,28 @@
                 <EditText
                     android:id="@+id/registration_spotify"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_spotify"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/element_normal"
+                    android:layout_height="@dimen/element_normal"
+                    android:layout_marginRight="@dimen/padding_smaller"
+                    android:src="@drawable/ic_iconmonstr_web"
+                    android:tint="@color/black"/>
+
+                <EditText
+                    android:id="@+id/registration_web"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_web"/>
 
             </LinearLayout>
 

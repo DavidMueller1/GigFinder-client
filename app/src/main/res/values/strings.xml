@@ -48,6 +48,16 @@
 
     <string name="registration_button">Registrieren</string>
 
+    <!-- Social Media Hints -->
+    <string name="hint_soundcloud">Soundcloud Profilname</string>
+    <string name="hint_facebook">Facebook Profilname</string>
+    <string name="hint_twitter">Twitter Profilname</string>
+    <string name="hint_youtube">YouTube Kanalname</string>
+    <string name="hint_instagram">Instagram Accountname</string>
+    <string name="hint_spotify">Spotify Profilname</string>
+    <string name="hint_web">Eigene Website</string>
+
+
     <!-- Genres  -->
     <string name="artist_genre_choose">Bitte auswählen…</string>
     <string name="artist_genre_techno">Techno</string>
