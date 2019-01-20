@@ -355,7 +355,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
         }
     }
 
-
     private void displayLoadingScreen(boolean isLoading) {
         if(isLoading) {
             runOnUiThread(new Runnable() {
@@ -562,6 +561,76 @@ public class ArtistProfileActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             //TODO Update GUI
+        }
+    }
+
+    class PostReview extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/reviews");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestProperty("Content-Type","application/json");
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setUseCaches(false);
+                urlConnection.setDoOutput(true);
+
+                //Send data TODO
+                DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("ArtistId", userId);
+                jsonObject.put("HostId", profileUserId);
+                os.writeBytes(jsonObject.toString());
+                os.close();
+
+                //Get response
+                InputStream is = null;
+                try {
+                    is = urlConnection.getInputStream();
+                } catch (IOException ioe) {
+                    if (urlConnection instanceof HttpURLConnection) {
+                        HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
+                        int statusCode = httpConn.getResponseCode();
+                        if (statusCode != 200) {
+                            is = httpConn.getErrorStream();
+                            Log.d(TAG, "PostFavorite: STATUS CODE: " + statusCode);
+                            Log.d(TAG, "PostFavorite: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
+                            Log.d(TAG, httpConn.getURL().toString());
+                        }
+                    }
+                }
+
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                Log.d(TAG, "PostReview Response:" + response.toString());
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
         }
     }
 }

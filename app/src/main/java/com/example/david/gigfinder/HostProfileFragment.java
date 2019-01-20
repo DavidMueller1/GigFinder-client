@@ -169,6 +169,10 @@ public class HostProfileFragment extends Fragment {
         editor.commit();
     }
 
+    /**
+     * Updates the Profile using the cached Json Object
+     * @param jsonString
+     */
     private void updateProfile(String jsonString){
         try {
             JSONArray jsonArray = new JSONArray(jsonString);
@@ -223,26 +227,13 @@ public class HostProfileFragment extends Fragment {
             Log.d(TAG, socialMediaArrays.toString());
 
             for(int i=0; i<socialMedias.length(); i++){
-                JSONObject jsonObject = getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
-                //displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
+                JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
+                //displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website")); TODO: das sollte funktionieren
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    private JSONObject getSocialMedia(int id, JSONArray jsonArray){
-        for(int i =0; i<jsonArray.length(); i++){
-            try {
-                if(jsonArray.getJSONObject(i).getInt("id") == id){
-                    return jsonArray.getJSONObject(i);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 
     /**
@@ -345,6 +336,10 @@ public class HostProfileFragment extends Fragment {
 
     };
 
+    /**
+     * Displays the profile picture of the user
+     * @param result
+     */
     private void displayProfilePicture(String result) {
         try {
             JSONObject imageProfile = new JSONObject(result);
@@ -392,6 +387,9 @@ public class HostProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Gets the profile picture from the server and GUI update
+     */
     class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         @Override
