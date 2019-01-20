@@ -200,9 +200,13 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            chatStrings.get(id)[4] = result;
-            chatAdapter.notifyDataSetChanged();
+            if(!chatStrings.equals(null)) {
+                chatStrings.get(id)[4] = result;
+                chatAdapter.notifyDataSetChanged();
+            }
         }
+
+
     }
 }
 

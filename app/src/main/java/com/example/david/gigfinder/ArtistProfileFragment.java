@@ -1,5 +1,6 @@
 package com.example.david.gigfinder;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -51,13 +52,13 @@ import static android.content.Context.MODE_PRIVATE;
 public class ArtistProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - ArtistProfileFragment";
 
-    private static final int ID_SOUNDCLOUD = 0;
-    private static final int ID_FACEBOOK = 1;
-    private static final int ID_TWITTER = 2;
-    private static final int ID_YOUTUBE = 3;
-    private static final int ID_INSTAGRAM = 4;
-    private static final int ID_SPOTIFY = 5;
-    private static final int ID_WEB = 6;
+    private static final String ID_SOUNDCLOUD = "Soundcloud";
+    private static final String ID_FACEBOOK = "Facebook";
+    private static final String ID_TWITTER = "Twitter";
+    private static final String ID_YOUTUBE = "Youtube";
+    private static final String ID_INSTAGRAM = "Instagram";
+    private static final String ID_SPOTIFY = "Spotify";
+    private static final String ID_WEB = "Website";
 
     SharedPreferences sharedPreferences;
 
@@ -168,7 +169,7 @@ public class ArtistProfileFragment extends Fragment {
     private void updateProfile(String jsonString){
         try {
             // Social Media Example:
-            displaySocialMedia(ID_FACEBOOK, "Davids Facebook", "https://www.facebook.com"); // obviously mit link zum profil
+            //displaySocialMedia(ID_FACEBOOK, "Davids Facebook", "https://www.facebook.com"); // obviously mit link zum profil
 
             JSONArray jsonArray = new JSONArray(jsonString);
             JSONObject userProfile = jsonArray.getJSONObject(0);
@@ -177,13 +178,11 @@ public class ArtistProfileFragment extends Fragment {
             GetProfilePicture getProfilePicture = new GetProfilePicture();
             getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
 
-
             nameText.setText(userProfile.getString("name"));
             descriptionText.setText(userProfile.getString("description"));
             userID = userProfile.getInt("id");
             updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
-
 
             String myGenres = "(";
             for(int i=0; i<userProfile.getJSONArray("artistGenres").length(); i++){
@@ -196,23 +195,50 @@ public class ArtistProfileFragment extends Fragment {
             myGenres = myGenres.concat(")");
             genresText.setText(myGenres);
 
+
+            userProfile.put("profilePicture", "");
+            Log.d("TAG", userProfile.toString());
+
+            JSONArray socialMedias = userProfile.getJSONArray("artistSocialMedias");
+
+            String socials = sharedPreferences.getString("social medias", "");
+            JSONArray socialMediaArrays = new JSONArray(socials);
+
+            for(int i=0; i<socialMedias.length(); i++){
+                JSONObject jsonObject = getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
+                displaySocialMedia(jsonObject.getString("name"),
+                        socialMedias.getJSONObject(i).getString("handle"),
+                        jsonObject.getString("website"));
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
 
-
+    private JSONObject getSocialMedia(int id, JSONArray jsonArray){
+        for(int i =0; i<jsonArray.length(); i++){
+            try {
+                if(jsonArray.getJSONObject(i).getInt("id") == id){
+                    return jsonArray.getJSONObject(i);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
     /**
      * Displays a SocialMediaLink
-     * @param socialMediaId
+     * @param socialMedia
      * @param text
      * @param socialMediaLink
      */
-    private void displaySocialMedia(int socialMediaId, String text, final String socialMediaLink) {
+    private void displaySocialMedia(String socialMedia, String text, final String socialMediaLink) {
         LinearLayout container;
 
-        switch(socialMediaId) {
+        switch(socialMedia) {
             case ID_SOUNDCLOUD:
                 soundcloudText.setText(text);
                 container = getView().findViewById(R.id.profile_soundcloud);
