@@ -58,13 +58,13 @@ import static android.content.Context.MODE_PRIVATE;
 public class HostProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - HostProfileFragment";
 
-    private static final int ID_SOUNDCLOUD = 0;
-    private static final int ID_FACEBOOK = 1;
-    private static final int ID_TWITTER = 2;
-    private static final int ID_YOUTUBE = 3;
-    private static final int ID_INSTAGRAM = 4;
-    private static final int ID_SPOTIFY = 5;
-    private static final int ID_WEB = 6;
+    private static final String ID_SOUNDCLOUD = "Soundcloud";
+    private static final String ID_FACEBOOK = "Facebook";
+    private static final String ID_TWITTER = "Twitter";
+    private static final String ID_YOUTUBE = "Youtube";
+    private static final String ID_INSTAGRAM = "Instagram";
+    private static final String ID_SPOTIFY = "Spotify";
+    private static final String ID_WEB = "Website";
 
     SharedPreferences sharedPreferences;
 
@@ -214,23 +214,50 @@ public class HostProfileFragment extends Fragment {
             String address = GeoTools.getAddressFromLatLng(getContext(), new LatLng(lat, lng));
             locationText.setText(address);
 
+            JSONArray socialMedias = userProfile.getJSONArray("hostSocialMedias");
+
+            String socials = sharedPreferences.getString("social medias", "");
+            JSONArray socialMediaArrays = new JSONArray(socials);
+
+            Log.d(TAG, socialMedias.toString());
+            Log.d(TAG, socialMediaArrays.toString());
+
+            for(int i=0; i<socialMedias.length(); i++){
+                JSONObject jsonObject = getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
+                //displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    private JSONObject getSocialMedia(int id, JSONArray jsonArray){
+        for(int i =0; i<jsonArray.length(); i++){
+            try {
+                if(jsonArray.getJSONObject(i).getInt("id") == id){
+                    return jsonArray.getJSONObject(i);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
     /**
      * Displays a SocialMediaLink
-     * @param socialMediaId
+     * @param socialMedia
      * @param text
      * @param socialMediaLink
      */
-    private void displaySocialMedia(int socialMediaId, String text, final String socialMediaLink) {
+    private void displaySocialMedia(String socialMedia, String text, final String socialMediaLink) {
         LinearLayout container;
 
-        switch(socialMediaId) {
+        switch(socialMedia) {
             case ID_SOUNDCLOUD:
                 soundcloudText.setText(text);
+                Log.d(TAG, text);
                 container = getView().findViewById(R.id.profile_soundcloud);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {

@@ -196,9 +196,6 @@ public class ArtistProfileFragment extends Fragment {
             genresText.setText(myGenres);
 
 
-            userProfile.put("profilePicture", "");
-            Log.d("TAG", userProfile.toString());
-
             JSONArray socialMedias = userProfile.getJSONArray("artistSocialMedias");
 
             String socials = sharedPreferences.getString("social medias", "");

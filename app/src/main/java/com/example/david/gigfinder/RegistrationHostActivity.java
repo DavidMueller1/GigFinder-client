@@ -103,6 +103,10 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private JSONArray genres;
     private String[] genreStrings;
 
+    //Social Media
+    private JSONArray socialMedias;
+    private JSONArray mySocialMedias;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,6 +124,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
         getSocialMedias.execute();
 
         host = new Host();
+        mySocialMedias = new JSONArray();
 
         profilePictureTitle = findViewById(R.id.registration_host_image_title);
         profilePictureHint = findViewById(R.id.registration_host_image_hint);
@@ -324,8 +329,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
             }
 
-            // TODO get social media content
-
             SendRegisterHost sendRegisterHost = new SendRegisterHost();
             sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude, Base64.encodeToString(imageByteArray, Base64.DEFAULT)); //TODO params
         }
@@ -361,6 +364,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
         genreStrings[0] = genreSpinner.getSelectedItem().toString();
         //TODO just fill this list with selected genres
 
+        postSocialMedia();
+
         return true;
     }
 
@@ -391,6 +396,54 @@ public class RegistrationHostActivity extends AppCompatActivity {
         }
         Log.d(TAG, genresJson.toString());
         return genresJson;
+    }
+
+    private void postSocialMedia(){
+        if(!soundcloudField.getText().toString().equals("")){
+            pickSocialMedia("Soundcloud", soundcloudField.getText().toString());
+        }
+        if(!facebookField.getText().toString().equals("")){
+            pickSocialMedia("Facebook", facebookField.getText().toString());
+        }
+        if(!twitterField.getText().toString().equals("")){
+            pickSocialMedia("Twitter", twitterField.getText().toString());
+        }
+        if(!youtubeField.getText().toString().equals("")){
+            pickSocialMedia("YouTube", youtubeField.getText().toString());
+        }
+        if(!instagramField.getText().toString().equals("")){
+            //pickSocialMedia("Soundcloud", soundcloudField.getText().toString()); TODO
+        }
+        if(!spotifyField.getText().toString().equals("")){
+            pickSocialMedia("Spotify", spotifyField.getText().toString());
+        }
+        if(!webField.getText().toString().equals("")){
+            pickSocialMedia("Website", webField.getText().toString());
+        }
+    }
+
+    private void pickSocialMedia(String name, String handle){
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("SocialMediaId", getSocialMediaId(name));
+            jsonObject.put("Handle", handle);
+            mySocialMedias.put(jsonObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getSocialMediaId(String name){
+        for(int i = 0; i< socialMedias.length(); i++){
+            try {
+                if(socialMedias.getJSONObject(i).getString("name").equals(name)){
+                    return socialMedias.getJSONObject(i).getInt("id");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 
     private void displayLoadingScreen(boolean isLoading) {
@@ -436,9 +489,12 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 jsonObject.put("backgroundColor", params[2]);
                 jsonObject.put("latitude", params[3]);
                 jsonObject.put("longitude", params[4]);
-                jsonObject.put("hostGenres", genresToJson(genreStrings));
                 jsonObject.put("profilePicture", imageJson);
-                //jsonObject.put("image", params[4]);
+                jsonObject.put("hostGenres", genresToJson(genreStrings));
+                if(mySocialMedias.length()>0){
+                    jsonObject.put("hostSocialMedias", mySocialMedias);
+                    Log.d(TAG, mySocialMedias.toString());
+                }
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
@@ -591,6 +647,16 @@ public class RegistrationHostActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "Social Medias: " + result);
+
+            SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putString("social medias", result);
+            editor.apply();
+
+            try {
+                socialMedias = new JSONArray(result);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
         }
     }
