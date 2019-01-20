@@ -80,10 +80,14 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private boolean pictureChosen;
 
     private ArrayAdapter<String> adapter;
+
+    //Genres
     private JSONArray genres;
-    private String[] genreStrings;
+    private String[] myGenres;
+
+    //Social Media
+    private JSONArray socialMedias;
     private JSONArray mySocialMedias;
-    private JSONArray socialMeidas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -259,8 +263,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
             }
 
-            // TODO get social media content
-
             SendRegisterArtist sendRegisterArtist = new SendRegisterArtist();
             sendRegisterArtist.execute(artist.getName(), artist.getDescription(), String.valueOf(artist.getColor()), Base64.encodeToString(imageByteArray, Base64.DEFAULT));
         }
@@ -289,8 +291,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         artist.setDescription(descriptionField.getText().toString());
 
         // TODO multiple genres selectable
-        genreStrings = new String[1]; //Change length to num of selected genres
-        genreStrings[0] = genreSpinner.getSelectedItem().toString();
+        myGenres = new String[1]; //Change length to num of selected genres
+        myGenres[0] = genreSpinner.getSelectedItem().toString();
         //TODO just fill this list with selected genres
 
         postSocialMedia();
@@ -363,10 +365,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     }
 
     private int getSocialMediaId(String name){
-        for(int i = 0; i<socialMeidas.length(); i++){
+        for(int i = 0; i< socialMedias.length(); i++){
             try {
-                if(socialMeidas.getJSONObject(i).getString("name").equals(name)){
-                    return socialMeidas.getJSONObject(i).getInt("id");
+                if(socialMedias.getJSONObject(i).getString("name").equals(name)){
+                    return socialMedias.getJSONObject(i).getInt("id");
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -419,7 +421,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 jsonObject.put("description", params[1]);
                 jsonObject.put("backgroundColor", params[2]);
                 jsonObject.put("profilePicture", imageJson);
-                jsonObject.put("artistGenres", genresToJson(genreStrings));
+                jsonObject.put("artistGenres", genresToJson(myGenres));
                 if(mySocialMedias.length()>0){
                     jsonObject.put("artistSocialMedias", mySocialMedias);
                     Log.d(TAG, mySocialMedias.toString());
@@ -587,7 +589,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             editor.apply();
 
             try {
-                socialMeidas = new JSONArray(result);
+                socialMedias = new JSONArray(result);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
