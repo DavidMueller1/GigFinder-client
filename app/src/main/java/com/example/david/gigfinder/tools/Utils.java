@@ -8,6 +8,7 @@ import com.example.david.gigfinder.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.sql.Timestamp;
@@ -78,4 +79,22 @@ public abstract class Utils {
         return new SimpleDateFormat("dd.MM.yyyy").format(date);
     }
 
+    /**
+     * Returns the Social Media object
+     * @param id id of the social media
+     * @param jsonArray the social medias object stored in SharedPrefs
+     * @return
+     */
+    public static JSONObject getSocialMedia(int id, JSONArray jsonArray){
+        for(int i =0; i<jsonArray.length(); i++){
+            try {
+                if(jsonArray.getJSONObject(i).getInt("id") == id){
+                    return jsonArray.getJSONObject(i);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 }

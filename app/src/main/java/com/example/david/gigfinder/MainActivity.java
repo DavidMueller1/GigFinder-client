@@ -14,6 +14,9 @@ import android.widget.Toast;
 import com.example.david.gigfinder.adapters.SectionsPageAdapter;
 import com.example.david.gigfinder.tools.ColorTools;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -174,8 +177,14 @@ public class MainActivity extends AppCompatActivity {
 
         //Check if Genres is missing
         if(sharedPreferences.getString("genres", "x").equals("x")){
-            GetGenres getgenres = new GetGenres();
-            getgenres.execute();
+            GetGenres getGenres = new GetGenres();
+            getGenres.execute();
+        }
+
+        //Check if Social Media is missing
+        if (sharedPreferences.getString("social medias", "x").equals("x")){
+            GetSocialMedias getSocialMedias = new GetSocialMedias();
+            getSocialMedias.execute();
         }
     }
 
@@ -228,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets artist object from Server and stores it in SharedPrefs
      */
     class GetArtist extends AsyncTask<String, Void, String> {
 
@@ -270,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets host object from Server and stores it in SharedPrefs
      */
     class GetHost extends AsyncTask<String, Void, String> {
 
@@ -312,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets genres from Server and stores them in SharedPrefs
      */
     class GetGenres extends AsyncTask<String, Void, String> {
 
@@ -350,6 +359,51 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             Log.d(TAG, "GENRES: " + result);
             sharedPreferences.edit().putString("genres", result).apply();
+        }
+    }
+
+    /**
+     * Gets social medias from Server and stores them in SharedPrefs
+     */
+    class GetSocialMedias extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/socialmedias");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "Social Medias: " + result);
+
+            SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putString("social medias", result);
+            editor.apply();
         }
     }
 }

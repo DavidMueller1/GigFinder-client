@@ -82,8 +82,6 @@ public class ArtistProfileFragment extends Fragment {
     private FrameLayout progress;
     private byte[] imageByteArray;
 
-    //private Artist artist;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -166,6 +164,10 @@ public class ArtistProfileFragment extends Fragment {
 
     }
 
+    /**
+     * Updates the Profile using the cached Json Object
+     * @param jsonString
+     */
     private void updateProfile(String jsonString){
         try {
             // Social Media Example:
@@ -173,6 +175,7 @@ public class ArtistProfileFragment extends Fragment {
 
             JSONArray jsonArray = new JSONArray(jsonString);
             JSONObject userProfile = jsonArray.getJSONObject(0);
+            userProfile.put("profilePicture", "");
             Log.d(TAG, userProfile.toString());
 
             GetProfilePicture getProfilePicture = new GetProfilePicture();
@@ -202,7 +205,7 @@ public class ArtistProfileFragment extends Fragment {
             JSONArray socialMediaArrays = new JSONArray(socials);
 
             for(int i=0; i<socialMedias.length(); i++){
-                JSONObject jsonObject = getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
+                JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
                 displaySocialMedia(jsonObject.getString("name"),
                         socialMedias.getJSONObject(i).getString("handle"),
                         jsonObject.getString("website"));
@@ -211,19 +214,6 @@ public class ArtistProfileFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-    }
-
-    private JSONObject getSocialMedia(int id, JSONArray jsonArray){
-        for(int i =0; i<jsonArray.length(); i++){
-            try {
-                if(jsonArray.getJSONObject(i).getInt("id") == id){
-                    return jsonArray.getJSONObject(i);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 
     /**
@@ -325,6 +315,10 @@ public class ArtistProfileFragment extends Fragment {
 
     };
 
+    /**
+     * Displays the profile picture of the user
+     * @param result
+     */
     private void displayProfilePicture(String result) {
         try {
             JSONObject imageProfile = new JSONObject(result);
@@ -371,6 +365,9 @@ public class ArtistProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Gets the profile picture from the server and GUI update
+     */
     class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         @Override
