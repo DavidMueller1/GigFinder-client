@@ -1,18 +1,13 @@
 package com.example.david.gigfinder;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
-import android.util.JsonReader;
-import android.util.JsonWriter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,7 +25,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.david.gigfinder.data.Artist;
-import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.ImageTools;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
@@ -43,8 +36,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,8 +43,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class RegistrationArtistActivity extends AppCompatActivity {
 
@@ -93,6 +82,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
     private JSONArray genres;
     private String[] genreStrings;
+    private JSONArray mySocialMedias;
+    private JSONArray socialMeidas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +102,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         getSocialMedias.execute();
 
         artist = new Artist();
+        mySocialMedias = new JSONArray();
 
         profilePictureTitle = findViewById(R.id.registration_artist_image_title);
         profilePictureHint = findViewById(R.id.registration_artist_image_hint);
@@ -220,7 +212,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      * Called when the user presses the choose color button
      */
@@ -302,6 +293,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         genreStrings[0] = genreSpinner.getSelectedItem().toString();
         //TODO just fill this list with selected genres
 
+        postSocialMedia();
+
         return true;
     }
 
@@ -332,6 +325,54 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
         Log.d(TAG, genresJson.toString());
         return genresJson;
+    }
+
+    private void postSocialMedia(){
+            if(!soundcloudField.getText().toString().equals("")){
+                pickSocialMedia("Soundcloud", soundcloudField.getText().toString());
+            }
+            if(!facebookField.getText().toString().equals("")){
+                pickSocialMedia("Facebook", facebookField.getText().toString());
+            }
+            if(!twitterField.getText().toString().equals("")){
+                pickSocialMedia("Twitter", twitterField.getText().toString());
+            }
+            if(!youtubeField.getText().toString().equals("")){
+                pickSocialMedia("YouTube", youtubeField.getText().toString());
+            }
+            if(!instagramField.getText().toString().equals("")){
+                //pickSocialMedia("Soundcloud", soundcloudField.getText().toString()); TODO
+            }
+            if(!spotifyField.getText().toString().equals("")){
+                pickSocialMedia("Spotify", spotifyField.getText().toString());
+            }
+            if(!webField.getText().toString().equals("")){
+                pickSocialMedia("Website", webField.getText().toString());
+            }
+    }
+
+    private void pickSocialMedia(String name, String handle){
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("SocialMediaId", getSocialMediaId(name));
+            jsonObject.put("Handle", handle);
+            mySocialMedias.put(jsonObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getSocialMediaId(String name){
+        for(int i = 0; i<socialMeidas.length(); i++){
+            try {
+                if(socialMeidas.getJSONObject(i).getString("name").equals(name)){
+                    return socialMeidas.getJSONObject(i).getInt("id");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 
     private void displayLoadingScreen(boolean isLoading) {
@@ -377,9 +418,12 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 jsonObject.put("name", params[0]);
                 jsonObject.put("description", params[1]);
                 jsonObject.put("backgroundColor", params[2]);
-                jsonObject.put("artistGenres", genresToJson(genreStrings));
                 jsonObject.put("profilePicture", imageJson);
-                //jsonObject.put("image", params[4]);
+                jsonObject.put("artistGenres", genresToJson(genreStrings));
+                if(mySocialMedias.length()>0){
+                    jsonObject.put("artistSocialMedias", mySocialMedias);
+                    Log.d(TAG, mySocialMedias.toString());
+                }
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
@@ -494,6 +538,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "GENRES: " + result);
+
             SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
             editor.putString("genres", result);
             editor.apply();
@@ -537,6 +582,15 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             Log.d(TAG, "Social Medias: " + result);
 
+            SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putString("social medias", result);
+            editor.apply();
+
+            try {
+                socialMeidas = new JSONArray(result);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
