@@ -74,12 +74,12 @@
     <string name="profile_genre_multiple">Genres:</string>
 
     <!-- Gigs  -->
-    <string name="upcoming_gigs">Upcoming Gigs</string>
-    <string name="past_gigs">Past Gigs</string>
+    <string name="upcoming_gigs">Kommende Auftritte</string>
+    <string name="past_gigs">Vergangene Auftritte</string>
 
     <!-- Events  -->
-    <string name="upcoming_events">Upcoming Events</string>
-    <string name="past_events">Past Events</string>
+    <string name="upcoming_events">Kommende Auftritte</string>
+    <string name="past_events">Vergangene Auftritte</string>
 
     <!-- Add Event -->
     <string name="add_event_title_hint">Name des Events</string>
