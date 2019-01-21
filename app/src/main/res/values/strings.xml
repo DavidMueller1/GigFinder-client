@@ -78,6 +78,8 @@
     <string name="past_gigs">Vergangene Auftritte</string>
 
     <!-- Events  -->
+    <string name="event_participants">Bewerber</string>
+    <string name="event_participants_select">Zusagen</string>
     <string name="upcoming_events">Kommende Auftritte</string>
     <string name="past_events">Vergangene Auftritte</string>
 
@@ -106,6 +108,7 @@
     <!-- Buttons -->
     <string name="button_add_to_favorites">Zu Favoriten hinzufügen</string>
     <string name="button_send_message">Nachricht schreiben</string>
+    <string name="no_connection">Kein Zugang zum Internet</string>
 
 
 </resources>
