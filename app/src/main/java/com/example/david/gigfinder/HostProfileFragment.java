@@ -70,6 +70,7 @@ public class HostProfileFragment extends Fragment {
 
     private int userID;
     private Button testDeleteBtn;
+    private Button testSignOutBtn;
     private ImageView imageButton;
     private TextView nameText;
     private TextView descriptionText;
@@ -106,6 +107,7 @@ public class HostProfileFragment extends Fragment {
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
+        testSignOutBtn = getView().findViewById(R.id.signOutBtn);
         imageButton = getView().findViewById(R.id.profile_host_profilePicture);
         nameText = getView().findViewById(R.id.profile_host_name);
         descriptionText = getView().findViewById(R.id.profile_host_description);
@@ -128,6 +130,13 @@ public class HostProfileFragment extends Fragment {
             public void onClick(View v) {
                 DeleteUser deleteUser = new DeleteUser();
                 deleteUser.execute();
+            }
+        });
+
+        testSignOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
             }
         });
 
@@ -187,6 +196,7 @@ public class HostProfileFragment extends Fragment {
             userID = userProfile.getInt("id");
             updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
+            testSignOutBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             final float lat = Float.parseFloat(userProfile.getString("latitude"));
             final float lng = Float.parseFloat(userProfile.getString("longitude"));
 
@@ -385,6 +395,19 @@ public class HostProfileFragment extends Fragment {
                 }
             });
         }
+    }
+
+    /**
+     * Deletes SharedPrefs and opens the LoginActivity which then SignsOut the user
+     */
+    private void signOut() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        intent.putExtra("SignOut", true);
+        startActivity(intent);
+        getActivity().finish();
     }
 
     /**

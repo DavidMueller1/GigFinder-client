@@ -74,14 +74,14 @@
     <string name="profile_genre_multiple">Genres:</string>
 
     <!-- Gigs  -->
-    <string name="upcoming_gigs">Upcoming Gigs</string>
-    <string name="past_gigs">Past Gigs</string>
+    <string name="upcoming_gigs">Kommende Auftritte</string>
+    <string name="past_gigs">Vergangene Auftritte</string>
 
     <!-- Events  -->
-    <string name="upcoming_events">Upcoming Events</string>
-    <string name="past_events">Past Events</string>
     <string name="event_participants">Bewerber</string>
     <string name="event_participants_select">Zusagen</string>
+    <string name="upcoming_events">Kommende Auftritte</string>
+    <string name="past_events">Vergangene Auftritte</string>
 
     <!-- Add Event -->
     <string name="add_event_title_hint">Name des Events</string>
@@ -108,6 +108,7 @@
     <!-- Buttons -->
     <string name="button_add_to_favorites">Zu Favoriten hinzufügen</string>
     <string name="button_send_message">Nachricht schreiben</string>
+    <string name="no_connection">Kein Zugang zum Internet</string>
 
 
 </resources>
