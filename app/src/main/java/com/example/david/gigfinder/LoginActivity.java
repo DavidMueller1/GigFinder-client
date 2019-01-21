@@ -70,6 +70,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         progress = findViewById(R.id.login_progress);
+
+        if(getIntent().hasExtra("SignOut")){
+            signOut();
+        }
     }
 
     @Override
@@ -100,6 +104,16 @@ public class LoginActivity extends AppCompatActivity {
             //TODO Offline use of App
             Toast.makeText(getApplicationContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
     }
 
     /**

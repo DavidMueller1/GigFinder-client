@@ -155,9 +155,19 @@
                 android:textSize="@dimen/font_bigger" />
 
             <Button
+                android:id="@+id/signOutBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:text="Sing Out" />
+
+            <Button
                 android:id="@+id/deleteBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
                 android:text="Delete Profile" />
 
         </LinearLayout>
