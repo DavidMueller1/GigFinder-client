@@ -124,7 +124,6 @@ public class HostProfileFragment extends Fragment {
         spotifyText = getView().findViewById(R.id.profile_spotify_text);
         webText = getView().findViewById(R.id.profile_web_text);
 
-
         testDeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -238,7 +237,7 @@ public class HostProfileFragment extends Fragment {
 
             for(int i=0; i<socialMedias.length(); i++){
                 JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
-                //displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website")); TODO: das sollte funktionieren
+                //displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
             }
 
         } catch (JSONException e) {
