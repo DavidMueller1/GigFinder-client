@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.ChatAdapter;
 import com.example.david.gigfinder.adapters.ParticipantAdapter;
@@ -157,11 +158,18 @@ public class EventProfileActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(TAG, "Item " + position + " clicked!");
-                Intent intent = new Intent(getApplicationContext(), ArtistProfileActivity.class);
-                intent.putExtra("idToken", idToken);
-                intent.putExtra("profileUserId", Integer.parseInt(participantStrings.get(position)[2]));
-                startActivity(intent);
+                long viewId = view.getId();
+
+                if(viewId == R.id.participant_select_button) {
+                    Log.d(TAG, "Select button clicked: ");
+                }
+                else {
+                    Log.d(TAG, "Item " + position + " clicked on View " + view.getClass().toString());
+                    Intent intent = new Intent(getApplicationContext(), ArtistProfileActivity.class);
+                    intent.putExtra("idToken", idToken);
+                    intent.putExtra("profileUserId", Integer.parseInt(participantStrings.get(position)[2]));
+                    startActivity(intent);
+                }
             }
         });
     }
@@ -279,6 +287,8 @@ public class EventProfileActivity extends AppCompatActivity {
                 String profilePicId = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("profilePictureId"));*/
                 participantStrings.add(new String[]{name, ""});
             }
+            participantStrings.add(new String[]{"Test1", "", "1"});
+            participantStrings.add(new String[]{"Test2", "", "2"});
 
             participantAdapter.notifyDataSetChanged();
 

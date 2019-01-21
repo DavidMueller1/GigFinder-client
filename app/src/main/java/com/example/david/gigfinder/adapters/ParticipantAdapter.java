@@ -10,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.david.gigfinder.R;
@@ -58,6 +60,17 @@ public class ParticipantAdapter extends ArrayAdapter<String[]> {
                 e.printStackTrace();
             }
         }*/
+
+        Button button = customView.findViewById(R.id.participant_select_button);
+        final ListView parentList = (ListView) parent;
+        final int finalPosition = position;
+        button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                parentList.performItemClick(v, finalPosition, 0); // Let the event be handled in onItemClick()
+            }
+        });
 
         return customView;
     }

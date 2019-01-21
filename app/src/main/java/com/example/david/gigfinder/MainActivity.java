@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             // TODO get user from server
             Log.d(TAG, "User is NONE!");
             Toast.makeText(getApplicationContext(),"Using default user",Toast.LENGTH_SHORT).show();
-            user = "artist";
+            user = "host";
         }
 
         checkSharedPrefs(user);
