@@ -12,10 +12,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.david.gigfinder.adapters.ChatAdapter;
+import com.example.david.gigfinder.adapters.ParticipantAdapter;
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.Event;
 import com.example.david.gigfinder.data.Host;
@@ -61,6 +65,9 @@ public class EventProfileActivity extends AppCompatActivity {
     private int userId;
     private JSONObject hostJson;
     private JSONObject eventJson;
+
+    private ArrayList<String[]> participantStrings;
+    private ParticipantAdapter participantAdapter;
 
     TextView titleText;
     TextView genreText;
@@ -140,6 +147,23 @@ public class EventProfileActivity extends AppCompatActivity {
         if(user.equals("host")){
             applyBtn.setVisibility(View.GONE);
         }
+
+        participantStrings = new ArrayList<>();
+
+        participantAdapter = new ParticipantAdapter(getApplicationContext(), participantStrings);
+        ListView listView = findViewById(R.id.event_participants_list);
+        listView.setAdapter(participantAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "Item " + position + " clicked!");
+                Intent intent = new Intent(getApplicationContext(), ArtistProfileActivity.class);
+                intent.putExtra("idToken", idToken);
+                intent.putExtra("profileUserId", Integer.parseInt(participantStrings.get(position)[2]));
+                startActivity(intent);
+            }
+        });
     }
 
     /**
@@ -208,6 +232,9 @@ public class EventProfileActivity extends AppCompatActivity {
 
         String placeName = GeoTools.getAddressFromLatLng(this, new LatLng(eventJson.getDouble("latitude"), eventJson.getDouble("longitude")));
         locationText.setText(placeName);
+
+        GetParticipants getParticipants = new GetParticipants();
+        getParticipants.execute(eventJson.getInt("id") + "");
     }
 
     /**
@@ -235,6 +262,135 @@ public class EventProfileActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+
+
+    private void showParticipants(String result){
+        try {
+            JSONArray partJson = new JSONArray(result);
+            for(int i = 0; i<partJson.length(); i++){
+                JSONObject artist = partJson.getJSONObject(i).getJSONObject("artist");
+                String name = artist.getString("name");
+                Log.d(TAG, "Teilnehmer: " + name);
+                String id = String.valueOf(artist.getInt("id"));
+                /*String lastmsg = msgJson.getJSONObject(i).getJSONObject("lastMessage").getString("content");
+                String id = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("id"));
+                String profilePicId = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("profilePictureId"));*/
+                participantStrings.add(new String[]{name, ""});
+            }
+            participantAdapter.notifyDataSetChanged();
+
+            //updateProfilePictures();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*private void updateProfilePictures(){
+        for(int i=0; i<chatStrings.size(); i++){
+            ChatFragment.GetProfilePicture getProfilePicture = new ChatFragment.GetProfilePicture();
+            getProfilePicture.execute(chatStrings.get(i)[3], String.valueOf(i));
+        }
+    }
+
+    /**
+     *
+     */
+    class GetParticipants extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                Log.d(TAG, params[0]);
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/participations?event=" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.d(TAG, "Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            Log.d(TAG, "MESSAGES: " + result);
+            showParticipants(result);
+            /*if(result.equals("[]")) {
+
+            }else{
+
+            }*/
+        }
+    }
+
+    /*class GetProfilePicture extends AsyncTask<String, Void, String> {
+
+        int id;
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                id = Integer.parseInt(params[1]);
+
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if(!chatStrings.equals(null)) {
+                chatStrings.get(id)[4] = result;
+                chatAdapter.notifyDataSetChanged();
+            }
+        }
+
+
+    }*/
+
+
 
     /**
      *

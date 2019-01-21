@@ -80,6 +80,8 @@
     <!-- Events  -->
     <string name="upcoming_events">Upcoming Events</string>
     <string name="past_events">Past Events</string>
+    <string name="event_participants">Bewerber</string>
+    <string name="event_participants_select">Zusagen</string>
 
     <!-- Add Event -->
     <string name="add_event_title_hint">Name des Events</string>
