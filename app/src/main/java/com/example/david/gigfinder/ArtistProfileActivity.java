@@ -188,8 +188,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private void updateProfile(String result){
         try {
             Log.d(TAG, result);
-            /*JSONArray jsonArray = new JSONArray(jsonString);
-            JSONObject userProfile = jsonArray.getJSONObject(0);*/
             JSONObject userProfile = new JSONObject(result);
 
             GetProfilePicture getProfilePicture = new GetProfilePicture();
@@ -219,10 +217,15 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 addToFavsBtn.setVisibility(View.VISIBLE);
             }
 
-            /*SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
-            editor.putInt("userId", userID);
-            editor.apply();*/
-            //TODO: We should probably cache everything here
+            JSONArray socialMedias = userProfile.getJSONArray("artistSocialMedias");
+
+            String socials = sharedPreferences.getString("social medias", "");
+            JSONArray socialMediaArrays = new JSONArray(socials);
+
+            for(int i=0; i<socialMedias.length(); i++){
+                JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
+                //displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
