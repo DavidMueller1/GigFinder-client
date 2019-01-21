@@ -1,5 +1,6 @@
 package com.example.david.gigfinder;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -47,14 +48,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "ArtistProfileActivity";
 
-    private static final int ID_SOUNDCLOUD = 0;
-    private static final int ID_FACEBOOK = 1;
-    private static final int ID_TWITTER = 2;
-    private static final int ID_YOUTUBE = 3;
-    private static final int ID_INSTAGRAM = 4;
-    private static final int ID_SPOTIFY = 5;
-    private static final int ID_WEB = 6;
-
     SharedPreferences sharedPreferences;
 
     private ImageView imageButton;
@@ -75,7 +68,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private FrameLayout progress;
 
-    //private JSONObject hostJson;
     private int userId;
     private int profileUserId;
     String idToken;
@@ -199,9 +191,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
             updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
 
             String myGenres = "(";
-            for(int i=0; i<userProfile.getJSONArray("hostGenres").length(); i++){
-                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("hostGenres").getJSONObject(i).getInt("genreId"), sharedPreferences.getString("genres", "x")));
-                if(i < userProfile.getJSONArray("hostGenres").length()-1){
+            for(int i=0; i<userProfile.getJSONArray("artistGenres").length(); i++){
+                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("artistGenres").getJSONObject(i).getInt("genreId"), sharedPreferences.getString("genres", "x")));
+                if(i < userProfile.getJSONArray("artistGenres").length()-1){
                     myGenres = myGenres.concat(", ");
                 }
             }
@@ -224,7 +216,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
             for(int i=0; i<socialMedias.length(); i++){
                 JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
-                //displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
+                displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
             }
 
         } catch (JSONException e) {
@@ -234,95 +226,95 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     /**
      * Displays a SocialMediaLink
-     * @param socialMediaId
+     * @param socialMedia
      * @param text
      * @param socialMediaLink
      */
-    private void displaySocialMedia(int socialMediaId, String text, final String socialMediaLink) {
+    private void displaySocialMedia(String socialMedia, final String text, final String socialMediaLink) {
         LinearLayout container;
+        final Uri link = Uri.parse(socialMediaLink + text);
 
-        switch(socialMediaId) {
-            case ID_SOUNDCLOUD:
+        switch(socialMedia) {
+            case Utils.ID_SOUNDCLOUD:
                 soundcloudText.setText(text);
                 container = findViewById(R.id.profile_soundcloud);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_FACEBOOK:
+            case Utils.ID_FACEBOOK:
                 facebookText.setText(text);
                 container = findViewById(R.id.profile_facebook);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_TWITTER:
+            case Utils.ID_TWITTER:
                 twitterText.setText(text);
                 container = findViewById(R.id.profile_twitter);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_YOUTUBE:
+            case Utils.ID_YOUTUBE:
                 youtubeText.setText(text);
                 container = findViewById(R.id.profile_youtube);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_INSTAGRAM:
+            case Utils.ID_INSTAGRAM:
                 instagramText.setText(text);
                 container = findViewById(R.id.profile_instagram);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_SPOTIFY:
+            case Utils.ID_SPOTIFY:
                 spotifyText.setText(text);
                 container = findViewById(R.id.profile_spotify);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_WEB:
+            case Utils.ID_WEB:
                 webText.setText(text);
                 container = findViewById(R.id.profile_web);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
-                        startActivity(browserIntent);
+                        openWebsiteDialog(Uri.parse(text));
                     }
                 });
                 break;
@@ -330,6 +322,39 @@ public class ArtistProfileActivity extends AppCompatActivity {
         }
 
     };
+
+    /**
+     * Displays the Website dialog
+     * @param link
+     */
+    private void openWebsiteDialog(final Uri link){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+        View mView = getLayoutInflater().inflate(R.layout.dialog_website, null);
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+
+        Button cancelBtn = (Button) mView.findViewById(R.id.cancelBtn);
+        Button proceedBtn = (Button) mView.findViewById(R.id.proceedBtn);
+        TextView websiteText = (TextView) mView.findViewById(R.id.website_dialoge_text);
+
+        websiteText.setText(getString(R.string.website_dialog_1) + link.toString() + getString(R.string.website_dialog_2));
+
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        proceedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
+                startActivity(browserIntent);
+            }
+        });
+    }
 
     private void displayProfilePicture(String result) {
         try {
