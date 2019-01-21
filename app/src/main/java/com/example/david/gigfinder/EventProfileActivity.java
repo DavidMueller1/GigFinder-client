@@ -257,7 +257,7 @@ public class EventProfileActivity extends AppCompatActivity {
     private void showHost(String result){
         try {
             hostJson = new JSONObject(result);
-            testBtn.setText("Hosted By: " + hostJson.getString("name"));
+            testBtn.setText("Gehostet von: " + hostJson.getString("name"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -266,6 +266,7 @@ public class EventProfileActivity extends AppCompatActivity {
 
 
     private void showParticipants(String result){
+        findViewById(R.id.event_participants_none).setVisibility(View.GONE);
         try {
             JSONArray partJson = new JSONArray(result);
             for(int i = 0; i<partJson.length(); i++){
@@ -278,7 +279,12 @@ public class EventProfileActivity extends AppCompatActivity {
                 String profilePicId = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("profilePictureId"));*/
                 participantStrings.add(new String[]{name, ""});
             }
+
             participantAdapter.notifyDataSetChanged();
+
+            if (participantStrings.isEmpty()) {
+                findViewById(R.id.event_participants_none).setVisibility(View.VISIBLE);
+            }
 
             //updateProfilePictures();
 
