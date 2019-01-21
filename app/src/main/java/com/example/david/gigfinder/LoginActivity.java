@@ -1,6 +1,9 @@
 package com.example.david.gigfinder;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -69,21 +72,51 @@ public class LoginActivity extends AppCompatActivity {
         progress = findViewById(R.id.login_progress);
     }
 
+    @Override
+    protected void onStart() {
+        // Check for existing Google Sign In account, if the user is already signed in the GoogleSignInAccount will be non-null.
+        super.onStart();
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if(account != null) {
+            Log.d(TAG, "GoogleSignIn: Account already signed in");
+            signIn();
+        } else {
+            Log.d(TAG, "GoogleSignIn: No Account signed in");
+        }
+    }
+
     /**
      * Starts the GoogleSignIn Intent
      */
     private void signIn() {
+        if(isNetworkAvailable()) {
+            Log.d(TAG, "GoogleSignIn: Started!");
+            signInButton.setVisibility(View.GONE);
+            progress.setVisibility(View.VISIBLE);
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        }else{
+            Log.d(TAG, "GoogleSignIn: No Connection!");
+            //TODO Offline use of App
+            Toast.makeText(getApplicationContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
+        }
+    }
 
-        Log.d(TAG, "GoogleSignIn: Started!");
-
-        signInButton.setVisibility(View.GONE);
-        progress.setVisibility(View.VISIBLE);
-
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+    /**
+     * Checks if Network is Available
+     * @return True if there is an Internet Connection
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override
+    /**
+     * Called after user tries to Sign In with Google
+     */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -124,23 +157,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    /**
-     * Checks if there is a Google Account that is already signed in and updates GUI
-     */
-    protected void onStart() {
-        // Check for existing Google Sign In account, if the user is already signed in the GoogleSignInAccount will be non-null.
-        super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if(account != null) {
-            Log.d(TAG, "GoogleSignIn: Account already signed in");
-            //TODO: Update GUI
-            Toast.makeText(getApplicationContext(),"Already Signed In",Toast.LENGTH_SHORT).show();
-        } else {
-            Log.d(TAG, "GoogleSignIn: No Account signed in");
-        }
-    }
-
     /**
      * Updates the GUI if the Login was successful
      */
@@ -161,7 +177,6 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 Log.d(TAG, "SendLogin: Sending GET Request");
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/login");
-                //URL url = new URL("http://87.153.82.101:25632/api/login");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", params[0]);

@@ -1,7 +1,6 @@
 package com.example.david.gigfinder.tools;
 
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
+
 import android.util.Log;
 
 import com.example.david.gigfinder.R;
