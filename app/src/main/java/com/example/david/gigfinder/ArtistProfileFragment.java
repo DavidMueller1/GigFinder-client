@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
@@ -33,6 +34,11 @@ import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.ImageTools;
 import com.example.david.gigfinder.tools.Utils;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,6 +70,7 @@ public class ArtistProfileFragment extends Fragment {
 
     private int userID;
     private Button testDeleteBtn;
+    private Button testSignOutBtn;
     private ImageView imageButton;
     private TextView nameText;
     private TextView descriptionText;
@@ -95,6 +102,7 @@ public class ArtistProfileFragment extends Fragment {
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
+        testSignOutBtn = getView().findViewById(R.id.signOutBtn);
         imageButton = getView().findViewById(R.id.profile_artist_profilePicture);
         nameText = getView().findViewById(R.id.profile_artist_name);
         descriptionText = getView().findViewById(R.id.profile_artist_description);
@@ -116,6 +124,13 @@ public class ArtistProfileFragment extends Fragment {
             public void onClick(View v) {
                 DeleteUser deleteUser = new DeleteUser();
                 deleteUser.execute();
+            }
+        });
+
+        testSignOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
             }
         });
 
@@ -186,6 +201,7 @@ public class ArtistProfileFragment extends Fragment {
             userID = userProfile.getInt("id");
             updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
+            testSignOutBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
 
             String myGenres = "(";
             for(int i=0; i<userProfile.getJSONArray("artistGenres").length(); i++){
@@ -346,6 +362,10 @@ public class ArtistProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Displays the Loading screen if the App is loading data From Server
+     * @param isLoading
+     */
     private void displayLoadingScreen(boolean isLoading) {
         if(isLoading) {
             getActivity().runOnUiThread(new Runnable() {
@@ -363,6 +383,19 @@ public class ArtistProfileFragment extends Fragment {
                 }
             });
         }
+    }
+
+    /**
+     * Deletes SharedPrefs and opens the LoginActivity which then SignsOut the user
+     */
+    private void signOut() {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            intent.putExtra("SignOut", true);
+            startActivity(intent);
+            getActivity().finish();
     }
 
     /**
