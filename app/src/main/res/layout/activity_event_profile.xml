@@ -122,11 +122,26 @@
                     android:textColor="@color/black"/>
             </LinearLayout>
 
-            <android.support.v7.widget.RecyclerView
+            <!--android.support.v7.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-            </android.support.v7.widget.RecyclerView>
+            </android.support.v7.widget.RecyclerView-->
+
+            <TextView
+                android:id="@+id/event_participants_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/event_participants"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_bigger"
+                android:fontFeatureSettings="smcp" />
+
+            <com.example.david.gigfinder.adapters.WrapContentListView
+                android:id="@+id/event_participants_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/padding_default"/>
 
             <Button
                 android:id="@+id/testBtn"
