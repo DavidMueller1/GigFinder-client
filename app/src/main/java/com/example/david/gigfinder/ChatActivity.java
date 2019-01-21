@@ -70,7 +70,7 @@ public class ChatActivity extends AppCompatActivity {
         idToken = getIntent().getExtras().getString("idToken");
         receiverId = getIntent().getExtras().getInt("profileUserId");
         authorId = prefs.getInt("userId", 0);
-        user = prefs.getString("user", "host");
+        user = prefs.getString("user", "null");
 
         GetMessages getMessages = new GetMessages();
         getMessages.execute();
@@ -104,7 +104,7 @@ public class ChatActivity extends AppCompatActivity {
         nameboxLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(user=="host") {
+                if(user.equals("host")) {
                     Intent intent = new Intent(ChatActivity.this, ArtistProfileActivity.class);
                     intent.putExtra("profileUserId", receiverId);
                     intent.putExtra("idToken", idToken);

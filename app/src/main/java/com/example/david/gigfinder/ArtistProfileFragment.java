@@ -325,6 +325,10 @@ public class ArtistProfileFragment extends Fragment {
 
     };
 
+    /**
+     * Displays the Website dialog
+     * @param link
+     */
     private void openWebsiteDialog(final Uri link){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
         View mView = getLayoutInflater().inflate(R.layout.dialog_website, null);
@@ -413,8 +417,7 @@ public class ArtistProfileFragment extends Fragment {
      */
     private void signOut() {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.clear();
-            editor.apply();
+            editor.clear().apply();
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             intent.putExtra("SignOut", true);
             startActivity(intent);

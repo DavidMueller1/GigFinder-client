@@ -1,5 +1,6 @@
 package com.example.david.gigfinder;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +32,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.david.gigfinder.data.Artist;
+import com.example.david.gigfinder.data.SocialMediaLink;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.GeoTools;
@@ -57,14 +59,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class HostProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - HostProfileFragment";
-
-    private static final String ID_SOUNDCLOUD = "Soundcloud";
-    private static final String ID_FACEBOOK = "Facebook";
-    private static final String ID_TWITTER = "Twitter";
-    private static final String ID_YOUTUBE = "Youtube";
-    private static final String ID_INSTAGRAM = "Instagram";
-    private static final String ID_SPOTIFY = "Spotify";
-    private static final String ID_WEB = "Website";
 
     SharedPreferences sharedPreferences;
 
@@ -237,7 +231,7 @@ public class HostProfileFragment extends Fragment {
 
             for(int i=0; i<socialMedias.length(); i++){
                 JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
-                //displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
+                displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
             }
 
         } catch (JSONException e) {
@@ -251,92 +245,92 @@ public class HostProfileFragment extends Fragment {
      * @param text
      * @param socialMediaLink
      */
-    private void displaySocialMedia(String socialMedia, String text, final String socialMediaLink) {
+    private void displaySocialMedia(String socialMedia, final String text, final String socialMediaLink) {
         LinearLayout container;
+        final Uri link = Uri.parse(socialMediaLink + text);
+        Log.d(TAG, "Link: " + link.toString());
 
         switch(socialMedia) {
-            case ID_SOUNDCLOUD:
+            case Utils.ID_SOUNDCLOUD:
                 soundcloudText.setText(text);
-                Log.d(TAG, text);
                 container = getView().findViewById(R.id.profile_soundcloud);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_FACEBOOK:
+            case Utils.ID_FACEBOOK:
                 facebookText.setText(text);
                 container = getView().findViewById(R.id.profile_facebook);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_TWITTER:
+            case Utils.ID_TWITTER:
                 twitterText.setText(text);
                 container = getView().findViewById(R.id.profile_twitter);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_YOUTUBE:
+            case Utils.ID_YOUTUBE:
                 youtubeText.setText(text);
                 container = getView().findViewById(R.id.profile_youtube);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_INSTAGRAM:
+            case Utils.ID_INSTAGRAM:
                 instagramText.setText(text);
                 container = getView().findViewById(R.id.profile_instagram);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_SPOTIFY:
+            case Utils.ID_SPOTIFY:
                 spotifyText.setText(text);
                 container = getView().findViewById(R.id.profile_spotify);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_WEB:
+            case Utils.ID_WEB:
                 webText.setText(text);
                 container = getView().findViewById(R.id.profile_web);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
-                        startActivity(browserIntent);
+                        openWebsiteDialog(Uri.parse(text));
                     }
                 });
                 break;
@@ -344,6 +338,39 @@ public class HostProfileFragment extends Fragment {
         }
 
     };
+
+    /**
+     * Displays the Website dialog
+     * @param link
+     */
+    private void openWebsiteDialog(final Uri link){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
+        View mView = getLayoutInflater().inflate(R.layout.dialog_website, null);
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+
+        Button cancelBtn = (Button) mView.findViewById(R.id.cancelBtn);
+        Button proceedBtn = (Button) mView.findViewById(R.id.proceedBtn);
+        TextView websiteText = (TextView) mView.findViewById(R.id.website_dialoge_text);
+
+        websiteText.setText(getString(R.string.website_dialog_1) + link.toString() + getString(R.string.website_dialog_2));
+
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        proceedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
+                startActivity(browserIntent);
+            }
+        });
+    }
 
     /**
      * Displays the profile picture of the user
@@ -401,8 +428,7 @@ public class HostProfileFragment extends Fragment {
      */
     private void signOut() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
+        editor.clear().apply();
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         intent.putExtra("SignOut", true);
         startActivity(intent);
