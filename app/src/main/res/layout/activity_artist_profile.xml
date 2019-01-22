@@ -24,8 +24,6 @@
             android:textAlignment="center"
             android:textColor="@color/white"/>
 
-
-
         <TextView
             android:id="@+id/profile_artist_genre"
             android:layout_width="match_parent"
