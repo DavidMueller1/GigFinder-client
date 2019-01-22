@@ -70,6 +70,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private int userId;
     private int profileUserId;
+    private String picture;
     String idToken;
 
     @Override
@@ -113,7 +114,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(ArtistProfileActivity.this, ChatActivity.class);
                 intent.putExtra("idToken", idToken);
-
+                intent.putExtra("name", nameText.getText().toString());
+                intent.putExtra("picture", picture);
                 intent.putExtra("profileUserId", profileUserId);
 
                 startActivity(intent);
@@ -358,6 +360,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private void displayProfilePicture(String result) {
         try {
+            picture = result;
             JSONObject imageProfile = new JSONObject(result);
 
             ViewGroup.LayoutParams params = imageButton.getLayoutParams();

@@ -2,11 +2,13 @@ package com.example.david.gigfinder;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -57,6 +59,7 @@ public class ChatActivity extends AppCompatActivity {
     private Button sendBtn;
     private EditText chatText;
     private TextView chatName;
+
     private String idToken;
     private String user;
 
@@ -69,6 +72,7 @@ public class ChatActivity extends AppCompatActivity {
 
         idToken = getIntent().getExtras().getString("idToken");
         receiverId = getIntent().getExtras().getInt("profileUserId");
+
         authorId = prefs.getInt("userId", 0);
         user = prefs.getString("user", "null");
 
@@ -79,6 +83,14 @@ public class ChatActivity extends AppCompatActivity {
         chatName.setText(getIntent().getExtras().getString("name"));
 
         chatImg = (ImageView) findViewById(R.id.chatImg);
+        try {
+            JSONObject imageProfile = new JSONObject(getIntent().getExtras().getString("picture"));
+            byte[] picture = Base64.decode(imageProfile.getString("image"), Base64.DEFAULT);
+            chatImg.setImageBitmap(BitmapFactory.decodeByteArray(picture, 0, picture.length));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         chatText = (EditText) findViewById(R.id.edittext_chatbox);
 
         backBtn = (ImageView) findViewById(R.id.backImg);
