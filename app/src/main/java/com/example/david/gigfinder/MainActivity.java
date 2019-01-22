@@ -16,6 +16,7 @@ import com.example.david.gigfinder.tools.ColorTools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,8 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
     public static String idToken;
     public static int userId;
+    private String user;
 
-    SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
 
     private SectionsPageAdapter sectionsPageAdapter;
     private ViewPager mViewPager;
@@ -44,16 +46,45 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
         idToken = getIntent().getExtras().getString("idToken");
 
-        String user = sharedPreferences.getString("user", "none");
+        user = sharedPreferences.getString("user", "none");
 
         if(user == null || user.equals("none")) {
-            // TODO get user from server
-            Log.d(TAG, "User is NONE!");
-            Toast.makeText(getApplicationContext(),"Using default user",Toast.LENGTH_SHORT).show();
-            user = "host";
+            GetUser getUser = new GetUser();
+            getUser.execute();
+        }else{
+            checkSharedPrefs(user);
+        }
+    }
+
+    private void checkSharedPrefs(String user){
+
+        //Check if UserProfile is missing
+        if(sharedPreferences.getString("userProfile", "x").equals("x")){
+            if(user.equals("artist")) {
+                GetArtist getArtist = new GetArtist();
+                getArtist.execute();
+            }else{
+                GetHost getHost = new GetHost();
+                getHost.execute();
+            }
+        }else{
+            initGui();
         }
 
-        checkSharedPrefs(user);
+        //Check if Genres is missing
+        if(sharedPreferences.getString("genres", "x").equals("x")){
+            GetGenres getGenres = new GetGenres();
+            getGenres.execute();
+        }
+
+        //Check if Social Media is missing
+        if (sharedPreferences.getString("social medias", "x").equals("x")){
+            GetSocialMedias getSocialMedias = new GetSocialMedias();
+            getSocialMedias.execute();
+        }
+    }
+
+    private void initGui(){
 
         mViewPager = findViewById(R.id.viewpager);
         mViewPager.setOffscreenPageLimit(1);
@@ -162,32 +193,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkSharedPrefs(String user){
-
-        //Check if UserProfile is missing
-        if(sharedPreferences.getString("userProfile", "x").equals("x")){
-            if(user.equals("artist")) {
-                GetArtist getArtist = new GetArtist();
-                getArtist.execute();
-            }else{
-                GetHost getHost = new GetHost();
-                getHost.execute();
-            }
-        }
-
-        //Check if Genres is missing
-        if(sharedPreferences.getString("genres", "x").equals("x")){
-            GetGenres getGenres = new GetGenres();
-            getGenres.execute();
-        }
-
-        //Check if Social Media is missing
-        if (sharedPreferences.getString("social medias", "x").equals("x")){
-            GetSocialMedias getSocialMedias = new GetSocialMedias();
-            getSocialMedias.execute();
-        }
-    }
-
     /**
      * Adds the Fragments which will be selectable by the Tabs and their Titles to a SectionsPageAdapter and passes it to the ViewPager
      */
@@ -275,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             Log.d(TAG, "USER PROFILE: " + result);
             sharedPreferences.edit().putString("userProfile", result).apply();
+            initGui();
         }
     }
 
@@ -317,6 +323,63 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             Log.d(TAG, "USER PROFILE: " + result);
             sharedPreferences.edit().putString("userProfile", result).apply();
+            initGui();
+        }
+    }
+
+    /**
+     * Gets genres from Server and stores them in SharedPrefs
+     */
+    class GetUser extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/user");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "GetUser: " + result);
+            try {
+                JSONObject userJson = new JSONObject(result);
+                if(userJson.get("artist").equals(null)){
+                    sharedPreferences.edit().putString("user", "host").apply();
+                    Log.d(TAG, "GetUser: " + "host");
+                    user = "host";
+                }else{
+                    sharedPreferences.edit().putString("user", "artist").apply();
+                    Log.d(TAG, "GetUser: " + "artist");
+                    user = "artist";
+                }
+                checkSharedPrefs(user);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
