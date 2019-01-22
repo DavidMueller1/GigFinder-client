@@ -68,6 +68,7 @@ public class EventProfileActivity extends AppCompatActivity {
     private JSONObject eventJson;
 
     private ArrayList<String[]> participantStrings;
+    private ArrayList<JSONObject> participantJSONObjects;
     private ParticipantAdapter participantAdapter;
 
     TextView titleText;
@@ -150,6 +151,7 @@ public class EventProfileActivity extends AppCompatActivity {
         }
 
         participantStrings = new ArrayList<>();
+        participantJSONObjects = new ArrayList<>();
 
         participantAdapter = new ParticipantAdapter(getApplicationContext(), participantStrings);
         ListView listView = findViewById(R.id.event_participants_list);
@@ -161,7 +163,39 @@ public class EventProfileActivity extends AppCompatActivity {
                 long viewId = view.getId();
 
                 if(viewId == R.id.participant_select_button) {
-                    Log.d(TAG, "Select button clicked: ");
+                    Log.d(TAG, "Select button clicked, position: " + position + "    ID: " + id);
+
+                    PutParticipation putParticipation = new PutParticipation();
+                    putParticipation.execute(participantJSONObjects.get(position).toString(), "true");
+
+                    int count = parent.getChildCount();
+
+                    for(int i = 0; i < count; i++) {
+                        if(i == position) {
+                            View v = parent.getChildAt(i);
+                            v.findViewById(R.id.participant_cancel_button).setVisibility(View.VISIBLE);
+                        }
+                        View v = parent.getChildAt(i);
+                        v.findViewById(R.id.participant_select_button).setVisibility(View.GONE);
+
+                    }
+                }
+                else if(viewId == R.id.participant_cancel_button) {
+                    Log.d(TAG, "Cancel button clicked, position: " + position + "    ID: " + id);
+                    PutParticipation putParticipation = new PutParticipation();
+                    putParticipation.execute(participantJSONObjects.get(position).toString(), "false");
+
+                    // TODO Post Unselect
+                    int count = parent.getChildCount();
+
+                    for(int i = 0; i < count; i++) {
+                        if(i == position) {
+                            View v = parent.getChildAt(i);
+                            v.findViewById(R.id.participant_cancel_button).setVisibility(View.GONE);
+                        }
+                        View v = parent.getChildAt(i);
+                        v.findViewById(R.id.participant_select_button).setVisibility(View.VISIBLE);
+                    }
                 }
                 else {
                     Log.d(TAG, "Item " + position + " clicked on View " + view.getClass().toString());
@@ -241,8 +275,6 @@ public class EventProfileActivity extends AppCompatActivity {
         String placeName = GeoTools.getAddressFromLatLng(this, new LatLng(eventJson.getDouble("latitude"), eventJson.getDouble("longitude")));
         locationText.setText(placeName);
 
-        GetParticipants getParticipants = new GetParticipants();
-        getParticipants.execute(eventJson.getInt("id") + "");
     }
 
     /**
@@ -263,9 +295,15 @@ public class EventProfileActivity extends AppCompatActivity {
     }
 
     private void showHost(String result){
+
         try {
+
             hostJson = new JSONObject(result);
+            GetParticipants getParticipants = new GetParticipants();
+            getParticipants.execute(eventJson.getInt("id") + "");
+
             testBtn.setText("Gehostet von: " + hostJson.getString("name"));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -277,18 +315,39 @@ public class EventProfileActivity extends AppCompatActivity {
         findViewById(R.id.event_participants_none).setVisibility(View.GONE);
         try {
             JSONArray partJson = new JSONArray(result);
+            String isEventHost = userId == hostJson.getInt("id") ? "true" : "false";
+            int acceptedPos = -1;
+
+            for(int i = 0; i < partJson.length(); i++) {
+                if(isEventHost.equals("true") && partJson.getJSONObject(i).getBoolean("accepted")) {
+                    Log.d(TAG, "User at position " + i + " is accepted");
+                    acceptedPos = i;
+                }
+            }
+
             for(int i = 0; i<partJson.length(); i++){
+                participantJSONObjects.add(partJson.getJSONObject(i));
                 JSONObject artist = partJson.getJSONObject(i).getJSONObject("artist");
                 String name = artist.getString("name");
                 Log.d(TAG, "Teilnehmer: " + name);
                 String id = String.valueOf(artist.getInt("id"));
-                /*String lastmsg = msgJson.getJSONObject(i).getJSONObject("lastMessage").getString("content");
-                String id = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("id"));
-                String profilePicId = String.valueOf(msgJson.getJSONObject(i).getJSONObject(chatpartner).getInt("profilePictureId"));*/
-                participantStrings.add(new String[]{name, ""});
+                String buttonMode = "select";
+                if(acceptedPos != -1) {
+                    if(acceptedPos == i) {
+                        buttonMode = "cancel";
+                    }
+                    else {
+                        buttonMode = "none";
+                    }
+                }
+                String profilePicId = String.valueOf(artist.getInt("profilePictureId"));
+                participantStrings.add(new String[]{name, profilePicId, id, isEventHost, buttonMode, "noPic"}); // name image id isEventHost
             }
-            participantStrings.add(new String[]{"Test1", "", "1"});
-            participantStrings.add(new String[]{"Test2", "", "2"});
+            /*participantStrings.add(new String[]{"Test1", "", "1", "true", "none"});
+            participantStrings.add(new String[]{"Test2", "", "2", "true", "none"});*/
+
+            ListView listView = findViewById(R.id.event_participants_list);
+            int count = listView.getChildCount();
 
             participantAdapter.notifyDataSetChanged();
 
@@ -296,17 +355,71 @@ public class EventProfileActivity extends AppCompatActivity {
                 findViewById(R.id.event_participants_none).setVisibility(View.VISIBLE);
             }
 
-            //updateProfilePictures();
+            updateProfilePictures();
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    /*private void updateProfilePictures(){
-        for(int i=0; i<chatStrings.size(); i++){
-            ChatFragment.GetProfilePicture getProfilePicture = new ChatFragment.GetProfilePicture();
-            getProfilePicture.execute(chatStrings.get(i)[3], String.valueOf(i));
+
+    private void updateProfilePictures(){
+        for(int i = 0; i < participantStrings.size(); i++){
+            GetProfilePicture getProfilePicture = new GetProfilePicture();
+            getProfilePicture.execute(participantStrings.get(i)[1], String.valueOf(i));
+        }
+    }
+
+
+    class GetProfilePicture extends AsyncTask<String, Void, String> {
+
+        int id;
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                id = Integer.parseInt(params[1]);
+
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (!participantStrings.equals(null)) {
+                String base64 = "noPic";
+                try {
+                    JSONObject imageObject = new JSONObject(result);
+                    participantStrings.get(id)[5] = imageObject.getString("image");
+                    participantAdapter.notifyDataSetChanged();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -517,6 +630,74 @@ public class EventProfileActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             applyBtn.setClickable(false);
+        }
+    }
+
+    class PutParticipation extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                JSONObject jsonObject = new JSONObject(params[0]);
+                Log.d(TAG, jsonObject.toString());
+
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/participations/" + jsonObject.getInt("id"));
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestProperty("Content-Type","application/json");
+                urlConnection.setRequestMethod("PUT");
+                urlConnection.setUseCaches(false);
+                urlConnection.setDoOutput(true);
+
+                //Send data
+                DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
+                jsonObject.put("Accepted", Boolean.parseBoolean(params[1]));
+                os.writeBytes(jsonObject.toString());
+                os.close();
+
+                //Get response
+                InputStream is = null;
+                try {
+                    is = urlConnection.getInputStream();
+                } catch (IOException ioe) {
+                    if (urlConnection instanceof HttpURLConnection) {
+                        HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
+                        int statusCode = httpConn.getResponseCode();
+                        if (statusCode != 200) {
+                            is = httpConn.getErrorStream();
+                            Log.d(TAG, "PutParticipation: STATUS CODE: " + statusCode);
+                            Log.d(TAG, "PutParticipation: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
+                        }
+                    }
+                }
+
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                Log.d(TAG, "PutParticipation: RESPONSE:" + response.toString());
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
         }
     }
 }

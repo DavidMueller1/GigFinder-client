@@ -11,6 +11,7 @@
     <color name="lightGrey">#f2f2f2</color>
     <color name="grey">#9c9c9c</color>
     <color name="darkGrey">#4e4e4e</color>
+    <color name="darkRed">#d61f1f</color>
 
     <!-- Social Media -->
     <color name="soundcloud">#ff7700</color>

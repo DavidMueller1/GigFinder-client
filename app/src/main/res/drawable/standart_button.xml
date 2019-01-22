@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/orange" />
-    <!--corners android:bottomRightRadius="@dimen/padding_smaller"
+    <corners android:bottomRightRadius="@dimen/padding_smaller"
         android:bottomLeftRadius="@dimen/padding_smaller"
         android:topRightRadius="@dimen/padding_smaller"
-        android:topLeftRadius="@dimen/padding_smaller"/-->
+        android:topLeftRadius="@dimen/padding_smaller"/>
 </shape>
