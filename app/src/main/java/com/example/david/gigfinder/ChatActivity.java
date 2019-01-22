@@ -36,12 +36,16 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
+import static com.example.david.gigfinder.tools.Utils.convertStringToTimestamp;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -75,6 +79,10 @@ public class ChatActivity extends AppCompatActivity {
 
         authorId = prefs.getInt("userId", 0);
         user = prefs.getString("user", "null");
+
+        Log.d(TAG, idToken);
+        Log.d(TAG, String.valueOf(authorId));
+        Log.d(TAG, String.valueOf(receiverId));
 
         GetMessages getMessages = new GetMessages();
         getMessages.execute();
@@ -141,21 +149,32 @@ public class ChatActivity extends AppCompatActivity {
         try {
             JSONArray messagesArray = new JSONArray(messages);
             for(int i=0; i<messagesArray.length();i++){
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                Date date = format.parse(messagesArray.getJSONObject(i).getString("created"));
-                long l = date.getTime();
+                //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                //Date date = format.parse(messagesArray.getJSONObject(i).getString("created"));
+                //long l = date.getTime();
+                Timestamp timestamp = convertStringToTimestamp(messagesArray.getJSONObject(i).getString("created"));
                 if(messagesArray.getJSONObject(i).getInt("authorId")==receiverId){
-                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "chatpartner", false, l));
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "chatpartner", false, timestamp.getTime()));
                 }else{
-                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "me", true, l));
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "me", true, timestamp.getTime()));
                 }
             }
+            sortMessages();
             mMessageAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
+    }
+
+    private void sortMessages(){
+        messageList.sort(new Comparator<Message>() {
+            @Override
+            public int compare(Message o1, Message o2) {
+                Timestamp t1 = new Timestamp(o1.getCreatedAt());
+                Timestamp t2 = new Timestamp(o2.getCreatedAt());
+                return t1.compareTo(t2);
+            }
+        });
     }
 
     /**
@@ -251,6 +270,7 @@ public class ChatActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             try {
+
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/messages?receiver=" + receiverId);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -280,7 +300,7 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result){
-            Log.d(TAG, "MESSAGES: " + result);
+            Log.d(TAG, "Messages: " + result);
             showMessages(result);
         }
     }

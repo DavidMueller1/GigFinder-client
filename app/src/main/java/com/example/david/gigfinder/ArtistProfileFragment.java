@@ -196,6 +196,10 @@ public class ArtistProfileFragment extends Fragment {
             testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             testSignOutBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
 
+            SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+            editor.putInt("userId", userID);
+            editor.apply();
+
             String myGenres = "(";
             for(int i=0; i<userProfile.getJSONArray("artistGenres").length(); i++){
                 myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("artistGenres").getJSONObject(i).getInt("genreId"),
@@ -206,7 +210,6 @@ public class ArtistProfileFragment extends Fragment {
             }
             myGenres = myGenres.concat(")");
             genresText.setText(myGenres);
-
 
             JSONArray socialMedias = userProfile.getJSONArray("artistSocialMedias");
 
