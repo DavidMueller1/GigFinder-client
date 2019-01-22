@@ -168,11 +168,14 @@ public class ArtistProfileActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(titleBarColor);
 
         TextView descriptionLabel = findViewById(R.id.profile_artist_description_label);
+        TextView socialMediaLabel = findViewById(R.id.profile_artist_social_media_label);
         if(ColorTools.isBrightColorBool(color)) {
             descriptionLabel.setTextColor(titleBarColor);
+            socialMediaLabel.setTextColor(titleBarColor);
         }
         else {
             descriptionLabel.setTextColor(color);
+            socialMediaLabel.setTextColor(color);
         }
 
         descriptionLabel.setTextColor(color);
