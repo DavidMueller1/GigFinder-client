@@ -48,14 +48,6 @@ public class HostProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "HostProfileActivity";
 
-    private static final int ID_SOUNDCLOUD = 0;
-    private static final int ID_FACEBOOK = 1;
-    private static final int ID_TWITTER = 2;
-    private static final int ID_YOUTUBE = 3;
-    private static final int ID_INSTAGRAM = 4;
-    private static final int ID_SPOTIFY = 5;
-    private static final int ID_WEB = 6;
-
     SharedPreferences sharedPreferences;
 
     private ImageView imageButton;
@@ -175,11 +167,14 @@ public class HostProfileActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(titleBarColor);
 
         TextView descriptionLabel = findViewById(R.id.profile_host_description_label);
+        TextView socialMediaLabel = findViewById(R.id.profile_host_social_media_label);
         if(ColorTools.isBrightColorBool(color)) {
             descriptionLabel.setTextColor(titleBarColor);
+            socialMediaLabel.setTextColor(titleBarColor);
         }
         else {
             descriptionLabel.setTextColor(color);
+            socialMediaLabel.setTextColor(color);
         }
 
         descriptionLabel.setTextColor(color);
