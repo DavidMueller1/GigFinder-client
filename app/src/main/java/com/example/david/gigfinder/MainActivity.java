@@ -56,6 +56,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks if the SharedPrefs have the UserProfile, Genres, SocialMedia
+     * @param user
+     */
     private void checkSharedPrefs(String user){
 
         //Check if UserProfile is missing
@@ -84,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Initalizes the Gui
+     */
     private void initGui(){
 
         mViewPager = findViewById(R.id.viewpager);
