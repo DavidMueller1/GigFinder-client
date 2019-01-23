@@ -2,6 +2,7 @@ package com.example.david.gigfinder;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -37,7 +38,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
-
+    public static final String ID_TOKEN = "IdToken";
     private static final String TAG = "LoginActivity";
 
     private GoogleSignInClient mGoogleSignInClient;
@@ -74,6 +75,8 @@ public class LoginActivity extends AppCompatActivity {
         if(getIntent().hasExtra("SignOut")){
             signOut();
         }
+
+        startService(new Intent(this, GigFinderFirebaseMessagingService.class));
     }
 
     @Override
@@ -224,6 +227,10 @@ public class LoginActivity extends AppCompatActivity {
             Log.d(TAG, "SendLogin: " + result);
             if(result != null) {
                 if (result.equalsIgnoreCase("true")) {
+                    SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+                    editor.putString(ID_TOKEN, idToken);
+                    editor.apply();
+
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     intent.putExtra("idToken", idToken);

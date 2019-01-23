@@ -44,6 +44,8 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
+import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
+
 public class RegistrationArtistActivity extends AppCompatActivity {
 
     private static final String TAG = "MYLOG_RegistrationArtistActivity";
@@ -490,6 +492,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                     editor.putInt("userColor", user.getInt("backgroundColor"));
                     editor.apply();
                     //TODO: We should probably cache everything here
+
+                    sendDeviceToken(getBaseContext());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
