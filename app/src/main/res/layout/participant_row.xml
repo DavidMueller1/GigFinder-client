@@ -31,7 +31,8 @@
         android:layout_alignParentEnd="true"
         android:background="@drawable/standart_button"
         android:textColor="@color/white"
-        android:text="@string/event_participants_select" />
+        android:text="@string/event_participants_select"
+        android:backgroundTint="@color/darkGreen"/>
 
     <Button
         android:visibility="gone"
