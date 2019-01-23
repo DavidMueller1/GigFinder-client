@@ -1,5 +1,6 @@
 package com.example.david.gigfinder;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -47,14 +48,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "ArtistProfileActivity";
 
-    private static final int ID_SOUNDCLOUD = 0;
-    private static final int ID_FACEBOOK = 1;
-    private static final int ID_TWITTER = 2;
-    private static final int ID_YOUTUBE = 3;
-    private static final int ID_INSTAGRAM = 4;
-    private static final int ID_SPOTIFY = 5;
-    private static final int ID_WEB = 6;
-
     SharedPreferences sharedPreferences;
 
     private ImageView imageButton;
@@ -75,9 +68,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private FrameLayout progress;
 
-    //private JSONObject hostJson;
     private int userId;
     private int profileUserId;
+    private String picture;
     String idToken;
 
     @Override
@@ -121,7 +114,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(ArtistProfileActivity.this, ChatActivity.class);
                 intent.putExtra("idToken", idToken);
-
+                intent.putExtra("name", nameText.getText().toString());
+                intent.putExtra("picture", picture);
                 intent.putExtra("profileUserId", profileUserId);
 
                 startActivity(intent);
@@ -174,11 +168,14 @@ public class ArtistProfileActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(titleBarColor);
 
         TextView descriptionLabel = findViewById(R.id.profile_artist_description_label);
+        TextView socialMediaLabel = findViewById(R.id.profile_artist_social_media_label);
         if(ColorTools.isBrightColorBool(color)) {
             descriptionLabel.setTextColor(titleBarColor);
+            socialMediaLabel.setTextColor(titleBarColor);
         }
         else {
             descriptionLabel.setTextColor(color);
+            socialMediaLabel.setTextColor(color);
         }
 
         descriptionLabel.setTextColor(color);
@@ -188,8 +185,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private void updateProfile(String result){
         try {
             Log.d(TAG, result);
-            /*JSONArray jsonArray = new JSONArray(jsonString);
-            JSONObject userProfile = jsonArray.getJSONObject(0);*/
             JSONObject userProfile = new JSONObject(result);
 
             GetProfilePicture getProfilePicture = new GetProfilePicture();
@@ -201,9 +196,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
             updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
 
             String myGenres = "(";
-            for(int i=0; i<userProfile.getJSONArray("hostGenres").length(); i++){
-                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("hostGenres").getJSONObject(i).getInt("genreId"), sharedPreferences.getString("genres", "x")));
-                if(i < userProfile.getJSONArray("hostGenres").length()-1){
+            for(int i=0; i<userProfile.getJSONArray("artistGenres").length(); i++){
+                myGenres = myGenres.concat(Utils.genreIdToString(userProfile.getJSONArray("artistGenres").getJSONObject(i).getInt("genreId"), sharedPreferences.getString("genres", "x")));
+                if(i < userProfile.getJSONArray("artistGenres").length()-1){
                     myGenres = myGenres.concat(", ");
                 }
             }
@@ -219,10 +214,15 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 addToFavsBtn.setVisibility(View.VISIBLE);
             }
 
-            /*SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
-            editor.putInt("userId", userID);
-            editor.apply();*/
-            //TODO: We should probably cache everything here
+            JSONArray socialMedias = userProfile.getJSONArray("artistSocialMedias");
+
+            String socials = sharedPreferences.getString("social medias", "");
+            JSONArray socialMediaArrays = new JSONArray(socials);
+
+            for(int i=0; i<socialMedias.length(); i++){
+                JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
+                displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -231,95 +231,95 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     /**
      * Displays a SocialMediaLink
-     * @param socialMediaId
+     * @param socialMedia
      * @param text
      * @param socialMediaLink
      */
-    private void displaySocialMedia(int socialMediaId, String text, final String socialMediaLink) {
+    private void displaySocialMedia(String socialMedia, final String text, final String socialMediaLink) {
         LinearLayout container;
+        final Uri link = Uri.parse(socialMediaLink + text);
 
-        switch(socialMediaId) {
-            case ID_SOUNDCLOUD:
+        switch(socialMedia) {
+            case Utils.ID_SOUNDCLOUD:
                 soundcloudText.setText(text);
                 container = findViewById(R.id.profile_soundcloud);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_FACEBOOK:
+            case Utils.ID_FACEBOOK:
                 facebookText.setText(text);
                 container = findViewById(R.id.profile_facebook);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_TWITTER:
+            case Utils.ID_TWITTER:
                 twitterText.setText(text);
                 container = findViewById(R.id.profile_twitter);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_YOUTUBE:
+            case Utils.ID_YOUTUBE:
                 youtubeText.setText(text);
                 container = findViewById(R.id.profile_youtube);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_INSTAGRAM:
+            case Utils.ID_INSTAGRAM:
                 instagramText.setText(text);
                 container = findViewById(R.id.profile_instagram);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_SPOTIFY:
+            case Utils.ID_SPOTIFY:
                 spotifyText.setText(text);
                 container = findViewById(R.id.profile_spotify);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                         startActivity(browserIntent);
                     }
                 });
                 break;
-            case ID_WEB:
+            case Utils.ID_WEB:
                 webText.setText(text);
                 container = findViewById(R.id.profile_web);
                 container.setVisibility(View.VISIBLE);
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(socialMediaLink));
-                        startActivity(browserIntent);
+                        openWebsiteDialog(Uri.parse(text));
                     }
                 });
                 break;
@@ -328,8 +328,42 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     };
 
+    /**
+     * Displays the Website dialog
+     * @param link
+     */
+    private void openWebsiteDialog(final Uri link){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+        View mView = getLayoutInflater().inflate(R.layout.dialog_website, null);
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+
+        Button cancelBtn = (Button) mView.findViewById(R.id.cancelBtn);
+        Button proceedBtn = (Button) mView.findViewById(R.id.proceedBtn);
+        TextView websiteText = (TextView) mView.findViewById(R.id.website_dialoge_text);
+
+        websiteText.setText(getString(R.string.website_dialog_1) + link.toString() + getString(R.string.website_dialog_2));
+
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        proceedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
+                startActivity(browserIntent);
+            }
+        });
+    }
+
     private void displayProfilePicture(String result) {
         try {
+            picture = result;
             JSONObject imageProfile = new JSONObject(result);
 
             ViewGroup.LayoutParams params = imageButton.getLayoutParams();

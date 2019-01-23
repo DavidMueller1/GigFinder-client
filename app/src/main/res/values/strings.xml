@@ -80,6 +80,8 @@
     <!-- Events  -->
     <string name="event_participants">Bewerber</string>
     <string name="event_participants_select">Zusagen</string>
+    <string name="event_participants_cancel">Absagen</string>
+    <string name="event_participants_none">Noch keine Bewerber vorhanden</string>
     <string name="upcoming_events">Kommende Auftritte</string>
     <string name="past_events">Vergangene Auftritte</string>
 
@@ -100,6 +102,7 @@
     <string name="error_start_date">Der Startdatum fehlt</string>
     <string name="error_end_time">Die Endzeit fehlt</string>
     <string name="error_end_date">Der Enddatum fehlt</string>
+    <string name="error_time_order">Der Endzeitpunkt kann nicht vor dem Startzeitpunkt liegen</string>
     <string name="error_location">Die Location fehlt</string>
 
     <string name="missing_favorites">Du hast noch keine Favoriten :(</string>
@@ -109,6 +112,11 @@
     <string name="button_add_to_favorites">Zu Favoriten hinzufügen</string>
     <string name="button_send_message">Nachricht schreiben</string>
     <string name="no_connection">Kein Zugang zum Internet</string>
+    <string name="website_dialog_title">Externe Website</string>
+    <string name="website_dialog_1">Sind Sie sicher, dass sie die Website \"</string>
+    <string name="website_dialog_2">\" betreten möchten?</string>
+    <string name="website_cancel">Beenden</string>
+    <string name="website_proceed">Ja</string>
 
 
 </resources>

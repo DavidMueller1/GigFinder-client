@@ -67,14 +67,11 @@ public class GigsFragment extends Fragment {
         ListView upcomingListView = (ListView) getView().findViewById(R.id.upcomingGigsListView);
         ListView pastListView = (ListView) getView().findViewById(R.id.pastGigsListView);
 
-        ArrayList<String[]> placeholderStrings = new ArrayList<>();
-        placeholderStrings.add(new String[]{"Event Name", "20.04.2019", "Geschwister-Scholl-Platz 1"});
-        placeholderStrings.add(new String[]{"Event Name", "20.04.2019", "Geschwister-Scholl-Platz 1"});
+        ArrayList<String[]> futureGigs = new ArrayList<>();
 
-        ArrayList<String[]> placeholderStrings2 = new ArrayList<>();
-        placeholderStrings2.add(new String[]{"Event Name", "Geschwister-Scholl-Platz 1"});
+        ArrayList<String[]> pastGigs = new ArrayList<>();
 
-        upcomingGigsAdapter = new UpcomingGigsAdapter(this.getContext(), placeholderStrings);
+        upcomingGigsAdapter = new UpcomingGigsAdapter(this.getContext(), futureGigs);
         upcomingListView.setAdapter(upcomingGigsAdapter);
         upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -84,7 +81,7 @@ public class GigsFragment extends Fragment {
             }
         });
 
-        pastGigsAdapter = new PastGigsAdapter(this.getContext(), placeholderStrings2);
+        pastGigsAdapter = new PastGigsAdapter(this.getContext(), pastGigs);
         pastListView.setAdapter(pastGigsAdapter);
     }
 

@@ -137,6 +137,15 @@
                 android:textSize="@dimen/font_bigger"
                 android:fontFeatureSettings="smcp" />
 
+            <TextView
+                android:id="@+id/event_participants_none"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/padding_default"
+                android:text="@string/event_participants_none"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_default"/>
+
             <com.example.david.gigfinder.adapters.WrapContentListView
                 android:id="@+id/event_participants_list"
                 android:layout_width="match_parent"
