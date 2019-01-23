@@ -319,7 +319,7 @@ public class EventProfileActivity extends AppCompatActivity {
             int acceptedPos = -1;
 
             for(int i = 0; i < partJson.length(); i++) {
-                if(isEventHost.equals("true") && partJson.getJSONObject(i).getBoolean("accepted")) {
+                if(partJson.getJSONObject(i).getBoolean("accepted")) {
                     Log.d(TAG, "User at position " + i + " is accepted");
                     acceptedPos = i;
                 }
