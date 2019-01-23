@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.david.gigfinder.adapters.MessageListAdapter;
@@ -66,6 +67,8 @@ public class ChatActivity extends AppCompatActivity {
 
     private String idToken;
     private String user;
+    private String name;
+    private byte[] picture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,24 +79,21 @@ public class ChatActivity extends AppCompatActivity {
 
         idToken = getIntent().getExtras().getString("idToken");
         receiverId = getIntent().getExtras().getInt("profileUserId");
+        name = getIntent().getExtras().getString("name");
 
         authorId = prefs.getInt("userId", 0);
         user = prefs.getString("user", "null");
-
-        Log.d(TAG, idToken);
-        Log.d(TAG, String.valueOf(authorId));
-        Log.d(TAG, String.valueOf(receiverId));
 
         GetMessages getMessages = new GetMessages();
         getMessages.execute();
 
         chatName = (TextView) findViewById(R.id.chatName);
-        chatName.setText(getIntent().getExtras().getString("name"));
+        chatName.setText(name);
 
         chatImg = (ImageView) findViewById(R.id.chatImg);
         try {
             JSONObject imageProfile = new JSONObject(getIntent().getExtras().getString("picture"));
-            byte[] picture = Base64.decode(imageProfile.getString("image"), Base64.DEFAULT);
+            picture = Base64.decode(imageProfile.getString("image"), Base64.DEFAULT);
             chatImg.setImageBitmap(BitmapFactory.decodeByteArray(picture, 0, picture.length));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -154,13 +154,15 @@ public class ChatActivity extends AppCompatActivity {
                 //long l = date.getTime();
                 Timestamp timestamp = convertStringToTimestamp(messagesArray.getJSONObject(i).getString("created"));
                 if(messagesArray.getJSONObject(i).getInt("authorId")==receiverId){
-                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "chatpartner", false, timestamp.getTime()));
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), name, false, timestamp.getTime(), picture));
+
                 }else{
-                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "me", true, timestamp.getTime()));
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "me", true, timestamp.getTime(), null));
                 }
             }
             sortMessages();
             mMessageAdapter.notifyDataSetChanged();
+            mMessageRecycler.scrollToPosition(messageList.size()-1);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -189,7 +191,7 @@ public class ChatActivity extends AppCompatActivity {
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestProperty("Content-Type","application/json");
+                urlConnection.setRequestProperty("Content-Type","application/json;charset=utf-8");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
@@ -200,7 +202,8 @@ public class ChatActivity extends AppCompatActivity {
                 jsonObject.put("AuthorId", authorId);
                 jsonObject.put("ReceiverId", receiverId);
                 jsonObject.put("Content", params[0]);
-                os.writeBytes(jsonObject.toString());
+
+                os.write(jsonObject.toString().getBytes("UTF-8"));
                 os.close();
 
                 //Get response
@@ -252,8 +255,9 @@ public class ChatActivity extends AppCompatActivity {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 Date date = format.parse(msg.getString("created"));
                 long l = date.getTime();
-                messageList.add(new Message(msg.getString("content"), "me", true, l));
+                messageList.add(new Message(msg.getString("content"), "me", true, l, null));
                 mMessageAdapter.notifyDataSetChanged();
+                mMessageRecycler.scrollToPosition(messageList.size()-1);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (ParseException e) {
