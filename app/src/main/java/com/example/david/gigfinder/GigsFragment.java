@@ -15,11 +15,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import com.example.david.gigfinder.adapters.FavAdapter;
 import com.example.david.gigfinder.adapters.PastGigsAdapter;
 import com.example.david.gigfinder.adapters.UpcomingGigsAdapter;
+import com.example.david.gigfinder.tools.GeoTools;
+import com.example.david.gigfinder.tools.Utils;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +36,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -42,6 +47,17 @@ public class GigsFragment extends Fragment {
     private String idToken;
     private UpcomingGigsAdapter upcomingGigsAdapter;
     private PastGigsAdapter pastGigsAdapter;
+
+    ArrayList<JSONObject> futureEventObjects;
+    ArrayList<JSONObject> pastEventObjects;
+
+    ArrayList<String[]> futureGigs;
+    ArrayList<String[]> pastGigs;
+
+    private ListView upcomingListView;
+    private ListView pastListView;
+    private FrameLayout progress;
+
     int userId;
 
     @Nullable
@@ -58,17 +74,20 @@ public class GigsFragment extends Fragment {
 
         idToken = getArguments().getString("idToken");
 
-        ListView upcomingListView = (ListView) getView().findViewById(R.id.upcomingGigsListView);
-        ListView pastListView = (ListView) getView().findViewById(R.id.pastGigsListView);
+        upcomingListView = (ListView) getView().findViewById(R.id.upcomingGigsListView);
+        pastListView = (ListView) getView().findViewById(R.id.pastGigsListView);
 
-        ArrayList<String[]> futureGigs = new ArrayList<>();
-        ArrayList<String[]> pastGigs = new ArrayList<>();
+        futureGigs = new ArrayList<>();
+        pastGigs = new ArrayList<>();
 
         upcomingGigsAdapter = new UpcomingGigsAdapter(this.getContext(), futureGigs);
         upcomingListView.setAdapter(upcomingGigsAdapter);
 
         pastGigsAdapter = new PastGigsAdapter(this.getContext(), pastGigs);
         pastListView.setAdapter(pastGigsAdapter);
+
+        futureEventObjects = new ArrayList<>();
+        pastEventObjects = new ArrayList<>();
 
         try {
             JSONObject jsonObject = new JSONArray(prefs.getString("userProfile","x")).getJSONObject(0);
@@ -82,12 +101,24 @@ public class GigsFragment extends Fragment {
         }else{
             //online mode
             GetParticipations getParticipations = new GetParticipations();
-            //getParticipations.execute();
+            getParticipations.execute();
 
             upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(getActivity(), EventProfileActivity.class);
+                    intent.putExtra("idToken", idToken);
+                    intent.putExtra("Event", futureEventObjects.get(position).toString());
+                    startActivity(intent);
+                }
+            });
+
+            pastListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getActivity(), EventProfileActivity.class);
+                    intent.putExtra("idToken", idToken);
+                    intent.putExtra("Event", pastEventObjects.get(position).toString());
                     startActivity(intent);
                 }
             });
@@ -109,6 +140,80 @@ public class GigsFragment extends Fragment {
         }
     }
 
+    private void showGigs(String result) {
+//        ArrayList<String[]> futureEvents = new ArrayList<>();
+//        ArrayList<String[]> pastEvents = new ArrayList<>();
+
+
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+            for(int i=0; i<jsonArray.length(); i++){
+                JSONObject event = jsonArray.getJSONObject(i).getJSONObject("event");
+                if(Utils.convertStringToTimestamp(event.getString("start")).after(new Timestamp(System.currentTimeMillis()))) {
+                    // event is in the future
+                    futureEventObjects.add(event);
+                    Log.d(TAG, "Event in the future: " + event.toString());
+                    String time = Utils.getDateStringFromServerFormat(event.getString("start")) + " um " + Utils.getTimeStringFromServerFormat(event.getString("start")) + " Uhr";
+                    futureGigs.add(new String[] {event.getString("title"), time, GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude"))), "loading"});
+                }
+                else {
+                    // event is in the past
+                    pastEventObjects.add(event);
+                    Log.d(TAG, "Event in the past: " + event.toString());
+                    pastGigs.add(new String[] {event.getString("title"), GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude")))});
+                }
+                String[] eString = {};
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d(TAG, "Error getting Events: " + e.getStackTrace().toString());
+        }
+
+        upcomingGigsAdapter.notifyDataSetChanged();
+        pastGigsAdapter.notifyDataSetChanged();
+        checkStatus();
+    }
+
+    private void checkStatus() {
+        for(int i = 0; i < futureEventObjects.size(); i++) {
+                try {
+                    GetEventParticipants getEventParticipants = new GetEventParticipants();
+                    getEventParticipants.execute(Integer.toString(futureEventObjects.get(i).getInt("id")), Integer.toString(i));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+
+    private void updateStatus(int index, String result) {
+        boolean someoneAccepted = false;
+
+        try {
+            JSONArray participants = new JSONArray(result);
+            for(int i = 0; i < participants.length(); i++) {
+                if(participants.getJSONObject(i).getBoolean("accepted")) {
+                    someoneAccepted = true;
+                    if(participants.getJSONObject(i).getInt("artistId") == userId) {
+                        futureGigs.get(index)[3] = "accepted";
+                    }
+                    else {
+                        futureGigs.get(index)[3] = "canceled";
+                    }
+                    break;
+                }
+            }
+
+            if(!someoneAccepted) {
+                futureGigs.get(index)[3] = "pending";
+            }
+
+            upcomingGigsAdapter.notifyDataSetChanged();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Checks if Network is Available
      * @return True if there is an Internet Connection
@@ -126,7 +231,7 @@ public class GigsFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/participants?artist="+userId);
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/participations?artist="+userId);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
@@ -156,6 +261,58 @@ public class GigsFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "Participations By This User: " + result);
+            showGigs(result);
+        }
+    }
+
+    /**
+     *
+     */
+    class GetEventParticipants extends AsyncTask<String, Void, String> {
+        int index;
+
+        @Override
+        protected String doInBackground(String... params) {
+            index = Integer.parseInt(params[1]);
+            try {
+                Log.d(TAG, params[0]);
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/participations?event=" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.d(TAG, "Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            Log.d(TAG, "Participants result: " + result);
+            updateStatus(index, result);
+            /*if(result.equals("[]")) {
+
+            }else{
+
+            }*/
         }
     }
 }

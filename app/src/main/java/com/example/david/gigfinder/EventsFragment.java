@@ -115,7 +115,7 @@ public class EventsFragment extends Fragment {
                     futureEventObjects.add(event);
                     Log.d(TAG, "Event in the future: " + event.toString());
                     String time = Utils.getDateStringFromServerFormat(event.getString("start")) + " um " + Utils.getTimeStringFromServerFormat(event.getString("start")) + " Uhr";
-                    futureEvents.add(new String[] {event.getString("title"), time, GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude")))});
+                    futureEvents.add(new String[] {event.getString("title"), time, GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude"))), "none"});
                 }
                 else {
                     // event is in the past
