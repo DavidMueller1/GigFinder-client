@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -39,11 +40,16 @@ import static android.content.Context.MODE_PRIVATE;
 public class ChatFragment extends Fragment {
 
     private static final String TAG = "APPLOG - ChatFragment";
+
     private ChatAdapter chatAdapter;
+
     private TextView noChatsText;
-    ArrayList<String[]> chatStrings;
-    String idToken;
-    String user;
+    private ListView listView;
+    private FrameLayout progress;
+
+    private ArrayList<String[]> chatStrings;
+    private String idToken;
+    private String user;
 
     @Nullable
     @Override
@@ -61,6 +67,7 @@ public class ChatFragment extends Fragment {
         user = prefs.getString("user", "host");
 
         noChatsText = getView().findViewById(R.id.noChatText);
+        progress = getView().findViewById(R.id.progressBarHolder);
 
         GetReceivers getReceivers = new GetReceivers();
         getReceivers.execute();
@@ -68,19 +75,8 @@ public class ChatFragment extends Fragment {
         chatStrings = new ArrayList<>();
 
         chatAdapter = new ChatAdapter(this.getContext(), chatStrings);
-        ListView listView = (ListView) getView().findViewById(R.id.chatListView);
+        listView = (ListView) getView().findViewById(R.id.chatListView);
         listView.setAdapter(chatAdapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), ChatActivity.class);
-                intent.putExtra("idToken", idToken);
-                intent.putExtra("name", chatStrings.get(position)[0]);
-                intent.putExtra("profileUserId", Integer.parseInt(chatStrings.get(position)[2]));
-                startActivity(intent);
-            }
-        });
     }
 
     private void showMessages(String result){
@@ -115,6 +111,36 @@ public class ChatFragment extends Fragment {
         }
     }
 
+    private void displayLoadingScreen(boolean isLoading) {
+        if(isLoading) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+        else {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progress.setVisibility(View.GONE);
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Intent intent = new Intent(getActivity(), ChatActivity.class);
+                            intent.putExtra("idToken", idToken);
+                            intent.putExtra("name", chatStrings.get(position)[0]);
+                            intent.putExtra("picture", chatStrings.get(position)[4]);
+                            intent.putExtra("profileUserId", Integer.parseInt(chatStrings.get(position)[2]));
+                            startActivity(intent);
+                        }
+                    });
+                }
+            });
+        }
+    }
+
     /**
      *
      */
@@ -123,6 +149,8 @@ public class ChatFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             try {
+                displayLoadingScreen(true);
+
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/receivers");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -154,10 +182,10 @@ public class ChatFragment extends Fragment {
         protected void onPostExecute(String result){
             Log.d(TAG, "MESSAGES: " + result);
             if(result.equals("[]")) {
-
+                displayLoadingScreen(false);
             }else{
-                showMessages(result);
                 noChatsText.setVisibility(View.GONE);
+                showMessages(result);
             }
         }
     }
@@ -203,6 +231,9 @@ public class ChatFragment extends Fragment {
             if(!chatStrings.equals(null)) {
                 chatStrings.get(id)[4] = result;
                 chatAdapter.notifyDataSetChanged();
+            }
+            if(chatStrings.size()==id+1){
+                displayLoadingScreen(false);
             }
         }
 

@@ -35,6 +35,7 @@ import com.example.david.gigfinder.data.Host;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.ImageTools;
+import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
@@ -55,6 +56,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -341,55 +343,6 @@ public class AddEventActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Called when the user presses the registrate button TODO modify to add event
-     */
-    /*private void performRegistration() {
-        Log.d(TAG, "Checking user input...");
-        if(checkUserInputBasic()) {
-            Log.d(TAG, "User input ok");
-
-            SendRegisterHost sendRegisterHost = new SendRegisterHost();
-            sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor())); //TODO params
-
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra("idToken", idToken);
-            intent.putExtra("user", "host");
-            startActivity(intent);
-            finish();
-        }
-    }
-
-    private boolean checkUserInputBasic(){
-        // Check whether name field is empty
-        host.setName(nameField.getText().toString());
-        if(host.getName().equals("")) {
-            Toast.makeText(getApplicationContext(),"Namensfeld ist leer.",Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Namefield empty.");
-            return false;
-        }
-
-        // Description is optional (can be empty)
-        host.setDescription(descriptionField.getText().toString());
-
-        if(position == null) {
-            Toast.makeText(getApplicationContext(),"Keine Location ausgewählt",Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "No Location choosen.");
-            return false;
-        }
-
-        ArrayList genres = new ArrayList();
-        genres.add((Genre)genreSpinner.getSelectedItem());
-        host.setGenres(genres);
-        if(host.getGenres().get(0).equals(getResources().getString(R.string.artist_genre_choose))) {
-            Toast.makeText(getApplicationContext(),"Kein Genre ausgewählt",Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "No genre selected.");
-            return false;
-        }
-
-        return true;
-    }*/
 
     private boolean checkUserInput(){
 
@@ -424,6 +377,15 @@ public class AddEventActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.error_end_date), Toast.LENGTH_SHORT).show();
             return false;
         }
+
+        Timestamp start = Utils.convertStringToTimestamp(timeStrings[1] + "T" + timeStrings[0]);
+        Timestamp end = Utils.convertStringToTimestamp(timeStrings[3] + "T" + timeStrings[2]);
+
+        if(start.after(end)) {
+            Toast.makeText(getApplicationContext(), getString(R.string.error_time_order), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
 
         if(position==null){
             Toast.makeText(getApplicationContext(), getString(R.string.error_location), Toast.LENGTH_SHORT).show();

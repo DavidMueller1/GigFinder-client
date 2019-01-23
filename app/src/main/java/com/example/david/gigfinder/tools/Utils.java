@@ -19,6 +19,15 @@ import java.util.Date;
 import static android.content.Context.MODE_PRIVATE;
 
 public abstract class Utils {
+
+    public static final String ID_SOUNDCLOUD = "Soundcloud";
+    public static final String ID_FACEBOOK = "Facebook";
+    public static final String ID_TWITTER = "Twitter";
+    public static final String ID_YOUTUBE = "Youtube";
+    public static final String ID_INSTAGRAM = "Instagram";
+    public static final String ID_SPOTIFY = "Spotify";
+    public static final String ID_WEB = "Website";
+
     private static final String TAG = "Utils";
 
     public static String genreIdToString(int id, String genres){
@@ -45,6 +54,7 @@ public abstract class Utils {
         }
         return date;
     }
+
 
     public static Timestamp convertStringToTimestamp(String str_date) {
         try {
