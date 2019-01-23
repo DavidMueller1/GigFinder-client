@@ -2,6 +2,7 @@ package com.example.david.gigfinder;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -101,11 +102,14 @@ public class LoginActivity extends AppCompatActivity {
             startActivityForResult(signInIntent, RC_SIGN_IN);
         }else{
             Log.d(TAG, "GoogleSignIn: No Connection!");
-            //TODO Offline use of App
             Toast.makeText(getApplicationContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
+            offlineMode();
         }
     }
 
+    /**
+     * Signs out the client
+     */
     private void signOut() {
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
@@ -125,6 +129,22 @@ public class LoginActivity extends AppCompatActivity {
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    /**
+     * Checks if Cache is available to start offline mode
+     */
+    private void offlineMode(){
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
+
+        if(!sharedPreferences.getString("user", "null").equals("null")){
+            if(!sharedPreferences.getString("userProfile", "null").equals("null")){
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("idToken", "offline");
+                startActivity(intent);
+                finish();
+            }
+        }
     }
 
     @Override
