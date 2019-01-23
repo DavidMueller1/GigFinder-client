@@ -118,13 +118,14 @@ public class HostProfileFragment extends Fragment {
         spotifyText = getView().findViewById(R.id.profile_spotify_text);
         webText = getView().findViewById(R.id.profile_web_text);
 
+        progress = getView().findViewById(R.id.progressBarHolder);
+
         updateProfile(sharedPreferences.getString("userProfile", "x"));
 
         if(idToken.equals("offline")) {
             offlineMode();
         }else{
             //online mode
-            progress = getView().findViewById(R.id.progressBarHolder);
             displayLoadingScreen(true);
 
             testDeleteBtn.setOnClickListener(new View.OnClickListener() {

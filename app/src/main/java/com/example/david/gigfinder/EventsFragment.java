@@ -77,21 +77,20 @@ public class EventsFragment extends Fragment {
         futureEventObjects = new ArrayList<>();
         pastEventObjects = new ArrayList<>();
 
+        try {
+            JSONObject jsonObject = new JSONArray(prefs.getString("userProfile", "x")).getJSONObject(0);
+            userId = jsonObject.getInt("id");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         if(idToken.equals("offline")) {
             offlineMode();
         }
         else {
             //online mode
-            try {
-                JSONObject jsonObject = new JSONArray(prefs.getString("userProfile", "x")).getJSONObject(0);
-                userId = jsonObject.getInt("id");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
             GetEvents getEvents = new GetEvents();
             getEvents.execute();
-
 
             getView().findViewById(R.id.events_addbutton).setOnClickListener(new View.OnClickListener() {
                 @Override
