@@ -1,7 +1,10 @@
 package com.example.david.gigfinder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -54,6 +57,19 @@ public class GigsFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
         idToken = getArguments().getString("idToken");
+
+        ListView upcomingListView = (ListView) getView().findViewById(R.id.upcomingGigsListView);
+        ListView pastListView = (ListView) getView().findViewById(R.id.pastGigsListView);
+
+        ArrayList<String[]> futureGigs = new ArrayList<>();
+        ArrayList<String[]> pastGigs = new ArrayList<>();
+
+        upcomingGigsAdapter = new UpcomingGigsAdapter(this.getContext(), futureGigs);
+        upcomingListView.setAdapter(upcomingGigsAdapter);
+
+        pastGigsAdapter = new PastGigsAdapter(this.getContext(), pastGigs);
+        pastListView.setAdapter(pastGigsAdapter);
+
         try {
             JSONObject jsonObject = new JSONArray(prefs.getString("userProfile","x")).getJSONObject(0);
             userId = jsonObject.getInt("id");
@@ -61,29 +77,49 @@ public class GigsFragment extends Fragment {
             e.printStackTrace();
         }
 
-        GetParticipations getParticipations = new GetParticipations();
-        //getParticipations.execute();
+        if(idToken.equals("offline")) {
+            offlineMode();
+        }else{
+            //online mode
+            GetParticipations getParticipations = new GetParticipations();
+            //getParticipations.execute();
 
-        ListView upcomingListView = (ListView) getView().findViewById(R.id.upcomingGigsListView);
-        ListView pastListView = (ListView) getView().findViewById(R.id.pastGigsListView);
+            upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getActivity(), EventProfileActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
 
-        ArrayList<String[]> futureGigs = new ArrayList<>();
-
-        ArrayList<String[]> pastGigs = new ArrayList<>();
-
-        upcomingGigsAdapter = new UpcomingGigsAdapter(this.getContext(), futureGigs);
-        upcomingListView.setAdapter(upcomingGigsAdapter);
-        upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), EventProfileActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        pastGigsAdapter = new PastGigsAdapter(this.getContext(), pastGigs);
-        pastListView.setAdapter(pastGigsAdapter);
     }
+
+    /**
+     * Checks internet connection and starts offline mode
+     */
+    private void offlineMode(){
+        if(isNetworkAvailable()){
+            //Go back to Login
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }else{
+            //Show Popup
+        }
+    }
+
+    /**
+     * Checks if Network is Available
+     * @return True if there is an Internet Connection
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
 
     class GetParticipations extends AsyncTask<String, Void, String> {
 
