@@ -1,7 +1,10 @@
 package com.example.david.gigfinder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -69,14 +72,18 @@ public class ChatFragment extends Fragment {
         noChatsText = getView().findViewById(R.id.noChatText);
         progress = getView().findViewById(R.id.progressBarHolder);
 
-        GetReceivers getReceivers = new GetReceivers();
-        getReceivers.execute();
-
         chatStrings = new ArrayList<>();
-
         chatAdapter = new ChatAdapter(this.getContext(), chatStrings);
         listView = (ListView) getView().findViewById(R.id.chatListView);
         listView.setAdapter(chatAdapter);
+
+        if(idToken.equals("offline")){
+            offlineMode();
+        }else {
+            //online mode
+            GetReceivers getReceivers = new GetReceivers();
+            getReceivers.execute();
+        }
     }
 
     private void showMessages(String result){
@@ -139,6 +146,31 @@ public class ChatFragment extends Fragment {
                 }
             });
         }
+    }
+
+    /**
+     * Checks internet connection and starts offline mode
+     */
+    private void offlineMode(){
+        if(isNetworkAvailable()){
+            //Go back to Login
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }else{
+            //Show Popup
+        }
+    }
+
+    /**
+     * Checks if Network is Available
+     * @return True if there is an Internet Connection
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     /**
