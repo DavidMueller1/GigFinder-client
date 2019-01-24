@@ -121,6 +121,10 @@
     <string name="website_dialog_2">\" betreten möchten?</string>
     <string name="website_cancel">Beenden</string>
     <string name="website_proceed">Ja</string>
+    <string name="registration_genre_picker_title">Bis zu 3 Genres auswählen</string>
+    <string name="registration_genre_picker_negative">Beenden</string>
+    <string name="registration_genre_picker_positive">Auswählen</string>
+    <string name="registration_genre_hint">Genres Auswählen</string>
 
 
 </resources>
