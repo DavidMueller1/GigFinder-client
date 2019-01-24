@@ -298,6 +298,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         registrationButton.setTextColor(textColor);
         backgroundColorPickerButton.setBackgroundTintList(ColorStateList.valueOf(color));
         backgroundColorPickerButton.setTextColor(textColor);
+        genrePickerButton.setBackgroundTintList(ColorStateList.valueOf(color));
+        genrePickerButton.setTextColor(textColor);
 
         profilePictureTitle.setTextColor(color);
         profilePictureHint.setTextColor(color);

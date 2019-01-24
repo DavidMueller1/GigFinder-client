@@ -131,7 +131,6 @@
                 android:textColor="@color/white"
                 android:textSize="@dimen/font_default" />
 
-
             <TextView
                 android:id="@+id/registration_artist_social_media_title"
                 android:layout_width="match_parent"
