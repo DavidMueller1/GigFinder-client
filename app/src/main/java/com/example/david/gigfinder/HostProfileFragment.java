@@ -8,6 +8,8 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -94,8 +96,6 @@ public class HostProfileFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        progress = getView().findViewById(R.id.progressBarHolder);
-        displayLoadingScreen(true);
 
         idToken = getArguments().getString("idToken");
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
@@ -118,26 +118,34 @@ public class HostProfileFragment extends Fragment {
         spotifyText = getView().findViewById(R.id.profile_spotify_text);
         webText = getView().findViewById(R.id.profile_web_text);
 
-        testDeleteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DeleteUser deleteUser = new DeleteUser();
-                deleteUser.execute();
-            }
-        });
-
-        testSignOutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signOut();
-            }
-        });
+        progress = getView().findViewById(R.id.progressBarHolder);
 
         updateProfile(sharedPreferences.getString("userProfile", "x"));
 
+        if(idToken.equals("offline")) {
+            offlineMode();
+        }else{
+            //online mode
+            displayLoadingScreen(true);
+
+            testDeleteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DeleteUser deleteUser = new DeleteUser();
+                    deleteUser.execute();
+                }
+            });
+
+            testSignOutBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    signOut();
+                }
+            });
+        }
+
         super.onActivityCreated(savedInstanceState);
     }
-
 
     /**
      * Updates the color of all relevant elements
@@ -147,7 +155,6 @@ public class HostProfileFragment extends Fragment {
         nameText.setTextColor(fontColor);
         genresText.setTextColor(fontColor);
         getView().findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(color);
-
 
         int titleBarColor = ColorTools.getSecondaryColor(color);
         // happens in MainActivity, otherwise the statusBar changes on chat tab
@@ -180,8 +187,10 @@ public class HostProfileFragment extends Fragment {
             JSONArray jsonArray = new JSONArray(jsonString);
             JSONObject userProfile = jsonArray.getJSONObject(0);
 
-            GetProfilePicture getProfilePicture = new GetProfilePicture();
-            getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+            if(!idToken.equals("offline")) {
+                GetProfilePicture getProfilePicture = new GetProfilePicture();
+                getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+            }
 
             final String name = userProfile.getString("name");
             nameText.setText(name);
@@ -226,14 +235,10 @@ public class HostProfileFragment extends Fragment {
             String socials = sharedPreferences.getString("social medias", "");
             JSONArray socialMediaArrays = new JSONArray(socials);
 
-            Log.d(TAG, socialMedias.toString());
-            Log.d(TAG, socialMediaArrays.toString());
-
             for(int i=0; i<socialMedias.length(); i++){
                 JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
                 displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -433,6 +438,31 @@ public class HostProfileFragment extends Fragment {
         intent.putExtra("SignOut", true);
         startActivity(intent);
         getActivity().finish();
+    }
+
+    /**
+     * Checks internet connection and starts offline mode
+     */
+    private void offlineMode(){
+        if(isNetworkAvailable()){
+            //Go back to Login
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }else{
+            //Show Popup
+        }
+    }
+
+    /**
+     * Checks if Network is Available
+     * @return True if there is an Internet Connection
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     /**

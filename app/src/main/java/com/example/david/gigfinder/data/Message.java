@@ -5,12 +5,14 @@ public class Message {
     long createdAt;
     String name;
     boolean me;
+    private byte[] picture;
 
-    public Message(String message, String name, boolean me, long createdAt) {
+    public Message(String message, String name, boolean me, long createdAt, byte[] picture) {
         this.message = message;
         this.name = name;
         this.me = me;
         this.createdAt = createdAt;
+        this.picture = picture;
     }
 
     public String getMessage() {
@@ -27,5 +29,9 @@ public class Message {
 
     public boolean isMe() {
         return me;
+    }
+
+    public byte[] getPicture() {
+        return picture;
     }
 }

@@ -1,7 +1,10 @@
 package com.example.david.gigfinder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -45,8 +48,8 @@ public class EventsFragment extends Fragment {
     private UpcomingGigsAdapter upcomingGigsAdapter;
     private PastGigsAdapter pastGigsAdapter;
 
-    ArrayList<JSONObject> futureEventObjects;
-    ArrayList<JSONObject> pastEventObjects;
+    private ArrayList<JSONObject> futureEventObjects;
+    private ArrayList<JSONObject> pastEventObjects;
 
     private ListView upcomingListView;
     private ListView pastListView;
@@ -67,32 +70,37 @@ public class EventsFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
         idToken = getArguments().getString("idToken");
+
+        progress = getView().findViewById(R.id.progressBarHolder);
+        upcomingListView = getView().findViewById(R.id.upcomingEventsListView);
+        pastListView = getView().findViewById(R.id.pastEventsListView);
+        futureEventObjects = new ArrayList<>();
+        pastEventObjects = new ArrayList<>();
+
         try {
-            JSONObject jsonObject = new JSONArray(prefs.getString("userProfile","x")).getJSONObject(0);
+            JSONObject jsonObject = new JSONArray(prefs.getString("userProfile", "x")).getJSONObject(0);
             userId = jsonObject.getInt("id");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        GetEvents getEvents = new GetEvents();
-        getEvents.execute();
+        if(idToken.equals("offline")) {
+            offlineMode();
+        }
+        else {
+            //online mode
+            GetEvents getEvents = new GetEvents();
+            getEvents.execute();
 
-        progress = getView().findViewById(R.id.progressBarHolder);
-
-        upcomingListView = getView().findViewById(R.id.upcomingEventsListView);
-        pastListView = getView().findViewById(R.id.pastEventsListView);
-
-        futureEventObjects = new ArrayList<>();
-        pastEventObjects = new ArrayList<>();
-
-        getView().findViewById(R.id.events_addbutton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AddEventActivity.class);
-                intent.putExtra("idToken", idToken);
-                startActivityForResult(intent, ADD_EVENT);
-            }
-        });
+            getView().findViewById(R.id.events_addbutton).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), AddEventActivity.class);
+                    intent.putExtra("idToken", idToken);
+                    startActivityForResult(intent, ADD_EVENT);
+                }
+            });
+        }
     }
 
     private void updateList(String result) {
@@ -107,7 +115,7 @@ public class EventsFragment extends Fragment {
                     futureEventObjects.add(event);
                     Log.d(TAG, "Event in the future: " + event.toString());
                     String time = Utils.getDateStringFromServerFormat(event.getString("start")) + " um " + Utils.getTimeStringFromServerFormat(event.getString("start")) + " Uhr";
-                    futureEvents.add(new String[] {event.getString("title"), time, GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude")))});
+                    futureEvents.add(new String[] {event.getString("title"), time, GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude"))), "none"});
                 }
                 else {
                     // event is in the past
@@ -168,7 +176,32 @@ public class EventsFragment extends Fragment {
         }
     }
 
-    class GetEvents extends AsyncTask<String, Void, String> {
+    /**
+     * Checks internet connection and starts offline mode
+     */
+    private void offlineMode(){
+        if(isNetworkAvailable()){
+            //Go back to Login
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }else{
+            //Show Popup
+        }
+    }
+
+    /**
+     * Checks if Network is Available
+     * @return True if there is an Internet Connection
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private class GetEvents extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {

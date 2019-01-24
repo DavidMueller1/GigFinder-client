@@ -1,11 +1,18 @@
 package com.example.david.gigfinder;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -35,6 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +53,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
+import static com.example.david.gigfinder.tools.ImageTools.compressImage;
 
 public class RegistrationArtistActivity extends AppCompatActivity {
 
@@ -259,6 +268,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             byte[] imageByteArray = null;
             try {
                 imageByteArray = ImageTools.uriToByteArray(profilePictureUri, getApplicationContext());
+                imageByteArray = compressImage(getApplicationContext(), profilePictureUri, imageByteArray);
             } catch (IOException e) {
                 Log.d(TAG, "Uri not found");
                 Toast.makeText(getApplicationContext(),"Uri not found",Toast.LENGTH_SHORT).show();
@@ -398,7 +408,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
-    class SendRegisterArtist extends AsyncTask<String, Void, String> {
+    /**
+     * Send the registration request to the Server
+     */
+    private class SendRegisterArtist extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -428,7 +441,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                     jsonObject.put("artistSocialMedias", mySocialMedias);
                     Log.d(TAG, mySocialMedias.toString());
                 }
-                os.writeBytes(jsonObject.toString());
+                os.write(jsonObject.toString().getBytes("UTF-8"));
                 os.close();
 
                 //Get response
@@ -509,7 +522,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
-    class GetGenres extends AsyncTask<String, Void, String> {
+    /**
+     * Requests Genres from Server
+     */
+    private class GetGenres extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -552,7 +568,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
-    class GetSocialMedias extends AsyncTask<String, Void, String> {
+    /**
+     * Requests Social media from Server
+     */
+    private class GetSocialMedias extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {

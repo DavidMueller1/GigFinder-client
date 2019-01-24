@@ -1,6 +1,8 @@
 package com.example.david.gigfinder;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.View;
@@ -30,6 +32,7 @@ public class ReceivedMsgHolder extends RecyclerView.ViewHolder{
         Context mContext = null;
         timeText.setText(DateUtils.formatDateTime(null, message.getCreatedAt(), 0));
         nameText.setText(message.getName());
+        profileImage.setImageBitmap(BitmapFactory.decodeByteArray(message.getPicture(), 0, message.getPicture().length));
 
         // Insert the profile image from the URL into the ImageView.
         //Utils.displayRoundImageFromUrl(mContext, message.getSender().getProfileUrl(), profileImage);

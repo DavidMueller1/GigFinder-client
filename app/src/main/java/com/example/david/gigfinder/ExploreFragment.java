@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -63,9 +65,15 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         idToken = getArguments().getString("idToken");
-        getLocationPermission();
-        GetEvents getEvents = new GetEvents();
-        getEvents.execute();
+        if(idToken.equals("offline")) {
+            //offline mode
+            offlineMode();
+        }else{
+            //online mode
+            getLocationPermission();
+            GetEvents getEvents = new GetEvents();
+            getEvents.execute();
+        }
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -188,6 +196,31 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(ExploreFragment.this);
     }
 
+    /**
+     * Checks internet connection and starts offline mode
+     */
+    private void offlineMode(){
+        if(isNetworkAvailable()){
+            //Go back to Login
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }else{
+            //Show Popup
+        }
+    }
+
+    /**
+     * Checks if Network is Available
+     * @return True if there is an Internet Connection
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
     private void showEvents(String events){
         try {
             JSONArray jsonArray = new JSONArray(events);
@@ -216,7 +249,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     /**
      *
      */
-    class GetEvents extends AsyncTask<String, Void, String> {
+    private class GetEvents extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {

@@ -56,6 +56,7 @@ public class ParticipantAdapter extends ArrayAdapter<String[]> {
 
         TextView partName = customView.findViewById(R.id.participant_name);
         ImageView partImg = customView.findViewById(R.id.participant_image);
+        TextView partSelected = customView.findViewById(R.id.participant_selected_text);
         Button selectButton = customView.findViewById(R.id.participant_select_button);
         Button canelButton = customView.findViewById(R.id.participant_cancel_button);
 
@@ -63,6 +64,9 @@ public class ParticipantAdapter extends ArrayAdapter<String[]> {
 
         if(isEventHost.equals("false")) {
             selectButton.setVisibility(View.GONE);
+            if(buttonMode.equals("cancel")) {
+                partSelected.setText(getContext().getResources().getString(R.string.gigs_accepted));
+            }
         }
         else {
             if(buttonMode.equals("none")) {

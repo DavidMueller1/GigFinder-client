@@ -31,7 +31,8 @@
         android:layout_alignParentEnd="true"
         android:background="@drawable/standart_button"
         android:textColor="@color/white"
-        android:text="@string/event_participants_select" />
+        android:text="@string/event_participants_select"
+        android:backgroundTint="@color/darkGreen"/>
 
     <Button
         android:visibility="gone"
@@ -44,5 +45,16 @@
         android:text="@string/event_participants_cancel"
         android:textColor="@color/white"
         android:backgroundTint="@color/darkRed"/>
+
+    <TextView
+        android:id="@+id/participant_selected_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="@dimen/padding_smaller"
+        android:text=""
+        android:textColor="@color/darkGreen"
+        android:textSize="@dimen/font_default"/>
 
 </RelativeLayout>

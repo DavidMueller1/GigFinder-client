@@ -1,6 +1,9 @@
 package com.example.david.gigfinder;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -51,31 +54,35 @@ public class FavoritesFragment extends Fragment {
         idToken = getArguments().getString("idToken");
 
         noFavsText = getView().findViewById(R.id.noFavsText);
+        ListView listView = (ListView) getView().findViewById(R.id.favListView);
 
         favorites = new ArrayList<>();
-
         favAdapter = new FavAdapter(this.getContext(), favorites);
-        ListView listView = (ListView) getView().findViewById(R.id.favListView);
         listView.setAdapter(favAdapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), HostProfileActivity.class);
-                intent.putExtra("idToken", idToken);
-                intent.putExtra("host", favorites.get(position)[2]);
-                try {
-                    JSONObject jsonObject = new JSONObject(favorites.get(position)[2]);
-                    intent.putExtra("profileUserId", String.valueOf(jsonObject.getInt("id")));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                startActivity(intent);
-            }
-        });
+        if(idToken.equals("offline")){
+            offlineMode();
+        }else {
+            //online mode
+            GetFavorites getFavorites = new GetFavorites();
+            getFavorites.execute();
 
-        GetFavorites getFavorites = new GetFavorites();
-        getFavorites.execute();
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent intent = new Intent(getActivity(), HostProfileActivity.class);
+                    intent.putExtra("idToken", idToken);
+                    intent.putExtra("host", favorites.get(position)[2]);
+                    try {
+                        JSONObject jsonObject = new JSONObject(favorites.get(position)[2]);
+                        intent.putExtra("profileUserId", String.valueOf(jsonObject.getInt("id")));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     private void showFavorites(String result) {
@@ -90,6 +97,31 @@ public class FavoritesFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Checks internet connection and starts offline mode
+     */
+    private void offlineMode(){
+        if(isNetworkAvailable()){
+            //Go back to Login
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }else{
+            //Show Popup
+        }
+    }
+
+    /**
+     * Checks if Network is Available
+     * @return True if there is an Internet Connection
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     /**
