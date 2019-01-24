@@ -323,6 +323,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
             byte[] imageByteArray = null;
             try {
                 imageByteArray = ImageTools.uriToByteArray(profilePictureUri, getApplicationContext());
+                imageByteArray = ImageTools.compressImage(getApplicationContext(), profilePictureUri, imageByteArray);
             } catch (IOException e) {
                 Log.d(TAG, "Uri not found");
                 Toast.makeText(getApplicationContext(),"Uri not found",Toast.LENGTH_SHORT).show();
