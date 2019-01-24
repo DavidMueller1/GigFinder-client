@@ -274,12 +274,16 @@
                 android:textStyle="bold"
                 android:textSize="@dimen/font_default" />
 
-            <Spinner
-                android:id="@+id/add_event_genre"
+            <Button
+                android:id="@+id/button_genrePicker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_default"
                 android:layout_marginBottom="@dimen/padding_default"
-                android:spinnerMode="dropdown" />
+                android:background="@drawable/standart_button"
+                android:text="@string/registration_genre_hint"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_default" />
 
             <Button
                 android:id="@+id/button_add_event_save"
