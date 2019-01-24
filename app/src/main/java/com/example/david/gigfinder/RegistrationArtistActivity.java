@@ -407,7 +407,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
-    class SendRegisterArtist extends AsyncTask<String, Void, String> {
+    /**
+     * Send the registration request to the Server
+     */
+    private class SendRegisterArtist extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -437,7 +440,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                     jsonObject.put("artistSocialMedias", mySocialMedias);
                     Log.d(TAG, mySocialMedias.toString());
                 }
-                os.writeBytes(jsonObject.toString());
+                os.write(jsonObject.toString().getBytes("UTF-8"));
                 os.close();
 
                 //Get response
@@ -516,7 +519,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
-    class GetGenres extends AsyncTask<String, Void, String> {
+    /**
+     * Requests Genres from Server
+     */
+    private class GetGenres extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -559,7 +565,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
-    class GetSocialMedias extends AsyncTask<String, Void, String> {
+    /**
+     * Requests Social media from Server
+     */
+    private class GetSocialMedias extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {

@@ -48,8 +48,8 @@ public class EventsFragment extends Fragment {
     private UpcomingGigsAdapter upcomingGigsAdapter;
     private PastGigsAdapter pastGigsAdapter;
 
-    ArrayList<JSONObject> futureEventObjects;
-    ArrayList<JSONObject> pastEventObjects;
+    private ArrayList<JSONObject> futureEventObjects;
+    private ArrayList<JSONObject> pastEventObjects;
 
     private ListView upcomingListView;
     private ListView pastListView;
@@ -201,7 +201,7 @@ public class EventsFragment extends Fragment {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    class GetEvents extends AsyncTask<String, Void, String> {
+    private class GetEvents extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {

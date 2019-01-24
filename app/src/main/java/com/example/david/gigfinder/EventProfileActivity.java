@@ -584,7 +584,7 @@ public class EventProfileActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("EventId", eventJson.getInt("id"));
                 jsonObject.put("ArtistId", userId);
-                os.writeBytes(jsonObject.toString());
+                os.write(jsonObject.toString().getBytes("UTF-8"));
                 os.close();
 
                 //Get response
@@ -653,7 +653,7 @@ public class EventProfileActivity extends AppCompatActivity {
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 jsonObject.put("Accepted", Boolean.parseBoolean(params[1]));
-                os.writeBytes(jsonObject.toString());
+                os.write(jsonObject.toString().getBytes("UTF-8"));
                 os.close();
 
                 //Get response
