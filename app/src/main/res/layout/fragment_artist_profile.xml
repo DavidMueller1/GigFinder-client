@@ -339,6 +339,20 @@
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/font_bigger" />
 
+            <TextView
+                android:id="@+id/profile_artist_review_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_review"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/font_bigger"
+                android:fontFeatureSettings="smcp" />
+
+            <RatingBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:numStars="5"/>
+
             <Button
                 android:id="@+id/signOutBtn"
                 android:layout_width="match_parent"

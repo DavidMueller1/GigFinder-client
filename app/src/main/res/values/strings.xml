@@ -69,6 +69,7 @@
 
     <!-- Profil  -->
     <string name="profile_description">Beschreibung:</string>
+    <string name="profile_review">Bewertung:</string>
     <string name="profile_social_media_links">Social Media Links:</string>
     <string name="profile_genre_single">Genre:</string>
     <string name="profile_genre_multiple">Genres:</string>
@@ -82,6 +83,7 @@
     <string name="gigs_canceled">Abgelehnt</string>
 
     <!-- Events  -->
+    <string name="explore_title">Explore</string>
     <string name="event_participants">Bewerber</string>
     <string name="event_participants_select">Zusagen</string>
     <string name="event_participants_cancel">Absagen</string>

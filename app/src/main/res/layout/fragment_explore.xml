@@ -1,10 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/explore_title_bar_form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/orange">
+
+        <TextView
+            android:id="@+id/explore_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/explore_title"
+            android:padding="@dimen/padding_default"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_bigger"/>
+
+        <ImageView
+            android:id="@+id/explore_reload"
+            android:layout_width="@dimen/element_smaller"
+            android:layout_height="@dimen/element_smaller"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/padding_smaller"
+            android:clickable="true"
+            android:src="@drawable/ic_iconmonstr_refresh"
+            android:tint="@color/white"/>
+
+
+    </RelativeLayout>
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -14,4 +43,4 @@
         tools:context=".ExploreFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
 
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
