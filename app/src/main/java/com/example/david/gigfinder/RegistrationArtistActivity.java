@@ -1,18 +1,13 @@
 package com.example.david.gigfinder;
 
-import android.content.Context;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -23,7 +18,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +44,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import static com.example.david.gigfinder.tools.ImageTools.compressImage;
 
@@ -67,7 +61,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private TextView descriptionTitle;
     private EditText descriptionField;
     private TextView genreTitle;
-    private Spinner genreSpinner;
     private TextView socialMediaTitle;
     private EditText soundcloudField;
     private EditText facebookField;
@@ -77,6 +70,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private EditText spotifyField;
     private EditText webField;
     private Button backgroundColorPickerButton;
+    private Button genrePickerButton;
     private Button registrationButton;
 
     private FrameLayout progress;
@@ -93,7 +87,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
 
     //Genres
     private JSONArray genres;
-    private String[] myGenres;
+    private String[] genreStrings;
+    private ArrayList<String> myGenres;
 
     //Social Media
     private JSONArray socialMedias;
@@ -132,8 +127,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         descriptionTitle = findViewById(R.id.registration_artist_description_title);
         descriptionField = findViewById(R.id.registration_artist_description);
         genreTitle = findViewById(R.id.registration_artist_genre_title);
-        genreSpinner = findViewById(R.id.registration_artist_genre);
-        //Replaced the Strings with the Genre-Enum
 
         socialMediaTitle = findViewById(R.id.registration_artist_social_media_title);
         soundcloudField = findViewById(R.id.registration_soundcloud);
@@ -152,6 +145,13 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             }
         });
 
+        genrePickerButton = findViewById(R.id.button_registration_artist_genrePicker);
+        genrePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performGenreSelection();
+            }
+        });
 
         registrationButton = findViewById(R.id.button_artist_registration);
         registrationButton.setOnClickListener(new View.OnClickListener() {
@@ -233,6 +233,57 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         colorPicker.show();
     }
 
+    private void performGenreSelection(){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+        mBuilder.setTitle(getString(R.string.registration_genre_picker_title));
+
+        final ArrayList<String> selectedGenres = new ArrayList<String>();
+        final boolean[] checkedItems = new boolean[genreStrings.length];
+
+        mBuilder.setMultiChoiceItems(genreStrings, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                //unchecking
+                if (isChecked) {
+                    if (selectedGenres.size() >= 3) {
+                        checkedItems[which] = false;
+                        ((AlertDialog) dialog).getListView().setItemChecked(which, false);
+                    } else {
+                        checkedItems[which] = true;
+                        selectedGenres.add(genreStrings[which].toString());
+                    }
+                } else {
+                    selectedGenres.remove(genreStrings[which].toString());
+                }
+            }
+        });
+
+        mBuilder.setCancelable(false);
+        mBuilder.setPositiveButton(getString(R.string.registration_genre_picker_positive), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                myGenres = selectedGenres;
+                String buttonString = "";
+                for(String i : myGenres){
+                 buttonString=buttonString.concat(i + ", ");
+                }
+                if(buttonString.length()>1){
+                    genrePickerButton.setText(buttonString.substring(0, buttonString.length()-2));
+                }
+            }
+        });
+
+        mBuilder.setNegativeButton(getString(R.string.registration_genre_picker_negative), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = mBuilder.create();
+        dialog.show();
+    }
+
     /**
      * Called when the user chose a color
      */
@@ -298,13 +349,15 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             return false;
         }
 
+        // Check genres
+        if(myGenres.isEmpty()){
+            Toast.makeText(getApplicationContext(),"Bitte mindestens 1 Genre wählen.",Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Genres empty.");
+            return false;
+        }
+
         // Description is optional (can be empty)
         artist.setDescription(descriptionField.getText().toString());
-
-        // TODO multiple genres selectable
-        myGenres = new String[1]; //Change length to num of selected genres
-        myGenres[0] = genreSpinner.getSelectedItem().toString();
-        //TODO just fill this list with selected genres
 
         postSocialMedia();
 
@@ -312,20 +365,19 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     }
 
     private void showGenres(String result){
+        myGenres = new ArrayList<String>();
         try {
             genres = new JSONArray(result);
-            String[] genreStrings = new String[genres.length()];
+            genreStrings = new String[genres.length()];
             for(int i=0; i<genres.length(); i++){
                 genreStrings[i] = genres.getJSONObject(i).getString("value");
             }
-            adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, genreStrings);
-            genreSpinner.setAdapter(adapter);
         } catch (JSONException e) {
              e.printStackTrace();
         }
     }
 
-    private JSONArray genresToJson(String[] genreStrings) throws JSONException {
+    private JSONArray genresToJson(ArrayList<String> genreStrings) throws JSONException {
         JSONArray genresJson = new JSONArray();
         for(String i : genreStrings){
            for(int j=0; j<genres.length(); j++){
