@@ -2,9 +2,13 @@ package com.example.david.gigfinder.tools;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
+import android.provider.MediaStore;
 
 import com.example.david.gigfinder.R;
 
@@ -67,5 +71,121 @@ public abstract class ImageTools {
             byteBuffer.write(buffer, 0, len);
         }
         return byteBuffer.toByteArray();
+    }
+
+    /**
+     * Crops, resizes, rotates, compresses the image
+     * @param context
+     * @param uri
+     * @param fileBytes
+     * @return
+     */
+    public static byte[] compressImage(Context context, Uri uri, byte[] fileBytes) {
+        byte[] data = null;
+        Bitmap bitmap = BitmapFactory.decodeByteArray(fileBytes, 0, fileBytes.length);
+
+        bitmap = cropImage(bitmap);
+
+        if(bitmap.getHeight()>PROFILE_PICTURE_SIZE) {
+            bitmap = Bitmap.createScaledBitmap(bitmap, PROFILE_PICTURE_SIZE, PROFILE_PICTURE_SIZE, false);
+        }
+        ByteArrayOutputStream outputStream = null;
+
+        try {
+            bitmap = rotateImageIfRequired(bitmap, context, uri);
+            outputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            data = outputStream.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                // Intentionally blank
+            }
+        }
+
+        return data;
+    }
+
+    /**
+     * Image Rotation if the EXIF file is deleted
+     * @param img
+     * @param context
+     * @param selectedImage
+     * @return
+     * @throws IOException
+     */
+    public static Bitmap rotateImageIfRequired(Bitmap img, Context context, Uri selectedImage) throws IOException {
+
+        if (selectedImage.getScheme().equals("content")) {
+            String[] projection = { MediaStore.Images.ImageColumns.ORIENTATION };
+            Cursor c = context.getContentResolver().query(selectedImage, projection, null, null, null);
+            if (c.moveToFirst()) {
+                final int rotation = c.getInt(0);
+                c.close();
+                return rotateImage(img, rotation);
+            }
+            return img;
+        } else {
+            ExifInterface ei = new ExifInterface(selectedImage.getPath());
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    return rotateImage(img, 90);
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    return rotateImage(img, 180);
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return rotateImage(img, 270);
+                default:
+                    return img;
+            }
+        }
+    }
+
+    /**
+     * Image rotation
+     * @param img
+     * @param degree
+     * @return
+     */
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        return rotatedImg;
+    }
+
+    /**
+     * Center crops an image
+     * @param bitmap
+     * @return
+     */
+    private static Bitmap cropImage(Bitmap bitmap){
+        if (bitmap.getWidth() >= bitmap.getHeight()){
+
+            bitmap = Bitmap.createBitmap(
+                    bitmap,
+                    bitmap.getWidth()/2 - bitmap.getHeight()/2,
+                    0,
+                    bitmap.getHeight(),
+                    bitmap.getHeight()
+            );
+
+        }else{
+
+            bitmap = Bitmap.createBitmap(
+                    bitmap,
+                    0,
+                    bitmap.getHeight()/2 - bitmap.getWidth()/2,
+                    bitmap.getWidth(),
+                    bitmap.getWidth()
+            );
+        }
+        return bitmap;
     }
 }
