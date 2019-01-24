@@ -267,7 +267,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     /**
      *
      */
-    class GetEvents extends AsyncTask<String, Void, String> {
+    private class GetEvents extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
