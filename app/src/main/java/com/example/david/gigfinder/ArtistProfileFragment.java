@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -109,26 +111,28 @@ public class ArtistProfileFragment extends Fragment {
         spotifyText = getView().findViewById(R.id.profile_spotify_text);
         webText = getView().findViewById(R.id.profile_web_text);
 
-
         progress = getView().findViewById(R.id.progressBarHolder);
-
-        testDeleteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DeleteUser deleteUser = new DeleteUser();
-                deleteUser.execute();
-            }
-        });
-
-        testSignOutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signOut();
-            }
-        });
 
         updateProfile(sharedPreferences.getString("userProfile", "x"));
 
+        if(idToken.equals("offline")){
+            offlineMode();
+        }else {
+            testDeleteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DeleteUser deleteUser = new DeleteUser();
+                    deleteUser.execute();
+                }
+            });
+
+            testSignOutBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    signOut();
+                }
+            });
+        }
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -178,16 +182,16 @@ public class ArtistProfileFragment extends Fragment {
      */
     private void updateProfile(String jsonString){
         try {
-            // Social Media Example:
-            //displaySocialMedia(ID_FACEBOOK, "Davids Facebook", "https://www.facebook.com"); // obviously mit link zum profil
 
             JSONArray jsonArray = new JSONArray(jsonString);
             JSONObject userProfile = jsonArray.getJSONObject(0);
             userProfile.put("profilePicture", "");
             Log.d(TAG, userProfile.toString());
 
-            GetProfilePicture getProfilePicture = new GetProfilePicture();
-            getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+            if(!idToken.equals("offline")) {
+                GetProfilePicture getProfilePicture = new GetProfilePicture();
+                getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+            }
 
             nameText.setText(userProfile.getString("name"));
             descriptionText.setText(userProfile.getString("description"));
@@ -425,6 +429,31 @@ public class ArtistProfileFragment extends Fragment {
             intent.putExtra("SignOut", true);
             startActivity(intent);
             getActivity().finish();
+    }
+
+    /**
+     * Checks internet connection and starts offline mode
+     */
+    private void offlineMode(){
+        if(isNetworkAvailable()){
+            //Go back to Login
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }else{
+            //Show Popup
+        }
+    }
+
+    /**
+     * Checks if Network is Available
+     * @return True if there is an Internet Connection
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     /**

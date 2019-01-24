@@ -76,6 +76,10 @@
     <!-- Gigs  -->
     <string name="upcoming_gigs">Kommende Auftritte</string>
     <string name="past_gigs">Vergangene Auftritte</string>
+    <string name="gigs_loading">prüfe…</string>
+    <string name="gigs_accepted">Gebucht</string>
+    <string name="gigs_pending">Ausstehend</string>
+    <string name="gigs_canceled">Abgelehnt</string>
 
     <!-- Events  -->
     <string name="event_participants">Bewerber</string>

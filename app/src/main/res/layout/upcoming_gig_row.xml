@@ -23,17 +23,16 @@
 
     <TextView
         android:id="@+id/upcomingGigName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="248dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:text="Name"
         android:textAllCaps="false"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintEnd_toStartOf="@+id/gigs_status_text"
         app:layout_constraintStart_toEndOf="@+id/upcomingGigImg"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -51,7 +50,7 @@
         android:id="@+id/upcomingGigStartTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/padding_small"
         android:text="TextView"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView2"
@@ -70,13 +69,26 @@
 
     <TextView
         android:id="@+id/upcomingGigLocation"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="@dimen/padding_small"
+        android:layout_marginEnd="@dimen/padding_small"
         android:text="TextView"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/imageView" />
+
+    <TextView
+        android:id="@+id/gigs_status_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_smaller"
+        android:layout_marginTop="8dp"
+        android:text="Test"
+        android:textSize="@dimen/font_default"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </android.support.constraint.ConstraintLayout>

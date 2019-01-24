@@ -12,10 +12,10 @@
         android:id="@+id/image_msg_profile"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:background="@drawable/ic_music_gig"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        android:scaleType="centerCrop"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/text_msg_name"

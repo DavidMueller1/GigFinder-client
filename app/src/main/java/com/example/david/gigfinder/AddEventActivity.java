@@ -457,7 +457,8 @@ public class AddEventActivity extends AppCompatActivity {
                 jsonObject.put("start", params[4]);
                 jsonObject.put("end", params[5]);
                 jsonObject.put("eventGenres", genresToJson(genreStrings));
-                os.writeBytes(jsonObject.toString());
+
+                os.write(jsonObject.toString().getBytes("UTF-8"));
                 os.close();
 
                 //Get response

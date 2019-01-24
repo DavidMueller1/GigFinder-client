@@ -3,6 +3,8 @@ package com.example.david.gigfinder;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -48,11 +50,15 @@ public class MainActivity extends AppCompatActivity {
 
         user = sharedPreferences.getString("user", "none");
 
-        if(user == null || user.equals("none")) {
-            GetUser getUser = new GetUser();
-            getUser.execute();
-        }else{
-            checkSharedPrefs(user);
+        if(idToken.equals("offline")){
+            initGui();
+        }else {
+            if (user.equals("none")) {
+                GetUser getUser = new GetUser();
+                getUser.execute();
+            } else {
+                checkSharedPrefs(user);
+            }
         }
     }
 
