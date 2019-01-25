@@ -125,6 +125,7 @@
 
     <!-- Buttons -->
     <string name="button_add_to_favorites">Zu Favoriten hinzufügen</string>
+    <string name="button_delete_from_favorites">Aus Favoriten entfernen</string>
     <string name="button_send_message">Nachricht schreiben</string>
     <string name="no_connection">Kein Zugang zum Internet</string>
     <string name="website_dialog_title">Externe Website</string>

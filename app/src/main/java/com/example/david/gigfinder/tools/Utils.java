@@ -110,7 +110,8 @@ public abstract class Utils {
     }
 
     public static boolean isUserInFavorites(int id, String favorites){
-        if(!favorites.equals("")){
+        Log.d(TAG, favorites);
+        if(!(favorites.equals("") || favorites.equals("[]"))){
             JSONArray favs = null;
             try {
                 favs = new JSONArray(favorites);
