@@ -700,6 +700,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(true);
+                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;

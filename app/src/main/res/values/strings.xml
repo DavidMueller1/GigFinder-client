@@ -137,6 +137,7 @@
     <string name="registration_genre_picker_negative">Beenden</string>
     <string name="registration_genre_picker_positive">Auswählen</string>
     <string name="registration_genre_hint">Genres Auswählen</string>
+    <string name="max_stale">900</string>
 
 
 </resources>

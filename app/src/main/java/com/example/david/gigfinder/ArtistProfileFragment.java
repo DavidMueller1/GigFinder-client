@@ -11,6 +11,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -611,6 +612,8 @@ public class ArtistProfileFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(true);
+                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -681,6 +684,14 @@ public class ArtistProfileFragment extends Fragment {
             editor.clear();
             editor.apply();
             Log.d(TAG, "DELETE ARTIST: " + result);
+
+            try {
+                HttpResponseCache cache = HttpResponseCache.getInstalled();
+                cache.delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             intent.putExtra("SignOut", true);
             startActivity(intent);
