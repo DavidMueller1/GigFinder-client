@@ -125,7 +125,6 @@ public class HostProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addToFavorites();
-                // TODO check if already in favorites
             }
         });
 
@@ -137,8 +136,9 @@ public class HostProfileActivity extends AppCompatActivity {
      * Adds the Host to Favorites
      */
     private void addToFavorites() {
+        // TODO check if already in favorites
         PostFavorite postFavorite = new PostFavorite();
-        postFavorite.execute(); //TODO Ids;
+        postFavorite.execute();
     }
 
     /**
@@ -205,12 +205,18 @@ public class HostProfileActivity extends AppCompatActivity {
             myGenres = myGenres.concat(")");
             genresText.setText(myGenres);
 
-            addToFavsBtn.setVisibility(View.GONE);
             if(sharedPreferences.getString("user", "").equals("artist")) {
                 sendMsgBtn.setVisibility(View.VISIBLE);
+                addToFavsBtn.setVisibility(View.VISIBLE);
             }
             else {
                 sendMsgBtn.setVisibility(View.GONE);
+                addToFavsBtn.setVisibility(View.GONE);
+            }
+
+            if(Utils.isUserInFavorites(profileUserId, sharedPreferences.getString("favorites", ""))){
+                addToFavsBtn.setClickable(false);
+                //TODO Change design
             }
 
             locationContainer.setOnClickListener(new View.OnClickListener() {
@@ -353,8 +359,10 @@ public class HostProfileActivity extends AppCompatActivity {
         Button cancelBtn = (Button) mView.findViewById(R.id.cancelBtn);
         Button proceedBtn = (Button) mView.findViewById(R.id.proceedBtn);
         TextView websiteText = (TextView) mView.findViewById(R.id.custom_dialoge_text);
+        TextView dialogTitle = (TextView) mView.findViewById(R.id.custom_dialoge_title);
 
         websiteText.setText(getString(R.string.website_dialog_1) + link.toString() + getString(R.string.website_dialog_2));
+        dialogTitle.setText(getString(R.string.website_dialog_title));
 
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -514,6 +522,8 @@ public class HostProfileActivity extends AppCompatActivity {
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
+
+                Log.d(TAG, String.valueOf(userId));
 
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());

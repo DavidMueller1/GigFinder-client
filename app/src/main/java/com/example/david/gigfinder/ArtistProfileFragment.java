@@ -70,7 +70,6 @@ public class ArtistProfileFragment extends Fragment {
     private TextView webText;
 
     private FrameLayout progress;
-    private byte[] imageByteArray;
 
     @Nullable
     @Override
