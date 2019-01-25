@@ -476,7 +476,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
                 reviewStrings.add(new String[]{String.valueOf(rating), comment});
 
-                if(reviewJson.getInt("authorId") == userId && userType.equals("host")) {
+                if(reviewJson.getInt("authorId") == userId) {
                     possibleReviewPermission = false;
                 }
             }
@@ -487,7 +487,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        if(possibleReviewPermission) {
+        if(possibleReviewPermission && userType.equals("host")) {
             checkParticipations();
         }
     }
@@ -541,7 +541,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 JSONObject partJson = jsonArray.getJSONObject(i);
                 JSONObject event = partJson.getJSONObject("event");
 
-                if(partJson.getInt("hostId") == userId && partJson.getBoolean("accepted")) {
+                if(event.getInt("hostId") == userId && partJson.getBoolean("accepted")) {
                     Timestamp timestamp = Utils.convertStringToTimestamp(event.getString("end"));
                     if(timestamp.before(new Timestamp(System.currentTimeMillis()))) {
                         reviewPermission = true;

@@ -507,7 +507,7 @@ public class HostProfileActivity extends AppCompatActivity {
 
                 reviewStrings.add(new String[]{String.valueOf(rating), comment});
 
-                if(reviewJson.getInt("authorId") == userId && userType.equals("artist")) {
+                if(reviewJson.getInt("authorId") == userId) {
                     Log.d(TAG, "Permission noped");
                     possibleReviewPermission = false;
                 }
@@ -519,7 +519,7 @@ public class HostProfileActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        if(possibleReviewPermission) {
+        if(possibleReviewPermission && userType.equals("artist")) {
             checkParticipations();
         }
     }
