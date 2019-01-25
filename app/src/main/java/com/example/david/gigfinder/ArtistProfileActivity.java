@@ -596,6 +596,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 }
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(browserIntent);
+                dialog.cancel();
             }
         });
     }
