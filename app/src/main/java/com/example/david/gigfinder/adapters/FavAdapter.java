@@ -1,8 +1,11 @@
 package com.example.david.gigfinder.adapters;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +37,12 @@ public class FavAdapter extends ArrayAdapter<String[]> {
 
         favName.setText(getItem(position)[0]);
         favMsg.setText(getItem(position)[1]);
+
+        if(!getItem(position)[3].equals("null")){
+            byte[] bytes = Base64.decode(getItem(position)[3], Base64.DEFAULT);
+            Log.d(TAG, String.valueOf(bytes.length));
+            //favImg.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length)); TODO
+        }
 
         return customView;
     }
