@@ -15,10 +15,13 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnticipateInterpolator;
+import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.BounceInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -65,6 +68,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private RatingBar ratingBarOverlay;
     private Button reviewSubmitButton;
+    private EditText commentTextField;
 
     // Social Media
     private TextView soundcloudText;
@@ -129,12 +133,20 @@ public class ArtistProfileActivity extends AppCompatActivity {
         });
 
         ratingBarOverlay = findViewById(R.id.rating_bar_overlay);
+        commentTextField = findViewById(R.id.review_overlay_comment);
         reviewSubmitButton = findViewById(R.id.review_overlay_button_submit);
 
         reviewSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 handleReview();
+            }
+        });
+
+        findViewById(R.id.review_overlay_button_close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideReviewOverlay();
             }
         });
 
@@ -211,6 +223,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
             GetProfilePicture getProfilePicture = new GetProfilePicture();
             getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+
+            GetReview getReview = new GetReview();
+            getReview.execute();
 
             final String name = userProfile.getString("name");
             nameText.setText(name);
@@ -350,6 +365,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
 
     private void showReviewOverlay() {
+        ratingBarOverlay.setRating(0f);
         overlayReview.setVisibility(View.VISIBLE);
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
@@ -364,9 +380,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
         int screenHeight = size.y;
-        ObjectAnimator animation = ObjectAnimator.ofFloat(overlayReview, "translationY", 0f, screenHeight);
+        ObjectAnimator animation = ObjectAnimator.ofFloat(overlayReview, "translationY", 0f, -screenHeight);
         animation.setDuration(1000);
-        animation.setInterpolator(new OvershootInterpolator());
+        animation.setInterpolator(new AnticipateOvershootInterpolator());
         animation.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -391,15 +407,34 @@ public class ArtistProfileActivity extends AppCompatActivity {
         animation.start();
     }
 
+    /**
+     * Called after the user hits "raedy" in the Review Overlay
+     */
     private void handleReview() {
         int rating = (int) (2 * ratingBarOverlay.getRating());
         hideReviewOverlay();
+        String comment = commentTextField.getText().toString();
         PostReview postReview = new PostReview();
-        postReview.execute(Integer.toString(rating));
+        postReview.execute(Integer.toString(rating), comment);
     }
 
+    /**
+     * Updates the Reviews in the Profile
+     * @param result
+     */
     private void displayReviews(String result) {
-
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+            int arraySize = jsonArray.length();
+            float sum = 0f;
+            for(int i = 0; i < arraySize; i++) {
+                JSONObject reviewJson = jsonArray.getJSONObject(i);
+                sum += (float) reviewJson.getInt("rating") / 2;
+            }
+            ratingBar.setRating(sum / arraySize);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -684,6 +719,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
+                Log.d(TAG, "IDToken: " + idToken);
                 urlConnection.setRequestProperty("Content-Type","application/json");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
@@ -692,8 +728,11 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 //Send data TODO
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("ArtistId", userId);
-                jsonObject.put("HostId", profileUserId);
+                jsonObject.put("AuthorId", userId);
+                jsonObject.put("Rating", Integer.parseInt(params[0]));
+                jsonObject.put("Comment", params[1]);
+                jsonObject.put("ArtistId", profileUserId);
+                Log.d(TAG, jsonObject.toString());
                 //jsonObject.put("")
                 os.writeBytes(jsonObject.toString());
                 os.close();
@@ -742,7 +781,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-
+            GetReview getReview = new GetReview();
+            getReview.execute();
         }
     }
 
@@ -753,7 +793,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            displayLoadingScreen(true);
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/reviews?artist=" + profileUserId);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

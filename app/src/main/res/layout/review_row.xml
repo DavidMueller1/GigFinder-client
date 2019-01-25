@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/border">
+
+    <RatingBar
+        android:id="@+id/review_row_rating_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/padding_small"
+        android:scaleX="0.75"
+        android:scaleY="0.75"
+        android:numStars="5"
+        android:isIndicator="true" />
+
+    <TextView
+        android:id="@+id/review_row_comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_default"
+        android:layout_marginBottom="@dimen/padding_smaller"
+        android:text=""/>
+
+
+
+</LinearLayout>

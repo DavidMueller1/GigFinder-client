@@ -72,9 +72,13 @@
     <string name="profile_review_title">Bewertung</string>
     <string name="profile_review_stars_title">Rating</string>
     <string name="profile_review_stars_hint">Tippe, um eine Bewertung zu vergeben (es sind auch halbe Sterne möglich)</string>
+    <string name="profile_review_comment_title">Kommentar</string>
+    <string name="profile_review_comment_hint">Schreibe einen Kommentar zu deiner Bewertung</string>
     <string name="profile_review_button_review">Eine Bewertung erstellen</string>
+    <string name="profile_review_button_show_all">Alle Bewertungen anzeigen</string>
+    <string name="profile_review_button_hide_all">Bewertungen ausblenden</string>
     <string name="profile_review_button_submit">Fertig!</string>
-    <string name="profile_review">Bewertung:</string>
+    <string name="profile_review">Bewertungen:</string>
     <string name="profile_social_media_links">Social Media Links:</string>
     <string name="profile_genre_single">Genre:</string>
     <string name="profile_genre_multiple">Genres:</string>
