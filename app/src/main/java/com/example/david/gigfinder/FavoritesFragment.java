@@ -99,7 +99,7 @@ public class FavoritesFragment extends Fragment {
             }
             favAdapter.notifyDataSetChanged();
 
-            sharedPreferences.edit().putString("favorites", favoritesJson.toString());
+            sharedPreferences.edit().putString("favorites", favoritesJson.toString()).apply();
 
             updatePictures();
         } catch (JSONException e) {
