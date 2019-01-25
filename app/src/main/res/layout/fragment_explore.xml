@@ -23,6 +23,7 @@
 
         <ImageView
             android:id="@+id/explore_reload"
+            android:visibility="gone"
             android:layout_width="@dimen/element_smaller"
             android:layout_height="@dimen/element_smaller"
             android:layout_centerVertical="true"

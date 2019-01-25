@@ -334,6 +334,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/profile_review"
+                    android:layout_marginBottom="@dimen/padding_small"
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/font_bigger"
                     android:fontFeatureSettings="smcp" />
@@ -346,11 +347,51 @@
                     android:numStars="5"
                     android:isIndicator="true"/>
 
-                <TextView
+                <RelativeLayout
+                    android:id="@+id/profile_artist_button_show_all"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/profile_review_button_show_all"
-                    android:textAlignment="center"/>
+                    android:layout_marginBottom="@dimen/padding_smaller"
+                    android:clickable="true">
+
+                    <TextView
+                        android:id="@+id/profile_artist_show_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_marginHorizontal="@dimen/padding_small"
+                        android:text="@string/profile_review_button_show_all"
+                        android:textAlignment="center"/>
+
+                    <ImageView
+                        android:id="@+id/review_triangle_left"
+                        android:layout_width="@dimen/element_small"
+                        android:layout_height="@dimen/element_small"
+                        android:layout_toStartOf="@id/profile_artist_show_all"
+                        android:layout_centerVertical="true"
+                        android:rotation="180"
+                        android:src="@drawable/ic_iconmonstr_triangle"
+                        android:tint="@color/grey"/>
+
+                    <ImageView
+                        android:id="@+id/review_triangle_right"
+                        android:layout_width="@dimen/element_small"
+                        android:layout_height="@dimen/element_small"
+                        android:layout_toEndOf="@id/profile_artist_show_all"
+                        android:layout_centerVertical="true"
+                        android:rotation="180"
+                        android:src="@drawable/ic_iconmonstr_triangle"
+                        android:tint="@color/grey"/>
+
+                </RelativeLayout>
+
+                <com.example.david.gigfinder.adapters.WrapContentListView
+                    android:id="@+id/profile_artist_review_list"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:dividerHeight="@dimen/padding_smaller"
+                    android:divider="#00000000"/>
 
                 <View
                     android:layout_width="match_parent"

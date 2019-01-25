@@ -6,6 +6,7 @@
     <dimen name="padding_smaller">10dp</dimen>
     <dimen name="padding_small">4dp</dimen>
 
+    <dimen name="element_small">14dp</dimen>
     <dimen name="element_smaller">30dp</dimen>
     <dimen name="element_normal">40dp</dimen>
     <dimen name="element_bigger">48dp</dimen>
