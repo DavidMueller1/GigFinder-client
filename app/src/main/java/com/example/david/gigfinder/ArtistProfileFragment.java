@@ -146,6 +146,8 @@ public class ArtistProfileFragment extends Fragment {
         if(idToken.equals("offline")){
             offlineMode();
         }else {
+            displayLoadingScreen(true);
+
             testDeleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -492,6 +494,7 @@ public class ArtistProfileFragment extends Fragment {
             public void onClick(View v) {
                 DeleteUser deleteUser = new DeleteUser();
                 deleteUser.execute();
+                dialog.cancel();
             }
         });
     }
@@ -525,6 +528,8 @@ public class ArtistProfileFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        
+        displayLoadingScreen(false);
     }
 
     /**

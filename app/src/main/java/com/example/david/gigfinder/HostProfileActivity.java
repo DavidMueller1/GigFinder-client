@@ -110,10 +110,9 @@ public class HostProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_host_profile);
 
         idToken = getIntent().getExtras().getString("idToken");
-
-        sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
         profileUserId = getIntent().getExtras().getInt("profileUserId");
 
+        sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
         userId = sharedPreferences.getInt("userId", -1);
 
         imageButton = findViewById(R.id.profile_host_profilePicture);
@@ -173,7 +172,6 @@ public class HostProfileActivity extends AppCompatActivity {
             }
         });
 
-
         progress = findViewById(R.id.progressBarHolder);
         sendMsgBtn = findViewById(R.id.sendMsgBtn);
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
@@ -192,8 +190,11 @@ public class HostProfileActivity extends AppCompatActivity {
         addToFavsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addToFavorites();
-                //deleteFromFavorites();
+                if(Utils.isUserInFavorites(profileUserId, sharedPreferences.getString("favorites", ""))){
+                    deleteFromFavorites();
+                }else {
+                    addToFavorites();
+                }
             }
         });
 
@@ -212,6 +213,7 @@ public class HostProfileActivity extends AppCompatActivity {
      */
     private void addToFavorites() {
         // TODO check if already in favorites
+        addToFavsBtn.setClickable(false);
         PostFavorite postFavorite = new PostFavorite();
         postFavorite.execute();
     }
@@ -220,6 +222,7 @@ public class HostProfileActivity extends AppCompatActivity {
      * Deletes the Host from Favorites
      */
     private void deleteFromFavorites() {
+        addToFavsBtn.setClickable(false);
         DeleteFavorite deleteFavorite = new DeleteFavorite();
         deleteFavorite.execute(String.valueOf(Utils.idToFavoritesId(profileUserId, sharedPreferences.getString("favorites", ""))));
     }
@@ -293,9 +296,9 @@ public class HostProfileActivity extends AppCompatActivity {
             }
 
             if(Utils.isUserInFavorites(profileUserId, sharedPreferences.getString("favorites", ""))){
-                addToFavsBtn.setClickable(false);
-                //TODO Change design
-                //TODO Set removeFromFavs
+                addToFavsBtn.setText(getString(R.string.button_delete_from_favorites));
+            }else{
+                addToFavsBtn.setText(getString(R.string.button_add_to_favorites));
             }
 
             locationContainer.setOnClickListener(new View.OnClickListener() {
@@ -424,7 +427,6 @@ public class HostProfileActivity extends AppCompatActivity {
 
     };
 
-
     private void showReviewOverlay() {
         ratingBarOverlay.setRating(0f);
         overlayReview.setVisibility(View.VISIBLE);
@@ -543,7 +545,6 @@ public class HostProfileActivity extends AppCompatActivity {
             isReviewListExpanded = false;
         }
     }
-
 
     /**
      * Displays the Website dialog
@@ -777,7 +778,6 @@ public class HostProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            addToFavsBtn.setClickable(false);
             String favs = sharedPreferences.getString("favorites", "");
             if(favs.equals("")){
                 try {
@@ -796,6 +796,9 @@ public class HostProfileActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
+
+            addToFavsBtn.setClickable(true);
+            addToFavsBtn.setText(getString(R.string.button_delete_from_favorites));
         }
     }
 
@@ -834,7 +837,21 @@ public class HostProfileActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, result);
-            //TODO Update GUI
+            String favs = sharedPreferences.getString("favorites", "");
+            try {
+                JSONArray jsonArray = new JSONArray(favs);
+                JSONObject jsonObject = new JSONObject(result);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    if (jsonArray.getJSONObject(i).getInt("id") == jsonObject.getInt("id")) {
+                        jsonArray.remove(i);
+                    }
+                }
+                sharedPreferences.edit().putString("favorites", jsonArray.toString()).apply();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            addToFavsBtn.setClickable(true);
+            addToFavsBtn.setText(getString(R.string.button_add_to_favorites));
         }
     }
 

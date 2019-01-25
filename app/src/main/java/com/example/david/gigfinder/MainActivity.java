@@ -78,6 +78,12 @@ public class MainActivity extends AppCompatActivity {
                 getHost.execute();
             }
         }else{
+            try {
+                JSONArray jsonArray = new JSONArray(sharedPreferences.getString("userProfile", ""));
+                sharedPreferences.edit().putInt("userId", jsonArray.getJSONObject(0).getInt("id")).apply();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             initGui();
         }
 
@@ -293,10 +299,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             Log.d(TAG, "USER PROFILE: " + result);
             sharedPreferences.edit().putString("userProfile", result).apply();
-            JSONArray jsonArray = null;
             try {
-                jsonArray = new JSONArray(result);
-                sharedPreferences.edit().putInt("userId", jsonArray.getJSONObject(0).getInt("id"));
+                JSONArray jsonArray = jsonArray = new JSONArray(result);
+                sharedPreferences.edit().putInt("userId", jsonArray.getJSONObject(0).getInt("id")).apply();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -343,10 +348,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             Log.d(TAG, "USER PROFILE: " + result);
             sharedPreferences.edit().putString("userProfile", result).apply();
-            JSONArray jsonArray = null;
             try {
-                jsonArray = new JSONArray(result);
-                sharedPreferences.edit().putInt("userId", jsonArray.getJSONObject(0).getInt("id"));
+                JSONArray jsonArray = new JSONArray(result);
+                sharedPreferences.edit().putInt("userId", jsonArray.getJSONObject(0).getInt("id")).apply();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
