@@ -15,9 +15,11 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
@@ -25,13 +27,17 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.david.gigfinder.adapters.ParticipantAdapter;
+import com.example.david.gigfinder.adapters.ReviewAdapter;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.ImageTools;
 import com.example.david.gigfinder.tools.Utils;
@@ -49,6 +55,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class ArtistProfileActivity extends AppCompatActivity {
 
@@ -70,6 +77,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private Button reviewSubmitButton;
     private EditText commentTextField;
 
+    private RelativeLayout showAllReviewsButton;
+    private ListView reviewListView;
+
     // Social Media
     private TextView soundcloudText;
     private TextView facebookText;
@@ -80,6 +90,11 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private TextView webText;
 
     private FrameLayout progress;
+
+
+    private ArrayList<String[]> reviewStrings;
+    private ReviewAdapter reviewAdapter;
+    boolean isReviewListExpanded;
 
     private int userId;
     private int profileUserId;
@@ -150,6 +165,17 @@ public class ArtistProfileActivity extends AppCompatActivity {
             }
         });
 
+        isReviewListExpanded = false;
+        reviewListView = findViewById(R.id.profile_artist_review_list);
+
+        showAllReviewsButton = findViewById(R.id.profile_artist_button_show_all);
+        showAllReviewsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayReviewList();
+            }
+        });
+
         progress = findViewById(R.id.progressBarHolder);
         sendMsgBtn = findViewById(R.id.sendMsgBtn);
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
@@ -164,6 +190,11 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        reviewStrings = new ArrayList<>();
+
+        reviewAdapter = new ReviewAdapter(getApplicationContext(), reviewStrings);
+        reviewListView.setAdapter(reviewAdapter);
 
 
         GetUser getUser = new GetUser();
@@ -427,13 +458,59 @@ public class ArtistProfileActivity extends AppCompatActivity {
             JSONArray jsonArray = new JSONArray(result);
             int arraySize = jsonArray.length();
             float sum = 0f;
+            reviewStrings.clear();
             for(int i = 0; i < arraySize; i++) {
                 JSONObject reviewJson = jsonArray.getJSONObject(i);
-                sum += (float) reviewJson.getInt("rating") / 2;
+
+                float rating =  (float) reviewJson.getInt("rating") / 2;
+                Log.d(TAG, "Float: " + rating);
+                String comment = reviewJson.getString("comment");
+
+                sum += rating;
+
+                reviewStrings.add(new String[]{String.valueOf(rating), comment});
             }
+
+            reviewAdapter.notifyDataSetChanged();
             ratingBar.setRating(sum / arraySize);
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Shows and hides the full list of reviews
+     */
+    private void displayReviewList() {
+        if(!isReviewListExpanded) {
+            ObjectAnimator animation = ObjectAnimator.ofFloat(findViewById(R.id.review_triangle_left), "rotation", -180f, 0f);
+            animation.setDuration(400);
+            animation.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation.start();
+            ObjectAnimator animation2 = ObjectAnimator.ofFloat(findViewById(R.id.review_triangle_right), "rotation", 180f, 0f);
+            animation2.setDuration(400);
+            animation2.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation2.start();
+
+            ((TextView) findViewById(R.id.profile_artist_show_all)).setText(getString(R.string.profile_review_button_hide_all));
+
+            reviewListView.setVisibility(View.VISIBLE);
+            isReviewListExpanded = true;
+        }
+        else {
+            ObjectAnimator animation = ObjectAnimator.ofFloat(findViewById(R.id.review_triangle_left), "rotation", 0f, -180f);
+            animation.setDuration(400);
+            animation.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation.start();
+            ObjectAnimator animation2 = ObjectAnimator.ofFloat(findViewById(R.id.review_triangle_right), "rotation", 0f, 180f);
+            animation2.setDuration(400);
+            animation2.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation2.start();
+
+            ((TextView) findViewById(R.id.profile_artist_show_all)).setText(getString(R.string.profile_review_button_show_all));
+
+            reviewListView.setVisibility(View.GONE);
+            isReviewListExpanded = false;
         }
     }
 
