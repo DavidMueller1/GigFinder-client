@@ -2,6 +2,7 @@ package com.example.david.gigfinder;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 public class FavoritesFragment extends Fragment {
 
     private static final String TAG = "APPLOG - FavoritesFragment";
+    private SharedPreferences sharedPreferences;
 
     private FavAdapter favAdapter;
     private String idToken;
@@ -51,6 +53,7 @@ public class FavoritesFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        sharedPreferences = getActivity().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
         idToken = getArguments().getString("idToken");
 
         noFavsText = getView().findViewById(R.id.noFavsText);
@@ -91,11 +94,23 @@ public class FavoritesFragment extends Fragment {
             for(int i=0; i<favoritesJson.length(); i++){
                 String name = favoritesJson.getJSONObject(i).getJSONObject("host").getString("name");
                 String description = favoritesJson.getJSONObject(i).getJSONObject("host").getString("description");
-                favorites.add(new String[]{name, description, favoritesJson.getJSONObject(i).getJSONObject("host").toString()});
+                String profilePictureId = String.valueOf(favoritesJson.getJSONObject(i).getJSONObject("host").getInt("profilePictureId"));
+                favorites.add(new String[]{name, description, profilePictureId, "null"});
             }
             favAdapter.notifyDataSetChanged();
+
+            sharedPreferences.edit().putString("favorites", favoritesJson.toString());
+
+            updatePictures();
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void updatePictures() {
+        for(int i=0; i<favorites.size(); i++){
+            GetProfilePicture getProfilePicture = new GetProfilePicture();
+            getProfilePicture.execute(favorites.get(i)[2], String.valueOf(i));
         }
     }
 
@@ -168,6 +183,49 @@ public class FavoritesFragment extends Fragment {
                 noFavsText.setVisibility(View.GONE);
                 showFavorites(result);
             }
+        }
+    }
+
+    class GetProfilePicture extends AsyncTask<String, Void, String> {
+
+        int id;
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                id = Integer.parseInt(params[1]);
+
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            favorites.get(id)[3] = result;
+            favAdapter.notifyDataSetChanged();
         }
     }
 }
