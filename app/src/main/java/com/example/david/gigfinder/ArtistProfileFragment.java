@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
@@ -25,6 +26,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +74,7 @@ public class ArtistProfileFragment extends Fragment {
     private TextView descriptionText;
     private TextView genresText;
     private String idToken;
+    private RatingBar ratingBar;
 
     // Social Media
     private TextView soundcloudText;
@@ -102,6 +106,10 @@ public class ArtistProfileFragment extends Fragment {
         nameText = getView().findViewById(R.id.profile_artist_name);
         descriptionText = getView().findViewById(R.id.profile_artist_description);
         genresText = getView().findViewById(R.id.profile_artist_genre);
+        ratingBar = getView().findViewById(R.id.profile_artist_rating_bar);
+
+
+
 
         soundcloudText = getView().findViewById(R.id.profile_soundcloud_text);
         facebookText = getView().findViewById(R.id.profile_facebook_text);
@@ -143,6 +151,7 @@ public class ArtistProfileFragment extends Fragment {
         int fontColor = ColorTools.isBrightColor(color);
         nameText.setTextColor(fontColor);
         genresText.setTextColor(fontColor);
+        ratingBar.setProgressTintList(ColorStateList.valueOf(color));
         getView().findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
 
         int titleBarColor = ColorTools.getSecondaryColor(color);

@@ -1,348 +1,383 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/fragment_loading"/>
-
     <LinearLayout
-        android:id="@+id/profile_artist_title_bar_form"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/orange"
-        android:padding="@dimen/padding_smaller">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/profile_artist_name"
+        <include layout="@layout/fragment_loading"/>
+
+        <LinearLayout
+            android:id="@+id/profile_artist_title_bar_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/padding_small"
-            android:text="Name"
-            android:textSize="@dimen/font_big"
-            android:textAlignment="center"
-            android:textColor="@color/white"/>
+            android:orientation="vertical"
+            android:background="@color/orange"
+            android:padding="@dimen/padding_smaller">
 
-        <TextView
-            android:id="@+id/profile_artist_genre"
+            <TextView
+                android:id="@+id/profile_artist_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_small"
+                android:text="Name"
+                android:textSize="@dimen/font_big"
+                android:textAlignment="center"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:id="@+id/profile_artist_genre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(Rock, Pop, Beispielgenre)"
+                android:textSize="@dimen/font_default"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:layout_marginBottom="@dimen/padding_small"/>
+
+        </LinearLayout>
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="(Rock, Pop, Beispielgenre)"
-            android:textSize="@dimen/font_default"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:layout_marginBottom="@dimen/padding_small"/>
+            android:layout_height="match_parent"
+            android:paddingRight="@dimen/padding_default"
+            android:paddingLeft="@dimen/padding_default"
+            android:scrollbarStyle="outsideInset">
+
+            <LinearLayout
+                android:id="@+id/profile_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <ImageView
+                    android:id="@+id/profile_artist_profilePicture"
+                    android:layout_width="@dimen/element_big"
+                    android:layout_height="@dimen/element_big"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="@dimen/padding_default"
+                    android:layout_marginTop="@dimen/padding_default"
+                    android:src="@drawable/ic_baseline_add_photo"
+                    android:tint="@color/darkGrey"
+                    android:clickable="true"/>
+
+
+                <TextView
+                    android:id="@+id/profile_artist_description_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_description"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/font_bigger"
+                    android:fontFeatureSettings="smcp" />
+
+                <TextView
+                    android:id="@+id/profile_artist_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_bigger"
+                    android:layout_marginStart="@dimen/padding_default"
+                    android:text="blabla"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/font_bigger" />
+
+                <!--TextView
+                    android:id="@+id/profile_genres_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_genre_single"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/font_bigger"
+                    android:fontFeatureSettings="smcp" />
+
+                <TextView
+                    android:id="@+id/profile_genres"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_bigger"
+                    android:layout_marginStart="@dimen/padding_default"
+                    android:text="blabla"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/font_bigger" /-->
+
+                <TextView
+                    android:id="@+id/profile_artist_social_media_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFeatureSettings="smcp"
+                    android:text="@string/profile_social_media_links"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/font_bigger"
+                    android:visibility="visible" />
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/profile_soundcloud"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/border"
+                    android:paddingTop="@dimen/padding_small"
+                    android:paddingBottom="@dimen/padding_small">
+
+                    <ImageView
+                        android:layout_width="@dimen/element_bigger"
+                        android:layout_height="@dimen/element_bigger"
+                        android:layout_marginRight="@dimen/padding_smaller"
+                        android:layout_marginLeft="@dimen/padding_small"
+                        android:src="@drawable/ic_iconmonstr_soundcloud"
+                        android:tint="@color/soundcloud"/>
+
+                    <TextView
+                        android:id="@+id/profile_soundcloud_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Soundcloud"
+                        android:textSize="@dimen/font_bigger"
+                        android:textColor="@color/soundcloud"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/profile_facebook"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/border"
+                    android:paddingTop="@dimen/padding_small"
+                    android:paddingBottom="@dimen/padding_small">
+
+                    <ImageView
+                        android:layout_width="@dimen/element_bigger"
+                        android:layout_height="@dimen/element_bigger"
+                        android:layout_marginRight="@dimen/padding_smaller"
+                        android:layout_marginLeft="@dimen/padding_small"
+                        android:src="@drawable/ic_iconmonstr_facebook"
+                        android:tint="@color/facebook"/>
+
+                    <TextView
+                        android:id="@+id/profile_facebook_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Facebook"
+                        android:textSize="@dimen/font_bigger"
+                        android:textColor="@color/facebook"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/profile_twitter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/border"
+                    android:paddingTop="@dimen/padding_small"
+                    android:paddingBottom="@dimen/padding_small">
+
+                    <ImageView
+                        android:layout_width="@dimen/element_bigger"
+                        android:layout_height="@dimen/element_bigger"
+                        android:layout_marginRight="@dimen/padding_smaller"
+                        android:layout_marginLeft="@dimen/padding_small"
+                        android:src="@drawable/ic_iconmonstr_twitter"
+                        android:tint="@color/twitter"/>
+
+                    <TextView
+                        android:id="@+id/profile_twitter_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Twitter"
+                        android:textSize="@dimen/font_bigger"
+                        android:textColor="@color/twitter"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/profile_youtube"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/border"
+                    android:paddingTop="@dimen/padding_small"
+                    android:paddingBottom="@dimen/padding_small">
+
+                    <ImageView
+                        android:layout_width="@dimen/element_bigger"
+                        android:layout_height="@dimen/element_bigger"
+                        android:layout_marginRight="@dimen/padding_smaller"
+                        android:layout_marginLeft="@dimen/padding_small"
+                        android:src="@drawable/ic_iconmonstr_youtube"
+                        android:tint="@color/youtube"/>
+
+                    <TextView
+                        android:id="@+id/profile_youtube_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="YouTube"
+                        android:textSize="@dimen/font_bigger"
+                        android:textColor="@color/youtube"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/profile_instagram"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/border"
+                    android:paddingTop="@dimen/padding_small"
+                    android:paddingBottom="@dimen/padding_small">
+
+                    <ImageView
+                        android:layout_width="@dimen/element_bigger"
+                        android:layout_height="@dimen/element_bigger"
+                        android:layout_marginRight="@dimen/padding_smaller"
+                        android:layout_marginLeft="@dimen/padding_small"
+                        android:src="@drawable/ic_iconmonstr_instagram"
+                        android:tint="@color/instagram"/>
+
+                    <TextView
+                        android:id="@+id/profile_instagram_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="YouTube"
+                        android:textSize="@dimen/font_bigger"
+                        android:textColor="@color/instagram"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/profile_spotify"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/border"
+                    android:paddingTop="@dimen/padding_small"
+                    android:paddingBottom="@dimen/padding_small">
+
+                    <ImageView
+                        android:layout_width="@dimen/element_bigger"
+                        android:layout_height="@dimen/element_bigger"
+                        android:layout_marginRight="@dimen/padding_smaller"
+                        android:layout_marginLeft="@dimen/padding_small"
+                        android:src="@drawable/ic_iconmonstr_spotify"
+                        android:tint="@color/spotify"/>
+
+                    <TextView
+                        android:id="@+id/profile_spotify_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Spotify"
+                        android:textSize="@dimen/font_bigger"
+                        android:textColor="@color/spotify"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/profile_web"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/border"
+                    android:paddingTop="@dimen/padding_small"
+                    android:paddingBottom="@dimen/padding_small">
+
+                    <ImageView
+                        android:layout_width="@dimen/element_bigger"
+                        android:layout_height="@dimen/element_bigger"
+                        android:layout_marginRight="@dimen/padding_smaller"
+                        android:layout_marginLeft="@dimen/padding_small"
+                        android:src="@drawable/ic_iconmonstr_web"
+                        android:tint="@color/black"/>
+
+                    <TextView
+                        android:id="@+id/profile_web_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Web"
+                        android:textSize="@dimen/font_bigger"
+                        android:textColor="@color/black"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/padding_default" />
+
+
+                <TextView
+                    android:id="@+id/profile_artist_review_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_review"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/font_bigger"
+                    android:fontFeatureSettings="smcp" />
+
+                <RatingBar
+                    android:id="@+id/profile_artist_rating_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:numStars="5"
+                    android:isIndicator="true"/>
+
+                <!-- TODO make the buttons sexy -->
+                <Button
+                    android:id="@+id/profile_artist_button_review"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_smaller"
+                    android:text="@string/profile_review_button_review"
+                    android:background="@drawable/standart_button" />
+
+                <Button
+                    android:id="@+id/sendMsgBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_smaller"
+                    android:text="@string/button_send_message"
+                    android:background="@drawable/standart_button" />
+
+                <Button
+                    android:id="@+id/addToFavsBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/padding_default"
+                    android:layout_weight="1"
+                    android:text="@string/button_add_to_favorites"
+                    android:background="@drawable/standart_button"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingRight="@dimen/padding_default"
-        android:paddingLeft="@dimen/padding_default"
-        android:scrollbarStyle="outsideInset">
+    <include layout="@layout/overlay_review"/>
 
-        <LinearLayout
-            android:id="@+id/profile_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
-            <ImageView
-                android:id="@+id/profile_artist_profilePicture"
-                android:layout_width="@dimen/element_big"
-                android:layout_height="@dimen/element_big"
-                android:layout_gravity="center"
-                android:layout_marginBottom="@dimen/padding_default"
-                android:layout_marginTop="@dimen/padding_default"
-                android:src="@drawable/ic_baseline_add_photo"
-                android:tint="@color/darkGrey"
-                android:clickable="true"/>
-
-
-            <TextView
-                android:id="@+id/profile_artist_description_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_description"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/font_bigger"
-                android:fontFeatureSettings="smcp" />
-
-            <TextView
-                android:id="@+id/profile_artist_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_bigger"
-                android:layout_marginStart="@dimen/padding_default"
-                android:text="blabla"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/font_bigger" />
-
-            <!--TextView
-                android:id="@+id/profile_genres_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_genre_single"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/font_bigger"
-                android:fontFeatureSettings="smcp" />
-
-            <TextView
-                android:id="@+id/profile_genres"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_bigger"
-                android:layout_marginStart="@dimen/padding_default"
-                android:text="blabla"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/font_bigger" /-->
-
-            <TextView
-                android:id="@+id/profile_artist_social_media_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFeatureSettings="smcp"
-                android:text="@string/profile_social_media_links"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/font_bigger"
-                android:visibility="visible" />
-
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/profile_soundcloud"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_small"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:background="@drawable/border"
-                android:paddingTop="@dimen/padding_small"
-                android:paddingBottom="@dimen/padding_small">
-
-                <ImageView
-                    android:layout_width="@dimen/element_bigger"
-                    android:layout_height="@dimen/element_bigger"
-                    android:layout_marginRight="@dimen/padding_smaller"
-                    android:layout_marginLeft="@dimen/padding_small"
-                    android:src="@drawable/ic_iconmonstr_soundcloud"
-                    android:tint="@color/soundcloud"/>
-
-                <TextView
-                    android:id="@+id/profile_soundcloud_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Soundcloud"
-                    android:textSize="@dimen/font_bigger"
-                    android:textColor="@color/soundcloud"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/profile_facebook"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_small"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:background="@drawable/border"
-                android:paddingTop="@dimen/padding_small"
-                android:paddingBottom="@dimen/padding_small">
-
-                <ImageView
-                    android:layout_width="@dimen/element_bigger"
-                    android:layout_height="@dimen/element_bigger"
-                    android:layout_marginRight="@dimen/padding_smaller"
-                    android:layout_marginLeft="@dimen/padding_small"
-                    android:src="@drawable/ic_iconmonstr_facebook"
-                    android:tint="@color/facebook"/>
-
-                <TextView
-                    android:id="@+id/profile_facebook_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Facebook"
-                    android:textSize="@dimen/font_bigger"
-                    android:textColor="@color/facebook"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/profile_twitter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_small"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:background="@drawable/border"
-                android:paddingTop="@dimen/padding_small"
-                android:paddingBottom="@dimen/padding_small">
-
-                <ImageView
-                    android:layout_width="@dimen/element_bigger"
-                    android:layout_height="@dimen/element_bigger"
-                    android:layout_marginRight="@dimen/padding_smaller"
-                    android:layout_marginLeft="@dimen/padding_small"
-                    android:src="@drawable/ic_iconmonstr_twitter"
-                    android:tint="@color/twitter"/>
-
-                <TextView
-                    android:id="@+id/profile_twitter_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Twitter"
-                    android:textSize="@dimen/font_bigger"
-                    android:textColor="@color/twitter"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/profile_youtube"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_small"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:background="@drawable/border"
-                android:paddingTop="@dimen/padding_small"
-                android:paddingBottom="@dimen/padding_small">
-
-                <ImageView
-                    android:layout_width="@dimen/element_bigger"
-                    android:layout_height="@dimen/element_bigger"
-                    android:layout_marginRight="@dimen/padding_smaller"
-                    android:layout_marginLeft="@dimen/padding_small"
-                    android:src="@drawable/ic_iconmonstr_youtube"
-                    android:tint="@color/youtube"/>
-
-                <TextView
-                    android:id="@+id/profile_youtube_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="YouTube"
-                    android:textSize="@dimen/font_bigger"
-                    android:textColor="@color/youtube"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/profile_instagram"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_small"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:background="@drawable/border"
-                android:paddingTop="@dimen/padding_small"
-                android:paddingBottom="@dimen/padding_small">
-
-                <ImageView
-                    android:layout_width="@dimen/element_bigger"
-                    android:layout_height="@dimen/element_bigger"
-                    android:layout_marginRight="@dimen/padding_smaller"
-                    android:layout_marginLeft="@dimen/padding_small"
-                    android:src="@drawable/ic_iconmonstr_instagram"
-                    android:tint="@color/instagram"/>
-
-                <TextView
-                    android:id="@+id/profile_instagram_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="YouTube"
-                    android:textSize="@dimen/font_bigger"
-                    android:textColor="@color/instagram"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/profile_spotify"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_small"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:background="@drawable/border"
-                android:paddingTop="@dimen/padding_small"
-                android:paddingBottom="@dimen/padding_small">
-
-                <ImageView
-                    android:layout_width="@dimen/element_bigger"
-                    android:layout_height="@dimen/element_bigger"
-                    android:layout_marginRight="@dimen/padding_smaller"
-                    android:layout_marginLeft="@dimen/padding_small"
-                    android:src="@drawable/ic_iconmonstr_spotify"
-                    android:tint="@color/spotify"/>
-
-                <TextView
-                    android:id="@+id/profile_spotify_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Spotify"
-                    android:textSize="@dimen/font_bigger"
-                    android:textColor="@color/spotify"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/profile_web"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_small"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:background="@drawable/border"
-                android:paddingTop="@dimen/padding_small"
-                android:paddingBottom="@dimen/padding_small">
-
-                <ImageView
-                    android:layout_width="@dimen/element_bigger"
-                    android:layout_height="@dimen/element_bigger"
-                    android:layout_marginRight="@dimen/padding_smaller"
-                    android:layout_marginLeft="@dimen/padding_small"
-                    android:src="@drawable/ic_iconmonstr_web"
-                    android:tint="@color/black"/>
-
-                <TextView
-                    android:id="@+id/profile_web_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Web"
-                    android:textSize="@dimen/font_bigger"
-                    android:textColor="@color/black"/>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/padding_default" />
-
-            <!-- TODO make the buttons sexy -->
-            <Button
-                android:id="@+id/sendMsgBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_smaller"
-                android:text="@string/button_send_message"
-                android:background="@drawable/standart_button" />
-
-            <Button
-                android:id="@+id/addToFavsBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/padding_default"
-                android:layout_weight="1"
-                android:text="@string/button_add_to_favorites"
-                android:background="@drawable/standart_button"
-                android:visibility="gone" />
-
-        </LinearLayout>
-    </ScrollView>
-
-</LinearLayout>
+</RelativeLayout>

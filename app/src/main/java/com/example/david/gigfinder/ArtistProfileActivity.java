@@ -1,9 +1,12 @@
 package com.example.david.gigfinder;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +15,14 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -56,6 +63,12 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private TextView genresText;
     private Button sendMsgBtn;
     private Button addToFavsBtn;
+    private View overlayReview;
+    private RatingBar ratingBar;
+    private Button reviewButton;
+
+    private RatingBar ratingBarOverlay;
+    private Button reviewSubmitButton;
 
     // Social Media
     private TextView soundcloudText;
@@ -106,6 +119,28 @@ public class ArtistProfileActivity extends AppCompatActivity {
         instagramText = findViewById(R.id.profile_instagram_text);
         spotifyText = findViewById(R.id.profile_spotify_text);
         webText = findViewById(R.id.profile_web_text);
+
+        overlayReview = findViewById(R.id.review_overlay);
+        ratingBar = findViewById(R.id.profile_artist_rating_bar);
+        reviewButton = findViewById(R.id.profile_artist_button_review);
+
+        reviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Test");
+                showReviewOverlay();
+            }
+        });
+
+        ratingBarOverlay = findViewById(R.id.rating_bar_overlay);
+        reviewSubmitButton = findViewById(R.id.review_overlay_button_submit);
+
+        reviewSubmitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleReview();
+            }
+        });
 
         progress = findViewById(R.id.progressBarHolder);
         sendMsgBtn = findViewById(R.id.sendMsgBtn);
@@ -327,6 +362,61 @@ public class ArtistProfileActivity extends AppCompatActivity {
         }
 
     };
+
+
+    private void showReviewOverlay() {
+        overlayReview.setVisibility(View.VISIBLE);
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        int screenHeight = size.y;
+        ObjectAnimator animation = ObjectAnimator.ofFloat(overlayReview, "translationY", -screenHeight, 0f);
+        animation.setDuration(1000);
+        animation.setInterpolator(new OvershootInterpolator());
+        animation.start();
+    }
+
+    private void hideReviewOverlay() {
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        int screenHeight = size.y;
+        ObjectAnimator animation = ObjectAnimator.ofFloat(overlayReview, "translationY", 0f, screenHeight);
+        animation.setDuration(1000);
+        animation.setInterpolator(new OvershootInterpolator());
+        animation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                overlayReview.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animation.start();
+    }
+
+    private void handleReview() {
+        int rating = (int) (2 * ratingBarOverlay.getRating());
+        hideReviewOverlay();
+        PostReview postReview = new PostReview();
+        postReview.execute(Integer.toString(rating));
+    }
+
+    private void displayReviews(String result) {
+
+    }
+
 
     /**
      * Displays the Website dialog
@@ -617,6 +707,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("ArtistId", userId);
                 jsonObject.put("HostId", profileUserId);
+                //jsonObject.put("")
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
@@ -630,8 +721,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
                         int statusCode = httpConn.getResponseCode();
                         if (statusCode != 200) {
                             is = httpConn.getErrorStream();
-                            Log.d(TAG, "PostFavorite: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "PostFavorite: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
+                            Log.d(TAG, "PostReview: STATUS CODE: " + statusCode);
+                            Log.d(TAG, "PostReview: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
                             Log.d(TAG, httpConn.getURL().toString());
                         }
                     }
@@ -665,6 +756,49 @@ public class ArtistProfileActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
 
+        }
+    }
+
+    /**
+     *
+     */
+    class GetReview extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            displayLoadingScreen(true);
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/reviews?artist=" + profileUserId);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "USER REVIEWS: " + result);
+            displayReviews(result);
         }
     }
 }
