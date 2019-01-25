@@ -193,6 +193,7 @@ public class HostProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addToFavorites();
+                //deleteFromFavorites();
             }
         });
 
@@ -220,7 +221,7 @@ public class HostProfileActivity extends AppCompatActivity {
      */
     private void deleteFromFavorites() {
         DeleteFavorite deleteFavorite = new DeleteFavorite();
-        deleteFavorite.execute();
+        deleteFavorite.execute(String.valueOf(Utils.idToFavoritesId(profileUserId, sharedPreferences.getString("favorites", ""))));
     }
 
     /**
@@ -294,6 +295,7 @@ public class HostProfileActivity extends AppCompatActivity {
             if(Utils.isUserInFavorites(profileUserId, sharedPreferences.getString("favorites", ""))){
                 addToFavsBtn.setClickable(false);
                 //TODO Change design
+                //TODO Set removeFromFavs
             }
 
             locationContainer.setOnClickListener(new View.OnClickListener() {
@@ -775,7 +777,25 @@ public class HostProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            //TODO Show that the host is now a favorite
+            addToFavsBtn.setClickable(false);
+            String favs = sharedPreferences.getString("favorites", "");
+            if(favs.equals("")){
+                try {
+                    JSONArray jsonArray = new JSONArray();
+                    jsonArray.put(new JSONObject(result));
+                    sharedPreferences.edit().putString("favorites", jsonArray.toString()).apply();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                try {
+                    JSONArray jsonArray = new JSONArray(favs);
+                    jsonArray.put(new JSONObject(result));
+                    sharedPreferences.edit().putString("favorites", jsonArray.toString()).apply();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -784,7 +804,7 @@ public class HostProfileActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/favorites/"+"this ID"); //TODO Id
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/favorites/"+params[0]); //TODO Id
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
@@ -813,6 +833,7 @@ public class HostProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
+            Log.d(TAG, result);
             //TODO Update GUI
         }
     }
