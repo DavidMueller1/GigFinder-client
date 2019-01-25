@@ -50,6 +50,17 @@
             android:text="@string/profile_review_stars_hint"
             android:textAlignment="center" />
 
+        <EditText
+            android:id="@+id/review_overlay_comment"
+            style="@style/Widget.AppCompat.EditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:hint="@string/profile_review_comment_hint"
+            android:maxLines="6"
+            android:text=""
+            android:textSize="@dimen/font_bigger" />
+
     </LinearLayout>
 
     <Button
@@ -61,5 +72,15 @@
         android:layout_marginBottom="@dimen/padding_default"
         android:background="@drawable/standart_button"
         android:text="@string/profile_review_button_submit"/>
+
+    <ImageView
+        android:id="@+id/review_overlay_button_close"
+        android:layout_width="@dimen/element_smaller"
+        android:layout_height="@dimen/element_smaller"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="@dimen/padding_default"
+        android:tint="@color/grey"
+        android:clickable="true"
+        android:src="@drawable/ic_iconmonstr_close"/>
 
 </RelativeLayout>
