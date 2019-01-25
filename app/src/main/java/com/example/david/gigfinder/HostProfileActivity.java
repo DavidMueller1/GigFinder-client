@@ -479,6 +479,7 @@ public class HostProfileActivity extends AppCompatActivity {
     private void handleReview() {
         int rating = (int) (2 * ratingBarOverlay.getRating());
         hideReviewOverlay();
+        reviewButton.setVisibility(View.GONE);
         String comment = commentTextField.getText().toString();
         PostReview postReview = new PostReview();
         postReview.execute(Integer.toString(rating), comment);
