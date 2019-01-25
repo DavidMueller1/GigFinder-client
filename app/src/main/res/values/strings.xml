@@ -124,9 +124,9 @@
     <string name="button_send_message">Nachricht schreiben</string>
     <string name="no_connection">Kein Zugang zum Internet</string>
     <string name="website_dialog_title">Externe Website</string>
-    <string name="website_dialog_1">Sind Sie sicher, dass sie die Website \"</string>
+    <string name="website_dialog_1">Sind Sie sicher, dass sie die Webseite \"</string>
     <string name="website_dialog_2">\" betreten möchten?</string>
-    <string name="website_cancel">Beenden</string>
+    <string name="website_cancel">Abbrechen</string>
     <string name="website_proceed">Ja</string>
     <string name="registration_genre_picker_title">Bis zu 3 Genres auswählen</string>
     <string name="registration_genre_picker_negative">Beenden</string>
