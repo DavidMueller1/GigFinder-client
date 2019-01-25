@@ -253,7 +253,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private void updateProfile(String result){
         try {
-            Log.d(TAG, result);
+            //Log.d(TAG, result);
             JSONObject userProfile = new JSONObject(result);
 
             GetProfilePicture getProfilePicture = new GetProfilePicture();

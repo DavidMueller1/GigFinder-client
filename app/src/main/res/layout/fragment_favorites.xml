@@ -7,6 +7,17 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/favorites_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/favorites_title"
+        android:padding="@dimen/padding_smaller"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_big"
+        android:textAlignment="center"
+        android:background="@color/orange"/>
+
+    <TextView
         android:id="@+id/noFavsText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,12 +36,12 @@
     <ListView
         android:id="@+id/favListView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/favorites_title">
 
     </ListView>
 </android.support.constraint.ConstraintLayout>
