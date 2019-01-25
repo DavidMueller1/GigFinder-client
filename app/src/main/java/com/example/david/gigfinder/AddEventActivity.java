@@ -1,8 +1,10 @@
 package com.example.david.gigfinder;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -76,7 +78,6 @@ public class AddEventActivity extends AppCompatActivity {
     private EditText descriptionField;
     private LinearLayout locationButton;
     private TextView locationButtonText;
-    private Spinner genreSpinner;
     private TextView timeFromText;
     private Button pickTimeFromButton;
     private TextView dateFromText;
@@ -86,6 +87,7 @@ public class AddEventActivity extends AppCompatActivity {
     private TextView dateToText;
     private Button pickDateToButton;
     private Button addEventButton;
+    private Button genrePickerButton;
 
     String[] timeStrings = new String[4];
 
@@ -93,9 +95,9 @@ public class AddEventActivity extends AppCompatActivity {
 
     String idToken;
 
-    private ArrayAdapter<String> adapter;
     private JSONArray genres;
     private String[] genreStrings;
+    private ArrayList<String> myGenres;
 
     /*@Nullable
     @Override
@@ -114,7 +116,13 @@ public class AddEventActivity extends AppCompatActivity {
 
         sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
 
-        genreSpinner = findViewById(R.id.add_event_genre);
+        genrePickerButton = findViewById(R.id.button_genrePicker);
+        genrePickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                performGenreSelection();
+            }
+        });
 
         if(sharedPreferences.getString("genres","x").equals("x")){
             GetGenres getGenres = new GetGenres();
@@ -343,6 +351,56 @@ public class AddEventActivity extends AppCompatActivity {
         }
     }
 
+    private void performGenreSelection(){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
+        mBuilder.setTitle(getString(R.string.registration_genre_picker_title));
+
+        final ArrayList<String> selectedGenres = new ArrayList<String>();
+        final boolean[] checkedItems = new boolean[genreStrings.length];
+
+        mBuilder.setMultiChoiceItems(genreStrings, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                //unchecking
+                if (isChecked) {
+                    if (selectedGenres.size() >= 3) {
+                        checkedItems[which] = false;
+                        ((AlertDialog) dialog).getListView().setItemChecked(which, false);
+                    } else {
+                        checkedItems[which] = true;
+                        selectedGenres.add(genreStrings[which].toString());
+                    }
+                } else {
+                    selectedGenres.remove(genreStrings[which].toString());
+                }
+            }
+        });
+
+        mBuilder.setCancelable(false);
+        mBuilder.setPositiveButton(getString(R.string.registration_genre_picker_positive), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                myGenres = selectedGenres;
+                String buttonString = "";
+                for(String i : myGenres){
+                    buttonString=buttonString.concat(i + ", ");
+                }
+                if(buttonString.length()>1){
+                    genrePickerButton.setText(buttonString.substring(0, buttonString.length()-2));
+                }
+            }
+        });
+
+        mBuilder.setNegativeButton(getString(R.string.registration_genre_picker_negative), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = mBuilder.create();
+        dialog.show();
+    }
 
     private boolean checkUserInput(){
 
@@ -392,29 +450,30 @@ public class AddEventActivity extends AppCompatActivity {
             return false;
         }
 
-        // TODO multiple genres selectable
-        genreStrings = new String[1]; //Change length to num of selected genres
-        genreStrings[0] = genreSpinner.getSelectedItem().toString();
-        //TODO just fill this list with selected genres
+        // Check genres
+        if(myGenres.isEmpty()){
+            Toast.makeText(getApplicationContext(),"Bitte mindestens 1 Genre wählen.",Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Genres empty.");
+            return false;
+        }
 
         return true;
     }
 
     private void showGenres(String result){
+        myGenres = new ArrayList<String>();
         try {
             genres = new JSONArray(result);
-            String[] genreStrings = new String[genres.length()];
+            genreStrings = new String[genres.length()];
             for(int i=0; i<genres.length(); i++){
                 genreStrings[i] = genres.getJSONObject(i).getString("value");
             }
-            adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, genreStrings);
-            genreSpinner.setAdapter(adapter);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private JSONArray genresToJson(String[] genreStrings) throws JSONException {
+    private JSONArray genresToJson(ArrayList<String> genreStrings) throws JSONException {
         JSONArray genresJson = new JSONArray();
         for(String i : genreStrings){
             for(int j=0; j<genres.length(); j++){
@@ -456,7 +515,7 @@ public class AddEventActivity extends AppCompatActivity {
                 jsonObject.put("latitude", params[3]);
                 jsonObject.put("start", params[4]);
                 jsonObject.put("end", params[5]);
-                jsonObject.put("eventGenres", genresToJson(genreStrings));
+                jsonObject.put("eventGenres", genresToJson(myGenres));
 
                 os.write(jsonObject.toString().getBytes("UTF-8"));
                 os.close();

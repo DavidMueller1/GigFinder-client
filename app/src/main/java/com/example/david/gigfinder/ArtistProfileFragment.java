@@ -1,12 +1,9 @@
 package com.example.david.gigfinder;
 
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -24,7 +21,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,16 +28,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.david.gigfinder.data.Artist;
-import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.ImageTools;
 import com.example.david.gigfinder.tools.Utils;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,7 +43,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -82,7 +70,6 @@ public class ArtistProfileFragment extends Fragment {
     private TextView webText;
 
     private FrameLayout progress;
-    private byte[] imageByteArray;
 
     @Nullable
     @Override
@@ -121,8 +108,7 @@ public class ArtistProfileFragment extends Fragment {
             testDeleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DeleteUser deleteUser = new DeleteUser();
-                    deleteUser.execute();
+                    delteUserDialog();
                 }
             });
 
@@ -338,16 +324,18 @@ public class ArtistProfileFragment extends Fragment {
      */
     private void openWebsiteDialog(final Uri link){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
-        View mView = getLayoutInflater().inflate(R.layout.dialog_website, null);
+        View mView = getLayoutInflater().inflate(R.layout.custom_dialog, null);
         mBuilder.setView(mView);
         final AlertDialog dialog = mBuilder.create();
         dialog.show();
 
         Button cancelBtn = (Button) mView.findViewById(R.id.cancelBtn);
         Button proceedBtn = (Button) mView.findViewById(R.id.proceedBtn);
-        TextView websiteText = (TextView) mView.findViewById(R.id.website_dialoge_text);
+        TextView websiteText = (TextView) mView.findViewById(R.id.custom_dialoge_text);
+        TextView dialogTitle = (TextView) mView.findViewById(R.id.custom_dialoge_title);
 
         websiteText.setText(getString(R.string.website_dialog_1) + link.toString() + getString(R.string.website_dialog_2));
+        dialogTitle.setText(getString(R.string.website_dialog_title));
 
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -361,6 +349,40 @@ public class ArtistProfileFragment extends Fragment {
             public void onClick(View v) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
                 startActivity(browserIntent);
+            }
+        });
+    }
+
+    /**
+     * Asks the user if he wants to delete the profile
+     */
+    private void delteUserDialog(){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
+        View mView = getLayoutInflater().inflate(R.layout.custom_dialog, null);
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+
+        Button cancelBtn = (Button) mView.findViewById(R.id.cancelBtn);
+        Button proceedBtn = (Button) mView.findViewById(R.id.proceedBtn);
+        TextView dialogText = (TextView) mView.findViewById(R.id.custom_dialoge_text);
+        TextView dialogTitle = (TextView) mView.findViewById(R.id.custom_dialoge_title);
+
+        dialogText.setText("Sind Sie sicher, dass die ihr Profil dauerhaft löschen möchten");
+        dialogTitle.setText("Profil Löschen");
+
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        proceedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DeleteUser deleteUser = new DeleteUser();
+                deleteUser.execute();
             }
         });
     }
@@ -539,6 +561,11 @@ public class ArtistProfileFragment extends Fragment {
             editor.clear();
             editor.apply();
             Log.d(TAG, "DELETE ARTIST: " + result);
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            intent.putExtra("SignOut", true);
+            startActivity(intent);
+
+            Toast.makeText(getActivity().getApplicationContext(),"Profil Gelöscht",Toast.LENGTH_SHORT).show();
             getActivity().finish();
         }
     }
