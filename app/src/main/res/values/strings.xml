@@ -92,7 +92,6 @@
     <string name="gigs_canceled">Abgelehnt</string>
 
     <!-- Events  -->
-    <string name="explore_title">Explore</string>
     <string name="event_participants">Bewerber</string>
     <string name="event_participants_select">Zusagen</string>
     <string name="event_participants_cancel">Absagen</string>
@@ -138,6 +137,11 @@
     <string name="registration_genre_picker_positive">Auswählen</string>
     <string name="registration_genre_hint">Genres Auswählen</string>
     <string name="max_stale">900</string>
+
+    <!-- Titles -->
+    <string name="explore_title">Explore</string>
+    <string name="favorites_title">Favoriten</string>
+    <string name="chat_title">Chats</string>
 
 
 </resources>
