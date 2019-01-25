@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -478,6 +479,7 @@ public class HostProfileFragment extends Fragment {
                 }
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(browserIntent);
+                dialog.cancel();
             }
         });
     }
@@ -691,6 +693,13 @@ public class HostProfileFragment extends Fragment {
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             intent.putExtra("SignOut", true);
             startActivity(intent);
+
+            try {
+                HttpResponseCache cache = HttpResponseCache.getInstalled();
+                cache.delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             Toast.makeText(getActivity().getApplicationContext(),"Profil Gelöscht",Toast.LENGTH_SHORT).show();
             getActivity().finish();
