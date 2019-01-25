@@ -3,7 +3,6 @@ package com.example.david.gigfinder;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -23,11 +22,8 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.david.gigfinder.tools.ColorTools;
-import com.example.david.gigfinder.tools.GeoTools;
 import com.example.david.gigfinder.tools.ImageTools;
 import com.example.david.gigfinder.tools.Utils;
-import com.google.android.gms.common.util.Strings;
-import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +38,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.Locale;
 
 public class ArtistProfileActivity extends AppCompatActivity {
 
@@ -334,14 +329,14 @@ public class ArtistProfileActivity extends AppCompatActivity {
      */
     private void openWebsiteDialog(final Uri link){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
-        View mView = getLayoutInflater().inflate(R.layout.dialog_website, null);
+        View mView = getLayoutInflater().inflate(R.layout.custom_dialog, null);
         mBuilder.setView(mView);
         final AlertDialog dialog = mBuilder.create();
         dialog.show();
 
         Button cancelBtn = (Button) mView.findViewById(R.id.cancelBtn);
         Button proceedBtn = (Button) mView.findViewById(R.id.proceedBtn);
-        TextView websiteText = (TextView) mView.findViewById(R.id.website_dialoge_text);
+        TextView websiteText = (TextView) mView.findViewById(R.id.custom_dialoge_text);
 
         websiteText.setText(getString(R.string.website_dialog_1) + link.toString() + getString(R.string.website_dialog_2));
 

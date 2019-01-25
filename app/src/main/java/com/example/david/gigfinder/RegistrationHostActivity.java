@@ -126,6 +126,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
         getSocialMedias.execute();
 
         host = new Host();
+        //default color
+        host.setColor(getResources().getColor(R.color.orange));
         mySocialMedias = new JSONArray();
 
         profilePictureTitle = findViewById(R.id.registration_host_image_title);
