@@ -19,7 +19,8 @@
             android:text="@string/explore_title"
             android:padding="@dimen/padding_default"
             android:textColor="@color/white"
-            android:textSize="@dimen/font_bigger"/>
+            android:textSize="@dimen/font_big"
+            android:textAlignment="center"/>
 
         <ImageView
             android:id="@+id/explore_reload"

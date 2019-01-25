@@ -441,6 +441,7 @@
                 <!-- TODO make the buttons sexy -->
                 <Button
                     android:id="@+id/profile_artist_button_review"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/padding_smaller"
