@@ -52,6 +52,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -100,6 +101,7 @@ public class HostProfileActivity extends AppCompatActivity {
 
     //private JSONObject hostJson;
     private int userId;
+    String userType;
     private int profileUserId;
     private String picture;
     String idToken;
@@ -114,6 +116,7 @@ public class HostProfileActivity extends AppCompatActivity {
 
         sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
         userId = sharedPreferences.getInt("userId", -1);
+        userType = sharedPreferences.getString("user", "artist");
 
         imageButton = findViewById(R.id.profile_host_profilePicture);
         nameText = findViewById(R.id.profile_host_name);
@@ -486,6 +489,7 @@ public class HostProfileActivity extends AppCompatActivity {
      * @param result
      */
     private void displayReviews(String result) {
+        boolean possibleReviewPermission = true;
         try {
             JSONArray jsonArray = new JSONArray(result);
             int arraySize = jsonArray.length();
@@ -501,12 +505,21 @@ public class HostProfileActivity extends AppCompatActivity {
                 sum += rating;
 
                 reviewStrings.add(new String[]{String.valueOf(rating), comment});
+
+                if(reviewJson.getInt("authorId") == userId && userType.equals("artist")) {
+                    Log.d(TAG, "Permission noped");
+                    possibleReviewPermission = false;
+                }
             }
 
             reviewAdapter.notifyDataSetChanged();
             ratingBar.setRating(sum / arraySize);
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+
+        if(possibleReviewPermission) {
+            checkParticipations();
         }
     }
 
@@ -543,6 +556,37 @@ public class HostProfileActivity extends AppCompatActivity {
 
             reviewListView.setVisibility(View.GONE);
             isReviewListExpanded = false;
+        }
+    }
+
+    private void checkParticipations() {
+        GetParticipants getParticipants = new GetParticipants();
+        getParticipants.execute();
+    }
+
+    private void checkReviewPermission(String result) {
+        boolean reviewPermission = false;
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+            for(int i = 0; i < jsonArray.length(); i++) {
+                JSONObject partJson = jsonArray.getJSONObject(i);
+                JSONObject event = partJson.getJSONObject("event");
+
+                if(partJson.getInt("artistId") == userId && partJson.getBoolean("accepted")) {
+                    Timestamp timestamp = Utils.convertStringToTimestamp(event.getString("end"));
+                    if(timestamp.before(new Timestamp(System.currentTimeMillis()))) {
+                        reviewPermission = true;
+                        break;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            Log.d(TAG, "Fehler: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        if(reviewPermission) {
+            reviewButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -976,6 +1020,49 @@ public class HostProfileActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             Log.d(TAG, "USER REVIEWS: " + result);
             displayReviews(result);
+        }
+    }
+
+    /**
+     *
+     */
+    class GetParticipants extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/participations?host=" + profileUserId);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.d(TAG, "Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            Log.d(TAG, "MESSAGES: " + result);
+            checkReviewPermission(result);
         }
     }
 }
