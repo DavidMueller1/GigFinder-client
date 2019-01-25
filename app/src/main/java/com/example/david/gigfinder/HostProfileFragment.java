@@ -441,7 +441,6 @@ public class HostProfileFragment extends Fragment {
         }
     }
 
-
     /**
      * Displays the Website dialog
      * @param link
@@ -471,7 +470,13 @@ public class HostProfileFragment extends Fragment {
         proceedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
+                Uri uri;
+                if(!link.toString().startsWith("http://") && !link.toString().startsWith("https://")){
+                    uri = Uri.parse("http://" + link.toString());
+                }else{
+                    uri = link;
+                }
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(browserIntent);
             }
         });
