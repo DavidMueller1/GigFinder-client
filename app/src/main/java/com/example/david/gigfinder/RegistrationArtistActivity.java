@@ -111,6 +111,9 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         getSocialMedias.execute();
 
         artist = new Artist();
+        //default color
+        artist.setColor(getResources().getColor(R.color.orange));
+
         mySocialMedias = new JSONArray();
 
         profilePictureTitle = findViewById(R.id.registration_artist_image_title);

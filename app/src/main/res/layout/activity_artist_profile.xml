@@ -363,18 +363,8 @@
                     android:text="@string/button_send_message"
                     android:background="@drawable/standart_button" />
 
-                <Button
-                    android:id="@+id/addToFavsBtn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/padding_default"
-                    android:layout_weight="1"
-                    android:text="@string/button_add_to_favorites"
-                    android:background="@drawable/standart_button"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-        </ScrollView>
+        </LinearLayout>
+    </ScrollView>
 
     </LinearLayout>
 
