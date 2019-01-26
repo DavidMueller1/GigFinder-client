@@ -2,6 +2,7 @@ package com.example.david.gigfinder;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import com.example.david.gigfinder.adapters.MessageListAdapter;
 import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.Message;
 import com.example.david.gigfinder.data.User;
+import com.example.david.gigfinder.tools.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,20 +86,10 @@ public class ChatActivity extends AppCompatActivity {
         authorId = prefs.getInt("userId", 0);
         user = prefs.getString("user", "null");
 
-        GetMessages getMessages = new GetMessages();
-        getMessages.execute();
-
         chatName = (TextView) findViewById(R.id.chatName);
         chatName.setText(name);
 
         chatImg = (ImageView) findViewById(R.id.chatImg);
-        try {
-            JSONObject imageProfile = new JSONObject(getIntent().getExtras().getString("picture"));
-            picture = Base64.decode(imageProfile.getString("image"), Base64.DEFAULT);
-            chatImg.setImageBitmap(BitmapFactory.decodeByteArray(picture, 0, picture.length));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
         chatText = (EditText) findViewById(R.id.edittext_chatbox);
 
@@ -143,6 +135,8 @@ public class ChatActivity extends AppCompatActivity {
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this));
         mMessageRecycler.setAdapter(mMessageAdapter);
 
+        GetProfilePicture getProfilePicture = new GetProfilePicture();
+        getProfilePicture.execute(String.valueOf(getIntent().getExtras().getInt("pictureId")));
     }
 
     private void showMessages(String messages){
@@ -308,5 +302,61 @@ public class ChatActivity extends AppCompatActivity {
             Log.d(TAG, "Messages: " + result);
             showMessages(result);
         }
+    }
+
+    class GetProfilePicture extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + params[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(true);
+                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            try {
+            JSONObject imageProfile = new JSONObject(result);
+
+            byte[] decodedString = Base64.decode(imageProfile.getString("image"), Base64.DEFAULT);
+            picture = decodedString;
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+            chatImg.setImageBitmap(decodedByte);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            GetMessages getMessages = new GetMessages();
+            getMessages.execute();
+
+        }
+
     }
 }
