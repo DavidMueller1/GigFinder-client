@@ -96,7 +96,9 @@ public class FavoritesFragment extends Fragment {
 
             sharedPreferences.edit().putString("favorites", favoritesJson.toString()).apply();
 
-            updatePictures();
+            if(favorites.size()>0) {
+                updatePictures();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -195,6 +197,8 @@ public class FavoritesFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(true);
+                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -220,7 +224,7 @@ public class FavoritesFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             if (result != null && favorites != null) {
-                if(favorites.size()>=id) {
+                if(favorites.size()>id) {
                     favorites.get(id)[3] = result;
                     favAdapter.notifyDataSetChanged();
                 }
