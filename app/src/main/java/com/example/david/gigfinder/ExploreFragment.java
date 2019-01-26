@@ -21,6 +21,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -75,6 +78,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
             getEvents.execute();
         }
         super.onActivityCreated(savedInstanceState);
+
+        reloadAnimation(true);
     }
 
     @Override
@@ -243,6 +248,19 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
                 myMarker.setTag(event);
             } catch (JSONException e1) {
             e1.printStackTrace();
+        }
+    }
+
+    private void reloadAnimation(boolean isReloading) {
+        if(isReloading) {
+            RotateAnimation rotateAnimation = new RotateAnimation(0, -360, Animation.RELATIVE_TO_SELF, 0.565f, Animation.RELATIVE_TO_SELF, 0.53f);
+            rotateAnimation.setRepeatCount(Animation.INFINITE);
+            rotateAnimation.setDuration(1000);
+            rotateAnimation.setInterpolator(new LinearInterpolator());
+            getView().findViewById(R.id.explore_reload).startAnimation(rotateAnimation);
+        }
+        else {
+            getView().findViewById(R.id.explore_reload).clearAnimation();
         }
     }
 

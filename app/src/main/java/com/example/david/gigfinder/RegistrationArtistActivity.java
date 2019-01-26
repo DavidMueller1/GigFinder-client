@@ -412,7 +412,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 pickSocialMedia("YouTube", youtubeField.getText().toString());
             }
             if(!instagramField.getText().toString().equals("")){
-                //pickSocialMedia("Soundcloud", soundcloudField.getText().toString()); TODO
+                pickSocialMedia("Instagram", instagramField.getText().toString());
             }
             if(!spotifyField.getText().toString().equals("")){
                 pickSocialMedia("Spotify", spotifyField.getText().toString());

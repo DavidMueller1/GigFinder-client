@@ -75,13 +75,7 @@ public class FavoritesFragment extends Fragment {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent intent = new Intent(getActivity(), HostProfileActivity.class);
                     intent.putExtra("idToken", idToken);
-                    intent.putExtra("host", favorites.get(position)[2]);
-                    try {
-                        JSONObject jsonObject = new JSONObject(favorites.get(position)[2]);
-                        intent.putExtra("profileUserId", String.valueOf(jsonObject.getInt("id")));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    intent.putExtra("profileUserId", Integer.parseInt(favorites.get(position)[4]));
                     startActivity(intent);
                 }
             });
@@ -95,11 +89,12 @@ public class FavoritesFragment extends Fragment {
                 String name = favoritesJson.getJSONObject(i).getJSONObject("host").getString("name");
                 String description = favoritesJson.getJSONObject(i).getJSONObject("host").getString("description");
                 String profilePictureId = String.valueOf(favoritesJson.getJSONObject(i).getJSONObject("host").getInt("profilePictureId"));
-                favorites.add(new String[]{name, description, profilePictureId, "null"});
+                String id = String.valueOf(favoritesJson.getJSONObject(i).getJSONObject("host").getInt("id"));
+                favorites.add(new String[]{name, description, profilePictureId, "null", id});
             }
             favAdapter.notifyDataSetChanged();
 
-            sharedPreferences.edit().putString("favorites", favoritesJson.toString());
+            sharedPreferences.edit().putString("favorites", favoritesJson.toString()).apply();
 
             updatePictures();
         } catch (JSONException e) {

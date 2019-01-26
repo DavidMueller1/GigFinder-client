@@ -73,6 +73,16 @@
 
     <!-- Profil  -->
     <string name="profile_description">Beschreibung:</string>
+    <string name="profile_review_title">Bewertung</string>
+    <string name="profile_review_stars_title">Rating</string>
+    <string name="profile_review_stars_hint">Tippe, um eine Bewertung zu vergeben (es sind auch halbe Sterne möglich)</string>
+    <string name="profile_review_comment_title">Kommentar</string>
+    <string name="profile_review_comment_hint">Schreibe einen Kommentar zu deiner Bewertung</string>
+    <string name="profile_review_button_review">Eine Bewertung erstellen</string>
+    <string name="profile_review_button_show_all">Alle Bewertungen anzeigen</string>
+    <string name="profile_review_button_hide_all">Bewertungen ausblenden</string>
+    <string name="profile_review_button_submit">Fertig!</string>
+    <string name="profile_review">Bewertungen:</string>
     <string name="profile_social_media_links">Social Media Links:</string>
     <string name="profile_genre_single">Genre:</string>
     <string name="profile_genre_multiple">Genres:</string>
@@ -118,6 +128,7 @@
 
     <!-- Buttons -->
     <string name="button_add_to_favorites">Zu Favoriten hinzufügen</string>
+    <string name="button_delete_from_favorites">Aus Favoriten entfernen</string>
     <string name="button_send_message">Nachricht schreiben</string>
     <string name="no_connection">Kein Zugang zum Internet</string>
     <string name="website_dialog_title">Externe Website</string>
@@ -129,6 +140,12 @@
     <string name="registration_genre_picker_negative">Beenden</string>
     <string name="registration_genre_picker_positive">Auswählen</string>
     <string name="registration_genre_hint">Genres Auswählen</string>
+    <string name="max_stale">900</string>
+
+    <!-- Titles -->
+    <string name="explore_title">Explore</string>
+    <string name="favorites_title">Favoriten</string>
+    <string name="chat_title">Chats</string>
 
 
 </resources>

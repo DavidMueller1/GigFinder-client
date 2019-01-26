@@ -1,13 +1,17 @@
 package com.example.david.gigfinder;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,10 +22,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +39,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.david.gigfinder.adapters.ReviewAdapter;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.GeoTools;
 import com.example.david.gigfinder.tools.ImageTools;
@@ -46,6 +57,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -66,6 +78,10 @@ public class HostProfileFragment extends Fragment {
     private TextView locationText;
     private TextView genresText;
     private String idToken;
+    private RatingBar ratingBar;
+
+    private RelativeLayout showAllReviewsButton;
+    private ListView reviewListView;
 
     // Social Media
     private TextView soundcloudText;
@@ -78,6 +94,10 @@ public class HostProfileFragment extends Fragment {
 
     private FrameLayout progress;
 
+    private ArrayList<String[]> reviewStrings;
+    private ReviewAdapter reviewAdapter;
+    boolean isReviewListExpanded;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -86,8 +106,8 @@ public class HostProfileFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-
         idToken = getArguments().getString("idToken");
+
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
 
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
@@ -108,7 +128,27 @@ public class HostProfileFragment extends Fragment {
         spotifyText = getView().findViewById(R.id.profile_spotify_text);
         webText = getView().findViewById(R.id.profile_web_text);
 
+        ratingBar = getView().findViewById(R.id.profile_artist_rating_bar);
+
+
+        isReviewListExpanded = false;
+        reviewListView = getView().findViewById(R.id.profile_artist_review_list);
+
+        showAllReviewsButton = getView().findViewById(R.id.profile_artist_button_show_all);
+        showAllReviewsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayReviewList();
+            }
+        });
+
         progress = getView().findViewById(R.id.progressBarHolder);
+
+
+        reviewStrings = new ArrayList<>();
+
+        reviewAdapter = new ReviewAdapter(getContext(), reviewStrings);
+        reviewListView.setAdapter(reviewAdapter);
 
         updateProfile(sharedPreferences.getString("userProfile", "x"));
 
@@ -179,6 +219,9 @@ public class HostProfileFragment extends Fragment {
             if(!idToken.equals("offline")) {
                 GetProfilePicture getProfilePicture = new GetProfilePicture();
                 getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+
+                GetReview getReview = new GetReview();
+                getReview.execute();
             }
 
             final String name = userProfile.getString("name");
@@ -333,6 +376,72 @@ public class HostProfileFragment extends Fragment {
 
     };
 
+
+    /**
+     * Updates the Reviews in the Profile
+     * @param result
+     */
+    private void displayReviews(String result) {
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+            int arraySize = jsonArray.length();
+            float sum = 0f;
+            reviewStrings.clear();
+            for(int i = 0; i < arraySize; i++) {
+                JSONObject reviewJson = jsonArray.getJSONObject(i);
+
+                float rating =  (float) reviewJson.getInt("rating") / 2;
+                Log.d(TAG, "Float: " + rating);
+                String comment = reviewJson.getString("comment");
+
+                sum += rating;
+
+                reviewStrings.add(new String[]{String.valueOf(rating), comment});
+            }
+
+            reviewAdapter.notifyDataSetChanged();
+            ratingBar.setRating(sum / arraySize);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Shows and hides the full list of reviews
+     */
+    private void displayReviewList() {
+        if(!isReviewListExpanded) {
+            ObjectAnimator animation = ObjectAnimator.ofFloat(getView().findViewById(R.id.review_triangle_left), "rotation", -180f, 0f);
+            animation.setDuration(400);
+            animation.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation.start();
+            ObjectAnimator animation2 = ObjectAnimator.ofFloat(getView().findViewById(R.id.review_triangle_right), "rotation", 180f, 0f);
+            animation2.setDuration(400);
+            animation2.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation2.start();
+
+            ((TextView) getView().findViewById(R.id.profile_artist_show_all)).setText(getString(R.string.profile_review_button_hide_all));
+
+            reviewListView.setVisibility(View.VISIBLE);
+            isReviewListExpanded = true;
+        }
+        else {
+            ObjectAnimator animation = ObjectAnimator.ofFloat(getView().findViewById(R.id.review_triangle_left), "rotation", 0f, -180f);
+            animation.setDuration(400);
+            animation.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation.start();
+            ObjectAnimator animation2 = ObjectAnimator.ofFloat(getView().findViewById(R.id.review_triangle_right), "rotation", 0f, 180f);
+            animation2.setDuration(400);
+            animation2.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation2.start();
+
+            ((TextView) getView().findViewById(R.id.profile_artist_show_all)).setText(getString(R.string.profile_review_button_show_all));
+
+            reviewListView.setVisibility(View.GONE);
+            isReviewListExpanded = false;
+        }
+    }
+
     /**
      * Displays the Website dialog
      * @param link
@@ -362,8 +471,15 @@ public class HostProfileFragment extends Fragment {
         proceedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
+                Uri uri;
+                if(!link.toString().startsWith("http://") && !link.toString().startsWith("https://")){
+                    uri = Uri.parse("http://" + link.toString());
+                }else{
+                    uri = link;
+                }
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(browserIntent);
+                dialog.cancel();
             }
         });
     }
@@ -503,6 +619,8 @@ public class HostProfileFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(true);
+                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -576,8 +694,54 @@ public class HostProfileFragment extends Fragment {
             intent.putExtra("SignOut", true);
             startActivity(intent);
 
+            try {
+                HttpResponseCache cache = HttpResponseCache.getInstalled();
+                cache.delete();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             Toast.makeText(getActivity().getApplicationContext(),"Profil Gelöscht",Toast.LENGTH_SHORT).show();
             getActivity().finish();
+        }
+    }
+
+    class GetReview extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/reviews?host=" + userID);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "USER REVIEWS: " + result);
+            displayReviews(result);
         }
     }
 

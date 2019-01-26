@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.net.http.HttpResponseCache;
 import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -385,6 +386,19 @@ public class EventProfileActivity extends AppCompatActivity {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(true);
+                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
+
+                HttpResponseCache cache = HttpResponseCache.getInstalled();
+
+                if (cache != null) {
+                    String cacheInfo = "!!! Request count: "
+                            + cache.getRequestCount() + ", hit count "
+                            + cache.getHitCount() + ", network count "
+                            + cache.getNetworkCount() + "   size = "
+                            + cache.size() + " <-----------------";
+                    Log.w(TAG, cacheInfo);
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
