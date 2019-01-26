@@ -644,6 +644,7 @@ public class EventProfileActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             applyBtn.setClickable(false);
+
         }
     }
 
