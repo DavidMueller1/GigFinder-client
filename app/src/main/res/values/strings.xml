@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">GigFinder</string>
 
+    <!-- Notifications -->
+    <string name="channel_name">Allgemein</string>
+    <string name="channel_description">Dies sind die allgemeinen Nachrichten</string>
+
     <!-- Sign-In -->
     <string name="server_client_id">998701200015-krr5qpgg3go6iol8b2oqv3l4jcttspom.apps.googleusercontent.com</string>
 
@@ -138,10 +142,15 @@
     <string name="registration_genre_hint">Genres Auswählen</string>
     <string name="max_stale">900</string>
 
+    <!-- Filter Menu -->
+    <string name="filter_expired_events">Verfallene Evente</string>
+    <string name="filter_fav_events">Nur Events von Favoriten</string>
+    <string name="filtern_by_genre">Filtern bei Genre</string>
+    <string name="filtern_by_genre_title">Wählen Sie die gewünschten Genres</string>
+
     <!-- Titles -->
     <string name="explore_title">Explore</string>
     <string name="favorites_title">Favoriten</string>
     <string name="chat_title">Chats</string>
-
 
 </resources>

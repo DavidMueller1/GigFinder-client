@@ -264,7 +264,7 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            if(!chatStrings.equals(null)) {
+            if(chatStrings!=null) {
                 chatStrings.get(id)[4] = result;
                 chatAdapter.notifyDataSetChanged();
             }
