@@ -59,6 +59,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -88,6 +89,7 @@ public class AddEventActivity extends AppCompatActivity {
     private Button pickDateToButton;
     private Button addEventButton;
     private Button genrePickerButton;
+    private EditText gageField;
 
     String[] timeStrings = new String[4];
 
@@ -141,6 +143,7 @@ public class AddEventActivity extends AppCompatActivity {
             }
         });
         locationButtonText = findViewById(R.id.add_event_location_text);
+        gageField = findViewById(R.id.add_event_gage);
         //Replaced the Strings with the Genre-Enum
 
 
@@ -284,7 +287,7 @@ public class AddEventActivity extends AppCompatActivity {
             PostEvent postEvent = new PostEvent();
             postEvent.execute(nameField.getText().toString(), descriptionField.getText().toString(),
                     String.valueOf(position.longitude), String.valueOf(position.latitude),
-                    timeStrings[1] + "T" + timeStrings[0], timeStrings[3] + "T" + timeStrings[2]);
+                    timeStrings[1] + "T" + timeStrings[0], timeStrings[3] + "T" + timeStrings[2], gageField.getText().toString());
         }
     }
 
@@ -505,6 +508,15 @@ public class AddEventActivity extends AppCompatActivity {
                 SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
                 int hostID = prefs.getInt("userId", 0);
 
+                double gage;
+
+                if(params[6].equals("")) {
+                    gage = 0;
+                }
+                else {
+                    gage = Utils.round(Double.valueOf(params[6]), 2);
+                }
+
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
@@ -515,6 +527,7 @@ public class AddEventActivity extends AppCompatActivity {
                 jsonObject.put("latitude", params[3]);
                 jsonObject.put("start", params[4]);
                 jsonObject.put("end", params[5]);
+                jsonObject.put("gage", gage);
                 jsonObject.put("eventGenres", genresToJson(myGenres));
 
                 os.write(jsonObject.toString().getBytes("UTF-8"));
