@@ -100,8 +100,10 @@ public class GigsFragment extends Fragment {
             offlineMode();
         }else{
             //online mode
-            GetParticipations getParticipations = new GetParticipations();
-            getParticipations.execute();
+            if(isNetworkAvailable()) {
+                GetParticipations getParticipations = new GetParticipations();
+                getParticipations.execute();
+            }
 
             upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -177,9 +179,10 @@ public class GigsFragment extends Fragment {
     private void checkStatus() {
         for(int i = 0; i < futureEventObjects.size(); i++) {
                 try {
-                    GetEventParticipants getEventParticipants = new GetEventParticipants();
-                    getEventParticipants.execute(Integer.toString(futureEventObjects.get(i).getInt("id")), Integer.toString(i));
-
+                    if(isNetworkAvailable()) {
+                        GetEventParticipants getEventParticipants = new GetEventParticipants();
+                        getEventParticipants.execute(Integer.toString(futureEventObjects.get(i).getInt("id")), Integer.toString(i));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

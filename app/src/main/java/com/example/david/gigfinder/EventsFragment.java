@@ -93,8 +93,10 @@ public class EventsFragment extends Fragment {
         }
         else {
             //online mode
-            GetEvents getEvents = new GetEvents();
-            getEvents.execute();
+            if(isNetworkAvailable()) {
+                GetEvents getEvents = new GetEvents();
+                getEvents.execute();
+            }
 
             getView().findViewById(R.id.events_addbutton).setOnClickListener(new View.OnClickListener() {
                 @Override

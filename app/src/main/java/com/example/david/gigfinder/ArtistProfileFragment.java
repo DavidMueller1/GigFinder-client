@@ -219,11 +219,13 @@ public class ArtistProfileFragment extends Fragment {
             Log.d(TAG, userProfile.toString());
 
             if(!idToken.equals("offline")) {
-                GetProfilePicture getProfilePicture = new GetProfilePicture();
-                getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+                if(isNetworkAvailable()) {
+                    GetProfilePicture getProfilePicture = new GetProfilePicture();
+                    getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
 
-                GetReview getReview = new GetReview();
-                getReview.execute();
+                    GetReview getReview = new GetReview();
+                    getReview.execute();
+                }
             }
 
             nameText.setText(userProfile.getString("name"));
@@ -500,8 +502,10 @@ public class ArtistProfileFragment extends Fragment {
         proceedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DeleteUser deleteUser = new DeleteUser();
-                deleteUser.execute();
+                if(isNetworkAvailable()) {
+                    DeleteUser deleteUser = new DeleteUser();
+                    deleteUser.execute();
+                }
                 dialog.cancel();
             }
         });
