@@ -61,6 +61,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
+
 public class RegistrationHostActivity extends AppCompatActivity {
     private static final String TAG = "RegistrationHostActivity";
     private static final int PICK_IMAGE = 1;
@@ -625,6 +627,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 editor.putString("user", "host");
                 editor.putInt("userColor", user.getInt("backgroundColor"));
                 editor.apply();
+
+                sendDeviceToken(getBaseContext());
             } catch (JSONException e) {
                 e.printStackTrace();
             }

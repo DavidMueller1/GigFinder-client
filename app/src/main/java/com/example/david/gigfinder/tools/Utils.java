@@ -76,6 +76,22 @@ public abstract class Utils {
         }
     }
 
+    public static Date convertStringToDate(String str_date) {
+        try {
+            String modifiedString = str_date.replace("T", " ");
+            Log.d(TAG, "Modified String: " + modifiedString);
+
+            DateFormat formatter;
+            formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            Date date = (Date) formatter.parse(modifiedString);
+
+            return date;
+        } catch (ParseException e) {
+            System.out.println("Exception :" + e);
+            return null;
+        }
+    }
+
     public static String getTimeStringFromServerFormat(String time) {
         Timestamp timestamp = convertStringToTimestamp(time);
         Date date = new Date();

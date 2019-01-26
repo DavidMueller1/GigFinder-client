@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "998701200015",
+    "firebase_url": "https://gigfinder-1544788183264.firebaseio.com",
+    "project_id": "gigfinder-1544788183264",
+    "storage_bucket": "gigfinder-1544788183264.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:998701200015:android:9e9018c6d773c117",
+        "android_client_info": {
+          "package_name": "com.example.david.gigfinder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "998701200015-ijtqh6qjoug0gf6mhu2nj0mhrkbqodmd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.david.gigfinder",
+            "certificate_hash": "372d5fc219c3f5808919aa5af2afc062a3d4f741"
+          }
+        },
+        {
+          "client_id": "998701200015-krr5qpgg3go6iol8b2oqv3l4jcttspom.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCD8AQVzhm1XQ_1SAsV5W-2_uV4_b4tLfQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "998701200015-krr5qpgg3go6iol8b2oqv3l4jcttspom.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent">
 
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/explore_title_bar_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,11 +17,27 @@
             android:id="@+id/explore_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="@dimen/padding_default"
             android:text="@string/explore_title"
-            android:padding="@dimen/padding_smaller"
+            android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="@dimen/font_big"
-            android:textAlignment="center"/>
+            android:textSize="24sp" />
+
+        <ImageButton
+            android:id="@+id/filter_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/transparent"
+            android:onClick="showPopup"
+            android:src="@drawable/ic_filter_btn"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/explore_title"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/explore_reload"
@@ -34,8 +51,7 @@
             android:src="@drawable/ic_iconmonstr_refresh"
             android:tint="@color/white"/>
 
-
-    </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"

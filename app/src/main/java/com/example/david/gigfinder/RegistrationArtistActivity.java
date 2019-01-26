@@ -46,6 +46,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
 import static com.example.david.gigfinder.tools.ImageTools.compressImage;
 
 public class RegistrationArtistActivity extends AppCompatActivity {
@@ -561,6 +562,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                     editor.putInt("userColor", user.getInt("backgroundColor"));
                     editor.apply();
                     //TODO: We should probably cache everything here
+
+                    sendDeviceToken(getBaseContext());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
