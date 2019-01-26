@@ -151,9 +151,6 @@ public class EventProfileActivity extends AppCompatActivity {
                 postParticipation.execute();
             }
         });
-        if(user.equals("host")){
-            applyBtn.setVisibility(View.GONE);
-        }
 
         participantStrings = new ArrayList<>();
         participantJSONObjects = new ArrayList<>();
@@ -327,6 +324,8 @@ public class EventProfileActivity extends AppCompatActivity {
 
     private void showParticipants(String result){
         findViewById(R.id.event_participants_none).setVisibility(View.GONE);
+        participantStrings.clear();
+        boolean isParticipant = false;
         try {
             JSONArray partJson = new JSONArray(result);
             String isEventHost = userId == hostJson.getInt("id") ? "true" : "false";
@@ -356,6 +355,10 @@ public class EventProfileActivity extends AppCompatActivity {
                 }
                 String profilePicId = String.valueOf(artist.getInt("profilePictureId"));
                 participantStrings.add(new String[]{name, profilePicId, id, isEventHost, buttonMode, "noPic"}); // name image id isEventHost
+
+                if(artist.getInt("id") == userId) {
+                    isParticipant = true;
+                }
             }
             /*participantStrings.add(new String[]{"Test1", "", "1", "true", "none"});
             participantStrings.add(new String[]{"Test2", "", "2", "true", "none"});*/
@@ -373,6 +376,10 @@ public class EventProfileActivity extends AppCompatActivity {
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+
+        if(user.equals("artist") && !isParticipant) {
+            applyBtn.setVisibility(View.VISIBLE);
         }
     }
 
@@ -656,8 +663,13 @@ public class EventProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            applyBtn.setClickable(false);
-
+            applyBtn.setVisibility(View.GONE);
+            try {
+                GetParticipants getParticipants = new GetParticipants();
+                getParticipants.execute(eventJson.getInt("id") + "");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
