@@ -1,13 +1,13 @@
 package com.example.david.gigfinder;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -24,17 +24,23 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.PopupWindow;
+import android.widget.Switch;
+import android.widget.TextView;
 
+import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.UrlTileProvider;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -49,15 +55,33 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "APPLOG - ExploreFragment";
 
+    SharedPreferences sharedPreferences;
     String idToken;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionsGranted = false;
     private static final float DEFAULT_ZOOM = 12;
+
+    private String[] genreStrings;
+    private JSONArray genresFromServer;
+    private ArrayList<String> myGenres;
+    private boolean[] checkedGenres;
+
+    private ArrayList<Marker> markers = new ArrayList<Marker>();
+
+    private boolean showOldEvents = false;
+    private boolean onlyEventsByFavs = false;
+
+    private ImageButton filterBtn;
+    private PopupWindow popupWindow;
 
     @Nullable
     @Override
@@ -67,19 +91,104 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+
+        sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
         idToken = getArguments().getString("idToken");
+        filterBtn = getView().findViewById(R.id.filter_btn);
+
         if(idToken.equals("offline")) {
             //offline mode
             offlineMode();
         }else{
             //online mode
             getLocationPermission();
+            showGenres();
             GetEvents getEvents = new GetEvents();
             getEvents.execute();
+            initMenu();
+            filterBtn.setOnClickListener(filterOnClick());
         }
         super.onActivityCreated(savedInstanceState);
 
         reloadAnimation(true);
+    }
+
+    private void initMenu() {
+
+        LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View popupView = layoutInflater.inflate(R.layout.popup_filter_layout, null);
+
+        popupWindow = new PopupWindow(
+                popupView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        popupWindow.setOutsideTouchable(false);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                popupWindow.setOutsideTouchable(false);
+            }
+        });
+
+        Switch expiredEventsSwitch = popupView.findViewById(R.id.expiredEventsSwitch);
+        Switch eventsBySwitch = popupView.findViewById(R.id.eventsByFavsSwitch);
+        TextView filterByGenreTxt = popupView.findViewById(R.id.filterByGenreTxt);
+
+        expiredEventsSwitch.setChecked(showOldEvents);
+        expiredEventsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    showOldEvents = true;
+                    GetEvents getEvents = new GetEvents();
+                    getEvents.execute();
+                }else{
+                    showOldEvents = false;
+                    GetEvents getEvents = new GetEvents();
+                    getEvents.execute();
+                }
+            }
+        });
+
+        eventsBySwitch.setChecked(onlyEventsByFavs);
+        eventsBySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    onlyEventsByFavs = true;
+                    GetEvents getEvents = new GetEvents();
+                    getEvents.execute();
+                }else{
+                    onlyEventsByFavs = false;
+                    GetEvents getEvents = new GetEvents();
+                    getEvents.execute();
+                }
+            }
+        });
+
+        filterByGenreTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                filterByGenres();
+            }
+        });
+    }
+
+    private void showGenres(){
+        myGenres = new ArrayList<String>();
+        try {
+            genresFromServer = new JSONArray(sharedPreferences.getString("genres", ""));
+            genreStrings = new String[genresFromServer.length()];
+            checkedGenres = new boolean[genreStrings.length];
+            for(int i=0; i<genresFromServer.length(); i++){
+                genreStrings[i] = genresFromServer.getJSONObject(i).getString("value");
+                checkedGenres[i] = true;
+                myGenres.add(genresFromServer.getJSONObject(i).getString("value"));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -110,6 +219,65 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
             Log.d(TAG, "Getting device location!");
             getDeviceLocation();
         }
+    }
+
+    private View.OnClickListener filterOnClick(){
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!popupWindow.isOutsideTouchable()) {
+                    popupWindow.showAsDropDown(v);
+                    popupWindow.setOutsideTouchable(true);
+                }else {
+                    popupWindow.dismiss();
+                }
+            }
+        };
+        return onClickListener;
+    }
+
+    private void filterByGenres() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+        mBuilder.setTitle(getString(R.string.filtern_by_genre_title));
+
+        final ArrayList<String> selectedGenres = myGenres;
+
+        mBuilder.setMultiChoiceItems(genreStrings, checkedGenres, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                //unchecking
+                if (isChecked) {
+                    selectedGenres.add(genreStrings[which].toString());
+                } else {
+                    selectedGenres.remove(genreStrings[which].toString());
+                }
+            }
+        });
+
+        mBuilder.setPositiveButton(getString(R.string.registration_genre_picker_positive), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                myGenres = selectedGenres;
+                GetEvents getEvents = new GetEvents();
+                getEvents.execute();
+                popupWindow.dismiss();
+            }
+        });
+
+
+
+        mBuilder.setNeutralButton("Alle Genres", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                for(boolean i : checkedGenres){
+                    i=true;
+                    //((AlertDialog) dialog).getListView().setItemChecked(i, true);
+                }
+            }
+        });
+
+        AlertDialog dialog = mBuilder.create();
+        dialog.show();
     }
 
     /**
@@ -227,6 +395,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void showEvents(String events){
+        for(Marker i : markers){
+            i.remove();
+        }
+        markers.clear();
         try {
             JSONArray jsonArray = new JSONArray(events);
             for(int i=0; i<jsonArray.length(); i++){
@@ -238,6 +410,51 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    private void filterEvents(String events){
+        String favs = sharedPreferences.getString("favorites", "null");
+        try {
+            JSONArray jsonArray = new JSONArray(events);
+            JSONArray newArray = new JSONArray();
+            for(int i=0; i<jsonArray.length(); i++){
+                if(!showOldEvents){
+                    String end = jsonArray.getJSONObject(i).getString("end");
+                    if(Utils.convertStringToDate(end).before(Calendar.getInstance().getTime())){
+                        continue;
+                    }
+                }
+                if (onlyEventsByFavs){
+                    int id = jsonArray.getJSONObject(i).getInt("id");
+                    if(!Utils.isUserInFavorites(id, favs)){
+                        continue;
+                    }
+                }
+                if(!eventFitsGenres(jsonArray.getJSONObject(i).getJSONArray("eventGenres"))){
+                    continue;
+                }
+                newArray.put(jsonArray.getJSONObject(i));
+            }
+            Log.d(TAG, "!!! NEW EVENTS:" + newArray.toString());
+            showEvents(newArray.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean eventFitsGenres(JSONArray eventGenres){
+        String genres = sharedPreferences.getString("genres", "");
+        for(int i=0; i<eventGenres.length(); i++){
+            try {
+                String thisGenres = Utils.genreIdToString(eventGenres.getJSONObject(i).getInt("genreId"), genresFromServer.toString());
+                if(myGenres.contains(thisGenres)){
+                    return true;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     private void dropMarker(JSONObject event){
         try {
                 LatLng testMarker = new LatLng(event.getDouble("latitude"), event.getDouble("longitude"));//TODO Get right Location
@@ -246,6 +463,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
                         .title(event.getString("title"))
                         .snippet(event.getString("description")));
                 myMarker.setTag(event);
+                markers.add(myMarker);
             } catch (JSONException e1) {
             e1.printStackTrace();
         }
@@ -274,8 +492,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
             try {
                 URL url = new URL("https://gigfinder.azurewebsites.net/api/events?location=" + 48.150960 + "," + 11.580820 + "&radius=10000.0"); //TODO: latlng
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("Authorization", idToken); //TODO idToken
+
+                urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(false);
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -301,7 +521,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         @Override
         protected void onPostExecute(String result){
             Log.d(TAG, "EVENTS: " + result);
-            showEvents(result);
+            filterEvents(result);
         }
     }
 }
