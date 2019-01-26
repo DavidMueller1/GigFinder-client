@@ -217,11 +217,15 @@ public class HostProfileFragment extends Fragment {
             JSONObject userProfile = jsonArray.getJSONObject(0);
 
             if(!idToken.equals("offline")) {
-                GetProfilePicture getProfilePicture = new GetProfilePicture();
-                getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+                if(isNetworkAvailable()) {
 
-                GetReview getReview = new GetReview();
-                getReview.execute();
+                    GetProfilePicture getProfilePicture = new GetProfilePicture();
+                    getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+
+                    GetReview getReview = new GetReview();
+                    getReview.execute();
+
+                }
             }
 
             final String name = userProfile.getString("name");
@@ -512,8 +516,11 @@ public class HostProfileFragment extends Fragment {
         proceedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DeleteUser deleteUser = new DeleteUser();
-                deleteUser.execute();
+                if(isNetworkAvailable()) {
+                    DeleteUser deleteUser = new DeleteUser();
+                    deleteUser.execute();
+                }
+                dialog.cancel();
             }
         });
     }

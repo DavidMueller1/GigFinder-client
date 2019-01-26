@@ -81,8 +81,10 @@ public class ChatFragment extends Fragment {
             offlineMode();
         }else {
             //online mode
-            GetReceivers getReceivers = new GetReceivers();
-            getReceivers.execute();
+            if(isNetworkAvailable()) {
+                GetReceivers getReceivers = new GetReceivers();
+                getReceivers.execute();
+            }
         }
     }
 
@@ -112,9 +114,11 @@ public class ChatFragment extends Fragment {
     }
 
     private void updateProfilePictures(){
-        for(int i=0; i<chatStrings.size(); i++){
-            GetProfilePicture getProfilePicture = new GetProfilePicture();
-            getProfilePicture.execute(chatStrings.get(i)[3], String.valueOf(i));
+        for(int i=0; i<chatStrings.size(); i++) {
+            if (isNetworkAvailable()) {
+                GetProfilePicture getProfilePicture = new GetProfilePicture();
+                getProfilePicture.execute(chatStrings.get(i)[3], String.valueOf(i));
+            }
         }
     }
 

@@ -67,8 +67,10 @@ public class FavoritesFragment extends Fragment {
             offlineMode();
         }else {
             //online mode
-            GetFavorites getFavorites = new GetFavorites();
-            getFavorites.execute();
+            if(isNetworkAvailable()) {
+                GetFavorites getFavorites = new GetFavorites();
+                getFavorites.execute();
+            }
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -106,8 +108,10 @@ public class FavoritesFragment extends Fragment {
 
     private void updatePictures() {
         for(int i=0; i<favorites.size(); i++){
-            GetProfilePicture getProfilePicture = new GetProfilePicture();
-            getProfilePicture.execute(favorites.get(i)[2], String.valueOf(i));
+            if(isNetworkAvailable()) {
+                GetProfilePicture getProfilePicture = new GetProfilePicture();
+                getProfilePicture.execute(favorites.get(i)[2], String.valueOf(i));
+            }
         }
     }
 

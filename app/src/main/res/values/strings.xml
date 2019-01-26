@@ -155,5 +155,6 @@
     <string name="explore_title">Explore</string>
     <string name="favorites_title">Favoriten</string>
     <string name="chat_title">Chats</string>
+    <string name="chat_hint">Nachricht schreiben</string>
 
 </resources>
