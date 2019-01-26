@@ -2,6 +2,7 @@ package com.example.david.gigfinder;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,11 +14,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -32,10 +35,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.david.gigfinder.adapters.ProfileEventsAdapter;
 import com.example.david.gigfinder.adapters.ReviewAdapter;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.GeoTools;
 import com.example.david.gigfinder.tools.ImageTools;
+import com.example.david.gigfinder.tools.NonScrollListView;
 import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -54,6 +59,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
 
 public class HostProfileActivity extends AppCompatActivity {
@@ -77,8 +83,17 @@ public class HostProfileActivity extends AppCompatActivity {
     private Button reviewSubmitButton;
     private EditText commentTextField;
 
+    //Reviews
     private RelativeLayout showAllReviewsButton;
     private ListView reviewListView;
+    private ArrayList<String[]> reviewStrings;
+    private ReviewAdapter reviewAdapter;
+    boolean isReviewListExpanded;
+
+    //Upcoming Events
+    private NonScrollListView eventsListView;
+    private ArrayList<String[]> eventStrings;
+    private ProfileEventsAdapter profileEventsAdapter;
 
     // Social Media
     private TextView soundcloudText;
@@ -95,10 +110,6 @@ public class HostProfileActivity extends AppCompatActivity {
     private FrameLayout progress;
 
 
-    private ArrayList<String[]> reviewStrings;
-    private ReviewAdapter reviewAdapter;
-    boolean isReviewListExpanded;
-
     //private JSONObject hostJson;
     private int userId;
     String userType;
@@ -106,6 +117,7 @@ public class HostProfileActivity extends AppCompatActivity {
     private int pictureId;
     String idToken;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,6 +179,8 @@ public class HostProfileActivity extends AppCompatActivity {
         isReviewListExpanded = false;
         reviewListView = findViewById(R.id.profile_artist_review_list);
 
+        eventsListView = findViewById(R.id.profile_host_events_list);
+
         showAllReviewsButton = findViewById(R.id.profile_artist_button_show_all);
         showAllReviewsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,9 +217,21 @@ public class HostProfileActivity extends AppCompatActivity {
 
 
         reviewStrings = new ArrayList<>();
-
         reviewAdapter = new ReviewAdapter(getApplicationContext(), reviewStrings);
         reviewListView.setAdapter(reviewAdapter);
+
+        eventStrings = new ArrayList<>();
+        profileEventsAdapter = new ProfileEventsAdapter(getApplicationContext(), eventStrings);
+        eventsListView.setAdapter(profileEventsAdapter);
+        eventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(HostProfileActivity.this, EventProfileActivity.class);
+                intent.putExtra("idToken", idToken);
+                intent.putExtra("Event", eventStrings.get(position)[2].toString());
+                startActivity(intent);
+            }
+        });
 
         GetHost getHost = new GetHost();
         getHost.execute(String.valueOf(profileUserId));
@@ -326,6 +352,9 @@ public class HostProfileActivity extends AppCompatActivity {
                 JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
                 displaySocialMedia(jsonObject.getString("name"), socialMedias.getJSONObject(i).getString("handle"), jsonObject.getString("website"));
             }
+
+            GetEvents getEvents = new GetEvents();
+            getEvents.execute();
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -677,6 +706,28 @@ public class HostProfileActivity extends AppCompatActivity {
                     progress.setVisibility(View.GONE);
                 }
             });
+        }
+    }
+
+    private void showEvents(String result){
+        if(result != null && !result.equals("[]") && !result.equals("")){
+            try {
+                JSONArray events = new JSONArray(result);
+                for(int i=0; i<events.length(); i++){
+                    String end = events.getJSONObject(i).getString("end");
+                    if(Utils.convertStringToDate(end).after(Calendar.getInstance().getTime())) {
+                        eventStrings.add(new String[]{events.getJSONObject(i).getString("title"),
+                                events.getJSONObject(i).getString("start"),
+                                events.getJSONObject(i).toString()
+                        });
+                    }else{
+                    }
+                }
+                profileEventsAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -1070,6 +1121,52 @@ public class HostProfileActivity extends AppCompatActivity {
         protected void onPostExecute(String result){
             Log.d(TAG, "MESSAGES: " + result);
             checkReviewPermission(result);
+        }
+    }
+
+    private class GetEvents extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/events?host="+profileUserId);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(false);
+                urlConnection.addRequestProperty("Cache-Control", "no-cache");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                displayLoadingScreen(false);
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                displayLoadingScreen(false);
+                e.printStackTrace();
+            } catch (IOException e) {
+                displayLoadingScreen(false);
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "!!! Events by this user: " + result);
+            showEvents(result);
         }
     }
 }
