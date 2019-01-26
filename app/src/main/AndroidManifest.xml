@@ -47,6 +47,21 @@
         <activity android:name=".ArtistProfileActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".RegistrationHostActivity"></activity>
+        <service
+            android:name=".GigFinderFirebaseMessagingService"
+            android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_music_gig" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/darkOrange" />
     </application>
 
 </manifest> <!-- "@mipmap/ic_launcher_round" -->
