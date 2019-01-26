@@ -4,6 +4,10 @@
     <!-- Sign-In -->
     <string name="server_client_id">998701200015-krr5qpgg3go6iol8b2oqv3l4jcttspom.apps.googleusercontent.com</string>
 
+    <!-- Notifications -->
+    <string name="channel_name">Allgemein</string>
+    <string name="channel_description">Dies sind die allgemeinen Nachrichten</string>
+
     <!-- SharedPreferences -->
     <string name="shared_prefs">AppPrefs</string>
 

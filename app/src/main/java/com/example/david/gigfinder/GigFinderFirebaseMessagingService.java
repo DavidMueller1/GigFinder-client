@@ -1,9 +1,13 @@
 package com.example.david.gigfinder;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -30,6 +34,9 @@ import static com.example.david.gigfinder.LoginActivity.ID_TOKEN;
 public class GigFinderFirebaseMessagingService extends FirebaseMessagingService {
     public static final String DEVICE_TOKEN = "DeviceToken";
     public static final String USER_ID = "userId";
+    public static final String CHANNEL_ID = "com.example.david.gigfinder.main";
+
+    private int messageCounter = 0;
 
     @Override
     public void onNewToken(String s) {
@@ -47,6 +54,7 @@ public class GigFinderFirebaseMessagingService extends FirebaseMessagingService 
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
         if (remoteMessage.getData().size() > 0) {
@@ -66,7 +74,36 @@ public class GigFinderFirebaseMessagingService extends FirebaseMessagingService 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            if (messageCounter == 0)
+                initNotificationChannels();
+
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_music_gig)
+                    .setContentTitle(remoteMessage.getNotification().getTitle())
+                    .setContentText(remoteMessage.getNotification().getBody())
+                    .setColor(getColor(R.color.darkOrange))
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            nm.notify(messageCounter, mBuilder.build());
+            messageCounter++;
         }
+    }
+
+    private void initNotificationChannels() {
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        String channelIdOne = "com.my.fcm.test.app.test_channel_one";
+
+        NotificationChannel channelOne = new NotificationChannel(channelIdOne, getString(R.string.channel_name), NotificationManager.IMPORTANCE_DEFAULT);
+        channelOne.setDescription(getString(R.string.channel_description));
+        channelOne.enableLights(true);
+        mNotificationManager.createNotificationChannel(channelOne);
+    }
+
+    @Override
+    public void onDeletedMessages() {
+        super.onDeletedMessages();
     }
 
     public static void sendDeviceToken(Context context) {
@@ -102,7 +139,7 @@ public class GigFinderFirebaseMessagingService extends FirebaseMessagingService 
 
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
-                os.writeBytes(deviceToken);
+                os.writeBytes("\"" + deviceToken + "\"");
                 os.close();
 
                 //Get response

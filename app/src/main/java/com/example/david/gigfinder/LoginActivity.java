@@ -1,5 +1,6 @@
 package com.example.david.gigfinder;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,6 +26,8 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +39,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+
+import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.DEVICE_TOKEN;
+import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
 
 public class LoginActivity extends AppCompatActivity {
     public static final String ID_TOKEN = "IdToken";
@@ -76,7 +82,35 @@ public class LoginActivity extends AppCompatActivity {
             signOut();
         }
 
-        startService(new Intent(this, GigFinderFirebaseMessagingService.class));
+        if (!isServiceRunning(GigFinderFirebaseMessagingService.class))
+            startService(new Intent(this, GigFinderFirebaseMessagingService.class));
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
+                        editor.putString(DEVICE_TOKEN, token);
+                        editor.apply();
+                    }
+                });
+    }
+
+    public boolean isServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
