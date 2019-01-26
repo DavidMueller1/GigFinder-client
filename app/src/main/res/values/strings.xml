@@ -145,8 +145,9 @@
     <string name="max_stale">900</string>
 
     <!-- Filter Menu -->
-    <string name="filter_expired_events">Verfallene Evente</string>
-    <string name="filter_fav_events">Nur Events von Favoriten</string>
+    <string name="filter_expired_events">Vergangene Events</string>
+    <string name="filter_fav_events">Nur von Favoriten</string>
+    <string name="filter_my_events">Nur meine Events</string>
     <string name="filtern_by_genre">Filtern bei Genre</string>
     <string name="filtern_by_genre_title">Wählen Sie die gewünschten Genres</string>
 
