@@ -1,8 +1,12 @@
 package com.example.david.gigfinder;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -11,16 +15,29 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AnticipateInterpolator;
+import android.view.animation.AnticipateOvershootInterpolator;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.david.gigfinder.adapters.ParticipantAdapter;
+import com.example.david.gigfinder.adapters.ReviewAdapter;
 import com.example.david.gigfinder.tools.ColorTools;
 import com.example.david.gigfinder.tools.ImageTools;
 import com.example.david.gigfinder.tools.Utils;
@@ -38,6 +55,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 
 public class ArtistProfileActivity extends AppCompatActivity {
 
@@ -50,6 +70,17 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private TextView descriptionText;
     private TextView genresText;
     private Button sendMsgBtn;
+    private Button addToFavsBtn;
+    private View overlayReview;
+    private RatingBar ratingBar;
+    private Button reviewButton;
+
+    private RatingBar ratingBarOverlay;
+    private Button reviewSubmitButton;
+    private EditText commentTextField;
+
+    private RelativeLayout showAllReviewsButton;
+    private ListView reviewListView;
 
     // Social Media
     private TextView soundcloudText;
@@ -62,7 +93,13 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private FrameLayout progress;
 
+
+    private ArrayList<String[]> reviewStrings;
+    private ReviewAdapter reviewAdapter;
+    boolean isReviewListExpanded;
+
     private int userId;
+    String userType;
     private int profileUserId;
     private String picture;
     String idToken;
@@ -85,6 +122,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
         userId = prefs.getInt("userId", 0);
+        userType = prefs.getString("user", "host");
 
 
 //        profileUserId = 30;
@@ -101,6 +139,47 @@ public class ArtistProfileActivity extends AppCompatActivity {
         spotifyText = findViewById(R.id.profile_spotify_text);
         webText = findViewById(R.id.profile_web_text);
 
+        overlayReview = findViewById(R.id.review_overlay);
+        ratingBar = findViewById(R.id.profile_artist_rating_bar);
+        reviewButton = findViewById(R.id.profile_artist_button_review);
+
+        reviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Test");
+                showReviewOverlay();
+            }
+        });
+
+        ratingBarOverlay = findViewById(R.id.rating_bar_overlay);
+        commentTextField = findViewById(R.id.review_overlay_comment);
+        reviewSubmitButton = findViewById(R.id.review_overlay_button_submit);
+
+        reviewSubmitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleReview();
+            }
+        });
+
+        findViewById(R.id.review_overlay_button_close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideReviewOverlay();
+            }
+        });
+
+        isReviewListExpanded = false;
+        reviewListView = findViewById(R.id.profile_artist_review_list);
+
+        showAllReviewsButton = findViewById(R.id.profile_artist_button_show_all);
+        showAllReviewsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayReviewList();
+            }
+        });
+
         progress = findViewById(R.id.progressBarHolder);
         sendMsgBtn = findViewById(R.id.sendMsgBtn);
         sendMsgBtn.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +194,11 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        reviewStrings = new ArrayList<>();
+
+        reviewAdapter = new ReviewAdapter(getApplicationContext(), reviewStrings);
+        reviewListView.setAdapter(reviewAdapter);
 
 
         GetUser getUser = new GetUser();
@@ -169,11 +253,14 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private void updateProfile(String result){
         try {
-            Log.d(TAG, result);
+            //Log.d(TAG, result);
             JSONObject userProfile = new JSONObject(result);
 
             GetProfilePicture getProfilePicture = new GetProfilePicture();
             getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+
+            GetReview getReview = new GetReview();
+            getReview.execute();
 
             final String name = userProfile.getString("name");
             nameText.setText(name);
@@ -311,6 +398,167 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     };
 
+
+    private void showReviewOverlay() {
+        ratingBarOverlay.setRating(0f);
+        overlayReview.setVisibility(View.VISIBLE);
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        int screenHeight = size.y;
+        ObjectAnimator animation = ObjectAnimator.ofFloat(overlayReview, "translationY", -screenHeight, 0f);
+        animation.setDuration(1000);
+        animation.setInterpolator(new OvershootInterpolator());
+        animation.start();
+    }
+
+    private void hideReviewOverlay() {
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+        int screenHeight = size.y;
+        ObjectAnimator animation = ObjectAnimator.ofFloat(overlayReview, "translationY", 0f, -screenHeight);
+        animation.setDuration(1000);
+        animation.setInterpolator(new AnticipateOvershootInterpolator());
+        animation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                overlayReview.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        animation.start();
+    }
+
+    /**
+     * Called after the user hits "raedy" in the Review Overlay
+     */
+    private void handleReview() {
+        int rating = (int) (2 * ratingBarOverlay.getRating());
+        hideReviewOverlay();
+        reviewButton.setVisibility(View.GONE);
+        String comment = commentTextField.getText().toString();
+        PostReview postReview = new PostReview();
+        postReview.execute(Integer.toString(rating), comment);
+    }
+
+    /**
+     * Updates the Reviews in the Profile and checks if the user allready wrote a review
+     * @param result
+     */
+    private void displayReviews(String result) {
+        boolean possibleReviewPermission = true;
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+            int arraySize = jsonArray.length();
+            float sum = 0f;
+            reviewStrings.clear();
+            for(int i = 0; i < arraySize; i++) {
+                JSONObject reviewJson = jsonArray.getJSONObject(i);
+
+                float rating =  (float) reviewJson.getInt("rating") / 2;
+                Log.d(TAG, "Float: " + rating);
+                String comment = reviewJson.getString("comment");
+
+                sum += rating;
+
+                reviewStrings.add(new String[]{String.valueOf(rating), comment});
+
+                if(reviewJson.getInt("authorId") == userId) {
+                    possibleReviewPermission = false;
+                }
+            }
+
+            reviewAdapter.notifyDataSetChanged();
+            ratingBar.setRating(sum / arraySize);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if(possibleReviewPermission && userType.equals("host")) {
+            checkParticipations();
+        }
+    }
+
+    /**
+     * Shows and hides the full list of reviews
+     */
+    private void displayReviewList() {
+        if(!isReviewListExpanded) {
+            ObjectAnimator animation = ObjectAnimator.ofFloat(findViewById(R.id.review_triangle_left), "rotation", -180f, 0f);
+            animation.setDuration(400);
+            animation.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation.start();
+            ObjectAnimator animation2 = ObjectAnimator.ofFloat(findViewById(R.id.review_triangle_right), "rotation", 180f, 0f);
+            animation2.setDuration(400);
+            animation2.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation2.start();
+
+            ((TextView) findViewById(R.id.profile_artist_show_all)).setText(getString(R.string.profile_review_button_hide_all));
+
+            reviewListView.setVisibility(View.VISIBLE);
+            isReviewListExpanded = true;
+        }
+        else {
+            ObjectAnimator animation = ObjectAnimator.ofFloat(findViewById(R.id.review_triangle_left), "rotation", 0f, -180f);
+            animation.setDuration(400);
+            animation.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation.start();
+            ObjectAnimator animation2 = ObjectAnimator.ofFloat(findViewById(R.id.review_triangle_right), "rotation", 0f, 180f);
+            animation2.setDuration(400);
+            animation2.setInterpolator(new AccelerateDecelerateInterpolator());
+            animation2.start();
+
+            ((TextView) findViewById(R.id.profile_artist_show_all)).setText(getString(R.string.profile_review_button_show_all));
+
+            reviewListView.setVisibility(View.GONE);
+            isReviewListExpanded = false;
+        }
+    }
+
+    private void checkParticipations() {
+        GetParticipants getParticipants = new GetParticipants();
+        getParticipants.execute();
+    }
+
+    private void checkReviewPermission(String result) {
+        boolean reviewPermission = false;
+        try {
+            JSONArray jsonArray = new JSONArray(result);
+            for(int i = 0; i < jsonArray.length(); i++) {
+                JSONObject partJson = jsonArray.getJSONObject(i);
+                JSONObject event = partJson.getJSONObject("event");
+
+                if(event.getInt("hostId") == userId && partJson.getBoolean("accepted")) {
+                    Timestamp timestamp = Utils.convertStringToTimestamp(event.getString("end"));
+                    if(timestamp.before(new Timestamp(System.currentTimeMillis()))) {
+                        reviewPermission = true;
+                        break;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if(reviewPermission) {
+            reviewButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+
     /**
      * Displays the Website dialog
      * @param link
@@ -340,8 +588,15 @@ public class ArtistProfileActivity extends AppCompatActivity {
         proceedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, link);
+                Uri uri;
+                if(!link.toString().startsWith("http://") && !link.toString().startsWith("https://")){
+                    uri = Uri.parse("http://" + link.toString());
+                }else{
+                    uri = link;
+                }
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(browserIntent);
+                dialog.cancel();
             }
         });
     }
@@ -446,6 +701,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(true);
+                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -592,6 +849,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
+                Log.d(TAG, "IDToken: " + idToken);
                 urlConnection.setRequestProperty("Content-Type","application/json");
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
@@ -600,8 +858,12 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 //Send data TODO
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put("ArtistId", userId);
-                jsonObject.put("HostId", profileUserId);
+                jsonObject.put("AuthorId", userId);
+                jsonObject.put("Rating", Integer.parseInt(params[0]));
+                jsonObject.put("Comment", params[1]);
+                jsonObject.put("ArtistId", profileUserId);
+                Log.d(TAG, jsonObject.toString());
+                //jsonObject.put("")
                 os.writeBytes(jsonObject.toString());
                 os.close();
 
@@ -615,8 +877,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
                         int statusCode = httpConn.getResponseCode();
                         if (statusCode != 200) {
                             is = httpConn.getErrorStream();
-                            Log.d(TAG, "PostFavorite: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "PostFavorite: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
+                            Log.d(TAG, "PostReview: STATUS CODE: " + statusCode);
+                            Log.d(TAG, "PostReview: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
                             Log.d(TAG, httpConn.getURL().toString());
                         }
                     }
@@ -649,7 +911,93 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
+            GetReview getReview = new GetReview();
+            getReview.execute();
+        }
+    }
 
+    /**
+     *
+     */
+    class GetReview extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/reviews?artist=" + profileUserId);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(TAG, "USER REVIEWS: " + result);
+            displayReviews(result);
+        }
+    }
+
+    /**
+     *
+     */
+    class GetParticipants extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/participations?artist=" + profileUserId);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                Log.d(TAG, "Error: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            Log.d(TAG, "MESSAGES: " + result);
+            checkReviewPermission(result);
         }
     }
 }

@@ -110,7 +110,8 @@ public abstract class Utils {
     }
 
     public static boolean isUserInFavorites(int id, String favorites){
-        if(!favorites.equals("")){
+        Log.d(TAG, favorites);
+        if(!(favorites.equals("") || favorites.equals("[]"))){
             JSONArray favs = null;
             try {
                 favs = new JSONArray(favorites);
@@ -125,5 +126,23 @@ public abstract class Utils {
             }
         }
         return false;
+    }
+
+    public static int idToFavoritesId(int id, String favorites){
+        if(!favorites.equals("")){
+            JSONArray favs = null;
+            try {
+                favs = new JSONArray(favorites);
+                for(int i=0; i<favs.length(); i++){
+                    Log.d(TAG, String.valueOf(i));
+                    if(id == favs.getJSONObject(i).getInt("hostId")){
+                        return favs.getJSONObject(i).getInt("id");
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 }
