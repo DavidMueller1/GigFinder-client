@@ -193,6 +193,7 @@
                 android:text="Hosted By (Testbtn)" />
 
             <Button
+                android:visibility="gone"
                 android:id="@+id/applyBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
