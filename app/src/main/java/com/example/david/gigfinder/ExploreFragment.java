@@ -68,7 +68,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionsGranted = false;
-    private static final float DEFAULT_ZOOM = 12;
+    private static final float DEFAULT_ZOOM = 9;
+
+    private String user;
+    private int userId;
 
     private String[] genreStrings;
     private JSONArray genresFromServer;
@@ -79,11 +82,12 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
 
     private boolean showOldEvents = false;
     private boolean onlyEventsByFavs = false;
+    private boolean onlyMyEvents = false;
 
     private ImageButton filterBtn;
     private PopupWindow popupWindow;
 
-    boolean fragmentLoaded = false;
+    private boolean fragmentLoaded = false;
 
     @Nullable
     @Override
@@ -97,14 +101,16 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
         idToken = getArguments().getString("idToken");
         filterBtn = getView().findViewById(R.id.filter_btn);
+        user = sharedPreferences.getString("user", "");
+        userId = sharedPreferences.getInt("userId", 1);
 
         if(idToken.equals("offline")) {
             //offline mode
             offlineMode();
         }else{
             //online mode
-            getLocationPermission();
             showGenres();
+            getLocationPermission();
             GetEvents getEvents = new GetEvents();
             getEvents.execute();
             initMenu();
@@ -126,16 +132,19 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        popupWindow.setOutsideTouchable(false);
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setFocusable(false);
+
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                popupWindow.setOutsideTouchable(false);
+                popupWindow.setFocusable(false);
             }
         });
 
         Switch expiredEventsSwitch = popupView.findViewById(R.id.expiredEventsSwitch);
         Switch eventsBySwitch = popupView.findViewById(R.id.eventsByFavsSwitch);
+        Switch myEventsSwitch = popupView.findViewById(R.id.eventsByMeSwitch);
         TextView filterByGenreTxt = popupView.findViewById(R.id.filterByGenreTxt);
 
         expiredEventsSwitch.setChecked(showOldEvents);
@@ -154,22 +163,47 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        eventsBySwitch.setChecked(onlyEventsByFavs);
-        eventsBySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    onlyEventsByFavs = true;
-                    GetEvents getEvents = new GetEvents();
-                    getEvents.execute();
-                }else{
-                    onlyEventsByFavs = false;
-                    GetEvents getEvents = new GetEvents();
-                    getEvents.execute();
-                }
-            }
-        });
+        if(user.equals("artist")) {
 
+            myEventsSwitch.setVisibility(View.GONE);
+
+            eventsBySwitch.setChecked(onlyEventsByFavs);
+            eventsBySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        onlyEventsByFavs = true;
+                        GetEvents getEvents = new GetEvents();
+                        getEvents.execute();
+                    } else {
+                        onlyEventsByFavs = false;
+                        GetEvents getEvents = new GetEvents();
+                        getEvents.execute();
+                    }
+                }
+            });
+
+        }else {
+
+            eventsBySwitch.setVisibility(View.GONE);
+
+            myEventsSwitch.setChecked(onlyEventsByFavs);
+            myEventsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        onlyMyEvents = true;
+                        GetEvents getEvents = new GetEvents();
+                        getEvents.execute();
+                    } else {
+                        onlyMyEvents = false;
+                        GetEvents getEvents = new GetEvents();
+                        getEvents.execute();
+                    }
+                }
+            });
+
+        }
         filterByGenreTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,9 +262,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!popupWindow.isOutsideTouchable()) {
+                if(!popupWindow.isFocusable()) {
+                    popupWindow.setFocusable(true);
                     popupWindow.showAsDropDown(v);
-                    popupWindow.setOutsideTouchable(true);
                 }else {
                     popupWindow.dismiss();
                 }
@@ -239,6 +273,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         return onClickListener;
     }
 
+    //TODO
     private void filterByGenres() {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
         mBuilder.setTitle(getString(R.string.filtern_by_genre_title));
@@ -267,17 +302,25 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-
-
+        /*
         mBuilder.setNeutralButton("Alle Genres", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                for(boolean i : checkedGenres){
-                    i=true;
+                for(int i=0; i<checkedGenres.length; i++){
+                    checkedGenres[i] = true;
                     //((AlertDialog) dialog).getListView().setItemChecked(i, true);
                 }
             }
         });
+
+
+        mBuilder.setNegativeButton(getString(R.string.registration_genre_picker_negative), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        */
 
         AlertDialog dialog = mBuilder.create();
         dialog.show();
@@ -425,9 +468,15 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
                         continue;
                     }
                 }
-                if (onlyEventsByFavs){
-                    int id = jsonArray.getJSONObject(i).getInt("id");
+                if (user.equals("artist") && onlyEventsByFavs){
+                    int id = jsonArray.getJSONObject(i).getInt("hostId");
                     if(!Utils.isUserInFavorites(id, favs)){
+                        continue;
+                    }
+                }
+                if(user.equals("host") && onlyMyEvents){
+                    int id = jsonArray.getJSONObject(i).getInt("hostId");
+                    if(id != userId){
                         continue;
                     }
                 }
