@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">GigFinder</string>
 
+    <!-- Notifications -->
+    <string name="channel_name">Allgemein</string>
+    <string name="channel_description">Dies sind die allgemeinen Nachrichten</string>
+
     <!-- Sign-In -->
     <string name="server_client_id">998701200015-krr5qpgg3go6iol8b2oqv3l4jcttspom.apps.googleusercontent.com</string>
 
@@ -92,7 +96,6 @@
     <string name="gigs_canceled">Abgelehnt</string>
 
     <!-- Events  -->
-    <string name="explore_title">Explore</string>
     <string name="event_participants">Bewerber</string>
     <string name="event_participants_select">Zusagen</string>
     <string name="event_participants_cancel">Absagen</string>
@@ -145,5 +148,9 @@
     <string name="filtern_by_genre">Filtern bei Genre</string>
     <string name="filtern_by_genre_title">Wählen Sie die gewünschten Genres</string>
 
+    <!-- Titles -->
+    <string name="explore_title">Explore</string>
+    <string name="favorites_title">Favoriten</string>
+    <string name="chat_title">Chats</string>
 
 </resources>
