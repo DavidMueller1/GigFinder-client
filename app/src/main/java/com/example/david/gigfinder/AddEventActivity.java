@@ -288,6 +288,8 @@ public class AddEventActivity extends AppCompatActivity {
             postEvent.execute(nameField.getText().toString(), descriptionField.getText().toString(),
                     String.valueOf(position.longitude), String.valueOf(position.latitude),
                     timeStrings[1] + "T" + timeStrings[0], timeStrings[3] + "T" + timeStrings[2], gageField.getText().toString());
+
+            sharedPreferences.edit().putBoolean("reloadExplore", true).apply();
         }
     }
 
