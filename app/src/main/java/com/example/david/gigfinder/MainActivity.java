@@ -88,6 +88,18 @@ public class MainActivity extends AppCompatActivity {
      */
     private void checkSharedPrefs(String user){
 
+        //Check if Genres is missing
+        if(sharedPreferences.getString("genres", "x").equals("x")){
+            GetGenres getGenres = new GetGenres();
+            getGenres.execute();
+        }
+
+        //Check if Social Media is missing
+        if (sharedPreferences.getString("social medias", "x").equals("x")){
+            GetSocialMedias getSocialMedias = new GetSocialMedias();
+            getSocialMedias.execute();
+        }
+
         //Check if UserProfile is missing
         if(sharedPreferences.getString("userProfile", "x").equals("x")){
             if(user.equals("artist")) {
@@ -105,18 +117,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             initGui();
-        }
-
-        //Check if Genres is missing
-        if(sharedPreferences.getString("genres", "x").equals("x")){
-            GetGenres getGenres = new GetGenres();
-            getGenres.execute();
-        }
-
-        //Check if Social Media is missing
-        if (sharedPreferences.getString("social medias", "x").equals("x")){
-            GetSocialMedias getSocialMedias = new GetSocialMedias();
-            getSocialMedias.execute();
         }
     }
 

@@ -2,8 +2,11 @@ package com.example.david.gigfinder.tools;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Base64;
 import android.util.Log;
 
 import com.example.david.gigfinder.R;

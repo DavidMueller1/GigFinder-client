@@ -93,7 +93,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private FrameLayout progress;
 
-
     private ArrayList<String[]> reviewStrings;
     private ReviewAdapter reviewAdapter;
     boolean isReviewListExpanded;
@@ -101,7 +100,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private int userId;
     String userType;
     private int profileUserId;
-    private String picture;
+    private int pictureId;
     String idToken;
 
     @Override
@@ -188,7 +187,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 Intent intent = new Intent(ArtistProfileActivity.this, ChatActivity.class);
                 intent.putExtra("idToken", idToken);
                 intent.putExtra("name", nameText.getText().toString());
-                intent.putExtra("picture", picture);
+                intent.putExtra("pictureId", pictureId);
                 intent.putExtra("profileUserId", profileUserId);
 
                 startActivity(intent);
@@ -256,6 +255,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
             //Log.d(TAG, result);
             JSONObject userProfile = new JSONObject(result);
 
+            pictureId = userProfile.getInt("profilePictureId");
             GetProfilePicture getProfilePicture = new GetProfilePicture();
             getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
 
@@ -603,7 +603,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     private void displayProfilePicture(String result) {
         try {
-            picture = result;
             JSONObject imageProfile = new JSONObject(result);
 
             ViewGroup.LayoutParams params = imageButton.getLayoutParams();
@@ -662,6 +661,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(false);
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;

@@ -220,8 +220,10 @@ public class FavoritesFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             if (result != null && favorites != null) {
-                favorites.get(id)[3] = result;
-                favAdapter.notifyDataSetChanged();
+                if(favorites.size()>=id) {
+                    favorites.get(id)[3] = result;
+                    favAdapter.notifyDataSetChanged();
+                }
             }
         }
     }

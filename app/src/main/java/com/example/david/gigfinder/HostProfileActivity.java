@@ -103,7 +103,7 @@ public class HostProfileActivity extends AppCompatActivity {
     private int userId;
     String userType;
     private int profileUserId;
-    private String picture;
+    private int pictureId;
     String idToken;
 
     @Override
@@ -184,7 +184,7 @@ public class HostProfileActivity extends AppCompatActivity {
                 intent.putExtra("idToken", idToken);
                 intent.putExtra("profileUserId", profileUserId);
                 intent.putExtra("name", nameText.getText().toString());
-                intent.putExtra("picture", picture);
+                intent.putExtra("pictureId", pictureId);
                 startActivity(intent);
             }
         });
@@ -266,6 +266,7 @@ public class HostProfileActivity extends AppCompatActivity {
         try {
             JSONObject userProfile = new JSONObject(jsonString);
 
+            pictureId = userProfile.getInt("profilePictureId");
             GetProfilePicture getProfilePicture = new GetProfilePicture();
             getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
 
@@ -635,7 +636,6 @@ public class HostProfileActivity extends AppCompatActivity {
 
     private void displayProfilePicture(String result) {
         try {
-            picture = result;
             JSONObject imageProfile = new JSONObject(result);
 
             ViewGroup.LayoutParams params = imageButton.getLayoutParams();
