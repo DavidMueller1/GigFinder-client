@@ -93,9 +93,7 @@ public class GigFinderFirebaseMessagingService extends FirebaseMessagingService 
     private void initNotificationChannels() {
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        String channelIdOne = "com.my.fcm.test.app.test_channel_one";
-
-        NotificationChannel channelOne = new NotificationChannel(channelIdOne, getString(R.string.channel_name), NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationChannel channelOne = new NotificationChannel(CHANNEL_ID, getString(R.string.channel_name), NotificationManager.IMPORTANCE_DEFAULT);
         channelOne.setDescription(getString(R.string.channel_description));
         channelOne.enableLights(true);
         mNotificationManager.createNotificationChannel(channelOne);
