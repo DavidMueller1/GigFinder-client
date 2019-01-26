@@ -83,6 +83,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private ImageButton filterBtn;
     private PopupWindow popupWindow;
 
+    boolean fragmentLoaded = false;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -111,6 +113,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         super.onActivityCreated(savedInstanceState);
 
         reloadAnimation(true);
+        fragmentLoaded = true;
     }
 
     private void initMenu() {
@@ -479,6 +482,15 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         }
         else {
             getView().findViewById(R.id.explore_reload).clearAnimation();
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (fragmentLoaded && isVisibleToUser && sharedPreferences.getBoolean("reloadExplore", false)) {
+            GetEvents getEvents = new GetEvents();
+            getEvents.execute();
         }
     }
 

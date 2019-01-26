@@ -283,8 +283,13 @@ public class EventProfileActivity extends AppCompatActivity {
             gageContainer.setVisibility(View.GONE);
         }
         else {
+            if(gage % 1 == 0) {
+                gageText.setText(((int) gage) + " €");
+            }
+            else {
+                gageText.setText(gage + " €");
+            }
             gageContainer.setVisibility(View.VISIBLE);
-            gageText.setText(gage + " €");
         }
     }
 
