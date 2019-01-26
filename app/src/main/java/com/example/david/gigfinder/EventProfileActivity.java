@@ -77,6 +77,8 @@ public class EventProfileActivity extends AppCompatActivity {
     TextView descriptionText;
     TextView timeText;
     TextView dateText;
+    LinearLayout gageContainer;
+    TextView gageText;
     TextView locationText;
     LinearLayout locationContainer;
 
@@ -99,6 +101,8 @@ public class EventProfileActivity extends AppCompatActivity {
         descriptionText = findViewById(R.id.event_description);
         timeText = findViewById(R.id.event_time_text);
         dateText = findViewById(R.id.event_date_text);
+        gageContainer = findViewById(R.id.event_gage_container);
+        gageText = findViewById(R.id.event_gage_text);
         locationText = findViewById(R.id.event_location_text);
         locationContainer = findViewById(R.id.event_location_container);
         locationContainer.setOnClickListener(new View.OnClickListener() {
@@ -269,6 +273,7 @@ public class EventProfileActivity extends AppCompatActivity {
         String endDate = Utils.getDateStringFromServerFormat(eventJson.getString("end"));
         String date = startDate;
         if(!endDate.equals(startDate)) {
+
             date += " bis " + endDate;
         }
         dateText.setText(date);
@@ -276,6 +281,14 @@ public class EventProfileActivity extends AppCompatActivity {
         String placeName = GeoTools.getAddressFromLatLng(this, new LatLng(eventJson.getDouble("latitude"), eventJson.getDouble("longitude")));
         locationText.setText(placeName);
 
+        double gage = eventJson.getDouble("gage");
+        if(gage == 0) {
+            gageContainer.setVisibility(View.GONE);
+        }
+        else {
+            gageContainer.setVisibility(View.VISIBLE);
+            gageText.setText(gage + " €");
+        }
     }
 
     /**
