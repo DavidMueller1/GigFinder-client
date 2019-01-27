@@ -2,12 +2,8 @@ package com.example.david.gigfinder;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
 import android.net.http.HttpResponseCache;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,13 +14,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.david.gigfinder.adapters.ChatAdapter;
 import com.example.david.gigfinder.adapters.ParticipantAdapter;
-import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.Event;
-import com.example.david.gigfinder.data.Host;
 import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.GeoTools;
 import com.example.david.gigfinder.tools.Utils;
@@ -53,8 +45,6 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class EventProfileActivity extends AppCompatActivity {
@@ -426,7 +416,7 @@ public class EventProfileActivity extends AppCompatActivity {
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setUseCaches(true);
-                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
+                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale_online));
 
                 HttpResponseCache cache = HttpResponseCache.getInstalled();
 

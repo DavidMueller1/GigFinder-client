@@ -9,25 +9,21 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.ChatAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -78,14 +74,29 @@ public class ChatFragment extends Fragment {
         listView.setAdapter(chatAdapter);
 
         if(idToken.equals("offline")){
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Toast.makeText(getContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
+                }
+            });
             offlineMode();
         }else {
             //online mode
-            if(isNetworkAvailable()) {
-                GetReceivers getReceivers = new GetReceivers();
-                getReceivers.execute();
-            }
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Intent intent = new Intent(getActivity(), ChatActivity.class);
+                        intent.putExtra("idToken", idToken);
+                        intent.putExtra("name", chatStrings.get(position)[0]);
+                        intent.putExtra("pictureId", Integer.parseInt(chatStrings.get(position)[3]));
+                        intent.putExtra("profileUserId", Integer.parseInt(chatStrings.get(position)[2]));
+                        startActivity(intent);
+                    }
+                });
         }
+        GetReceivers getReceivers = new GetReceivers();
+        getReceivers.execute();
     }
 
     private void showMessages(String result){
@@ -115,10 +126,8 @@ public class ChatFragment extends Fragment {
 
     private void updateProfilePictures(){
         for(int i=0; i<chatStrings.size(); i++) {
-            if (isNetworkAvailable()) {
-                GetProfilePicture getProfilePicture = new GetProfilePicture();
-                getProfilePicture.execute(chatStrings.get(i)[3], String.valueOf(i));
-            }
+            GetProfilePicture getProfilePicture = new GetProfilePicture();
+            getProfilePicture.execute(chatStrings.get(i)[3], String.valueOf(i));
         }
     }
 
@@ -136,17 +145,6 @@ public class ChatFragment extends Fragment {
                 @Override
                 public void run() {
                     progress.setVisibility(View.GONE);
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Intent intent = new Intent(getActivity(), ChatActivity.class);
-                            intent.putExtra("idToken", idToken);
-                            intent.putExtra("name", chatStrings.get(position)[0]);
-                            intent.putExtra("pictureId", Integer.parseInt(chatStrings.get(position)[3]));
-                            intent.putExtra("profileUserId", Integer.parseInt(chatStrings.get(position)[2]));
-                            startActivity(intent);
-                        }
-                    });
                 }
             });
         }
@@ -177,10 +175,7 @@ public class ChatFragment extends Fragment {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    /**
-     *
-     */
-    class GetReceivers extends AsyncTask<String, Void, String> {
+    private class GetReceivers extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -191,8 +186,10 @@ public class ChatFragment extends Fragment {
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setUseCaches(false);
                 urlConnection.setRequestMethod("GET");
+                if(!isNetworkAvailable()){
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_offline));
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -227,7 +224,7 @@ public class ChatFragment extends Fragment {
         }
     }
 
-    class GetProfilePicture extends AsyncTask<String, Void, String> {
+    private class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         int id;
 
@@ -241,9 +238,11 @@ public class ChatFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setUseCaches(true);
-                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
-
+                if(isNetworkAvailable()) {
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_online));
+                }else{
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_offline));
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -276,8 +275,6 @@ public class ChatFragment extends Fragment {
                 displayLoadingScreen(false);
             }
         }
-
-
     }
 }
 

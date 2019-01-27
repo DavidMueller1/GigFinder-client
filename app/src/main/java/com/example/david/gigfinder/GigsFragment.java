@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.FavAdapter;
 import com.example.david.gigfinder.adapters.PastGigsAdapter;
@@ -48,11 +49,11 @@ public class GigsFragment extends Fragment {
     private UpcomingGigsAdapter upcomingGigsAdapter;
     private PastGigsAdapter pastGigsAdapter;
 
-    ArrayList<JSONObject> futureEventObjects;
-    ArrayList<JSONObject> pastEventObjects;
+    private ArrayList<JSONObject> futureEventObjects;
+    private ArrayList<JSONObject> pastEventObjects;
 
-    ArrayList<String[]> futureGigs;
-    ArrayList<String[]> pastGigs;
+    private ArrayList<String[]> futureGigs;
+    private ArrayList<String[]> pastGigs;
 
     private ListView upcomingListView;
     private ListView pastListView;
@@ -98,6 +99,21 @@ public class GigsFragment extends Fragment {
 
         if(idToken.equals("offline")) {
             offlineMode();
+
+            upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Toast.makeText(getContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            pastListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Toast.makeText(getContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
+                }
+            });
+
         }else{
             //online mode
             if(isNetworkAvailable()) {
@@ -138,14 +154,12 @@ public class GigsFragment extends Fragment {
             startActivity(intent);
             getActivity().finish();
         }else{
-            //Show Popup
+            GetParticipations getParticipations = new GetParticipations();
+            getParticipations.execute();
         }
     }
 
     private void showGigs(String result) {
-//        ArrayList<String[]> futureEvents = new ArrayList<>();
-//        ArrayList<String[]> pastEvents = new ArrayList<>();
-
 
         try {
             JSONArray jsonArray = new JSONArray(result);
@@ -164,16 +178,16 @@ public class GigsFragment extends Fragment {
                     Log.d(TAG, "Event in the past: " + event.toString());
                     pastGigs.add(new String[] {event.getString("title"), GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude")))});
                 }
-                String[] eString = {};
             }
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d(TAG, "Error getting Events: " + e.getStackTrace().toString());
         }
-
         upcomingGigsAdapter.notifyDataSetChanged();
         pastGigsAdapter.notifyDataSetChanged();
-        checkStatus();
+        if(isNetworkAvailable()) {
+            checkStatus();
+        }
     }
 
     private void checkStatus() {
@@ -228,8 +242,7 @@ public class GigsFragment extends Fragment {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-
-    class GetParticipations extends AsyncTask<String, Void, String> {
+    private class GetParticipations extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -239,6 +252,9 @@ public class GigsFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                if(!isNetworkAvailable()){
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_offline));
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -264,14 +280,15 @@ public class GigsFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "Participations By This User: " + result);
-            showGigs(result);
+            if(result != null && result != "") {
+                showGigs(result);
+            }else if(result != "[]"){
+                //TODO show "no events" screen
+            }
         }
     }
 
-    /**
-     *
-     */
-    class GetEventParticipants extends AsyncTask<String, Void, String> {
+    private class GetEventParticipants extends AsyncTask<String, Void, String> {
         int index;
 
         @Override
@@ -284,6 +301,7 @@ public class GigsFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(false);
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -308,14 +326,11 @@ public class GigsFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String result){
+        protected void onPostExecute(String result) {
             Log.d(TAG, "Participants result: " + result);
-            updateStatus(index, result);
-            /*if(result.equals("[]")) {
-
-            }else{
-
-            }*/
+            if (result != null) {
+                updateStatus(index, result);
+            }
         }
     }
 }
