@@ -81,7 +81,6 @@ public class HostProfileFragment extends Fragment {
     private TextView genresText;
     private String idToken;
     private RatingBar ratingBar;
-    private ImageView editButton;
 
     private RelativeLayout showAllReviewsButton;
     private ListView reviewListView;
@@ -119,29 +118,12 @@ public class HostProfileFragment extends Fragment {
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
         testSignOutBtn = getView().findViewById(R.id.signOutBtn);
         imageButton = getView().findViewById(R.id.profile_host_profilePicture);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO performProfilePictureSelection();
-            }
-        });
         nameText = getView().findViewById(R.id.profile_host_name);
         descriptionText = getView().findViewById(R.id.profile_host_description);
         locationText = getView().findViewById(R.id.profile_host_location_text);
         locationIcon = getView().findViewById(R.id.profile_host_location_icon);
         locationContainer = getView().findViewById(R.id.profile_host_location_container);
         genresText = getView().findViewById(R.id.profile_host_genre);
-        editButton = getView().findViewById(R.id.profile_edit_button);
-        editButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), RegistrationHostActivity.class);
-                intent.putExtra("idToken", idToken);
-                intent.putExtra("mode", 1); // = Profile Edit
-                //intent.putExtra("profilePictureString", profilePictureString);
-                startActivityForResult(intent, RESULT_EDIT_PROFILE);
-            }
-        });
 
         soundcloudText = getView().findViewById(R.id.profile_soundcloud_text);
         facebookText = getView().findViewById(R.id.profile_facebook_text);
@@ -204,60 +186,6 @@ public class HostProfileFragment extends Fragment {
         startActivityForResult(pickIntent, RESULT_PICK_IMAGE);
     }
 
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RESULT_EDIT_PROFILE) {
-            updateProfile(sharedPreferences.getString("userProfile", "x"));
-        }
-        else if(requestCode == RESULT_PICK_IMAGE) {
-            if (resultCode == RESULT_OK) {
-                Uri path = data.getData();
-
-                try {
-//                profilePictureUri = path;
-
-                    ViewGroup.LayoutParams params = imageButton.getLayoutParams();
-                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    imageButton.setBackground(null);
-                    imageButton.setLayoutParams(params);
-                    /*profilePictureButton.setImageBitmap(profilePicture);*/
-                    imageButton.setImageTintList(null);
-                    RequestOptions options = new RequestOptions()
-                            .centerCrop()
-                            .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER)
-                            .override(ImageTools.PROFILE_PICTURE_SIZE)
-                            .transforms(new CenterCrop(), new RoundedCorners(30));
-
-                    Glide.with(getContext())
-                            .load(path)
-                            .apply(options)
-                            .into(imageButton);
-
-                    byte[] imageByteArray = null;
-                    try {
-                        imageByteArray = ImageTools.uriToByteArray(path, getContext());
-                        imageByteArray = ImageTools.compressImage(getContext(), path, imageByteArray);
-                    } catch (IOException e) {
-                        Log.d(TAG, "Uri not found");
-                        Toast.makeText(getContext(), "Uri not found", Toast.LENGTH_SHORT).show();
-
-                    }
-
-                    PutProfilePicture putProfilePicture = new PutProfilePicture();
-                    putProfilePicture.execute(Base64.encodeToString(imageByteArray, Base64.DEFAULT));
-
-
-                } catch (Exception e) {
-                    Log.d(TAG, "File not found");
-                }
-            }
-        }
-    }
-
     /**
      * Updates the color of all relevant elements
      */
@@ -265,7 +193,6 @@ public class HostProfileFragment extends Fragment {
         int fontColor = ColorTools.isBrightColor(color);
         nameText.setTextColor(fontColor);
         genresText.setTextColor(fontColor);
-        editButton.setImageTintList(ColorStateList.valueOf(fontColor));
 
         getView().findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(color);
 
@@ -739,73 +666,6 @@ public class HostProfileFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             displayProfilePicture(result);
-        }
-    }
-
-
-    class PutProfilePicture extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + profilePictureObject.getInt("id"));
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestProperty("Content-Type", "application/json");
-                urlConnection.setRequestMethod("PUT");
-                urlConnection.setUseCaches(false);
-                urlConnection.setDoOutput(true);
-
-                //Send data
-                DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
-                profilePictureObject.put("image", params[0]);
-                os.write(profilePictureObject.toString().getBytes("UTF-8"));
-                os.close();
-
-                //Get response
-                InputStream is = null;
-                try {
-                    is = urlConnection.getInputStream();
-                } catch (IOException ioe) {
-                    if (urlConnection instanceof HttpURLConnection) {
-                        HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
-                        int statusCode = httpConn.getResponseCode();
-                        if (statusCode != 200) {
-                            is = httpConn.getErrorStream();
-                            Log.d(TAG, "PutProfilePicture: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "PutProfilePicture: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
-                        }
-                    }
-                }
-
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = rd.readLine()) != null) {
-                    response.append(line);
-                    response.append('\r');
-                }
-                rd.close();
-
-                Log.d(TAG, "PutProfilePicture: RESPONSE:" + response.toString());
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
         }
     }
 
