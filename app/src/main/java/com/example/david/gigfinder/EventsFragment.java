@@ -128,7 +128,7 @@ public class EventsFragment extends Fragment {
                     // event is in the past
                     pastEventObjects.add(event);
                     Log.d(TAG, "Event in the past: " + event.toString());
-                    pastEvents.add(new String[] {event.getString("title"), GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude")))});
+                    pastEvents.add(new String[] {event.getString("title"), GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude"))), "none"});
                 }
                 String[] eString = {};
             }
