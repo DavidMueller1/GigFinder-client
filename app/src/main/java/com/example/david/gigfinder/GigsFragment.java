@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.FavAdapter;
@@ -59,6 +60,9 @@ public class GigsFragment extends Fragment {
     private NonScrollListView upcomingListView;
     private NonScrollListView pastListView;
 
+    private TextView noUpcomingGigs;
+    private TextView noPastGigs;
+
     int userId;
 
     @Nullable
@@ -77,6 +81,9 @@ public class GigsFragment extends Fragment {
 
         upcomingListView = (NonScrollListView) getView().findViewById(R.id.upcomingGigsListView);
         pastListView = (NonScrollListView) getView().findViewById(R.id.pastGigsListView);
+
+        noUpcomingGigs = getView().findViewById(R.id.noUpcomingGigsText);
+        noPastGigs = getView().findViewById(R.id.noPastGigsText);
 
         futureGigs = new ArrayList<>();
         pastGigs = new ArrayList<>();
@@ -125,6 +132,7 @@ public class GigsFragment extends Fragment {
                     Intent intent = new Intent(getActivity(), EventProfileActivity.class);
                     intent.putExtra("idToken", idToken);
                     intent.putExtra("Event", futureEventObjects.get(position).toString());
+                    Log.d(TAG, "!!! " + futureEventObjects.toString());
                     startActivity(intent);
                 }
             });
@@ -176,6 +184,12 @@ public class GigsFragment extends Fragment {
                     Log.d(TAG, "Event in the past: " + event.toString());
                     pastGigs.add(new String[] {event.getString("title"), GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude"))), "loading"});
                 }
+            }
+            if(futureEventObjects.size()>0){
+                noUpcomingGigs.setVisibility(View.GONE);
+            }
+            if(pastEventObjects.size()>0){
+                noPastGigs.setVisibility(View.GONE);
             }
         } catch (JSONException e) {
             e.printStackTrace();

@@ -32,6 +32,16 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/noUpcomingGigsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/no_upcoming_gigs"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
             <com.example.david.gigfinder.tools.NonScrollListView
                 android:id="@+id/upcomingGigsListView"
                 android:layout_width="match_parent"
@@ -54,6 +64,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@android:color/darker_gray"/>
+
+            <TextView
+                android:id="@+id/noPastGigsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:text="@string/no_past_gigs"
+                android:textAlignment="center"
+                android:textSize="18sp" />
 
             <com.example.david.gigfinder.tools.NonScrollListView
                 android:id="@+id/pastGigsListView"

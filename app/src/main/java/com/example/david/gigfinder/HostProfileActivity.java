@@ -108,7 +108,6 @@ public class HostProfileActivity extends AppCompatActivity {
 
     private FrameLayout progress;
 
-
     //private JSONObject hostJson;
     private int userId;
     String userType;

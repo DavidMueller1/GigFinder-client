@@ -39,6 +39,16 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/noUpcomingEventsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="8dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/no_upcoming_events"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
                 <com.example.david.gigfinder.tools.NonScrollListView
                     android:id="@+id/upcomingEventsListView"
                     android:layout_width="match_parent"
@@ -61,6 +71,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@android:color/darker_gray"/>
+
+                <TextView
+                    android:id="@+id/noPastEventsText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="8dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/no_past_events"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
 
                 <com.example.david.gigfinder.tools.NonScrollListView
                     android:id="@+id/pastEventsListView"

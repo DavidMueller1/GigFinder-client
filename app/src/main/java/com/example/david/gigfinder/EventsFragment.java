@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.PastGigsAdapter;
@@ -57,6 +58,9 @@ public class EventsFragment extends Fragment {
     private ArrayList<JSONObject> futureEventObjects;
     private ArrayList<JSONObject> pastEventObjects;
 
+    private TextView noUpcomingEvents;
+    private TextView noPastEvents;
+
     private NonScrollListView upcomingListView;
     private NonScrollListView pastListView;
     private FrameLayout progress;
@@ -82,6 +86,9 @@ public class EventsFragment extends Fragment {
         pastListView = getView().findViewById(R.id.pastEventsListView);
         futureEventObjects = new ArrayList<>();
         pastEventObjects = new ArrayList<>();
+
+        noUpcomingEvents = getView().findViewById(R.id.noUpcomingEventsText);
+        noPastEvents = getView().findViewById(R.id.noPastEventsText);
 
         try {
             JSONObject jsonObject = new JSONArray(prefs.getString("userProfile", "x")).getJSONObject(0);
@@ -141,6 +148,13 @@ public class EventsFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d(TAG, "Error getting Events: " + e.getStackTrace().toString());
+        }
+
+        if(futureEvents.size()>0){
+            noUpcomingEvents.setVisibility(View.GONE);
+        }
+        if(pastEvents.size()>0){
+            noPastEvents.setVisibility(View.GONE);
         }
 
         upcomingGigsAdapter = new UpcomingGigsAdapter(getContext(), futureEvents);
