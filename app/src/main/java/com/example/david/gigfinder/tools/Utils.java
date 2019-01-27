@@ -34,7 +34,7 @@ public abstract class Utils {
     public static final String ID_SOUNDCLOUD = "Soundcloud";
     public static final String ID_FACEBOOK = "Facebook";
     public static final String ID_TWITTER = "Twitter";
-    public static final String ID_YOUTUBE = "Youtube";
+    public static final String ID_YOUTUBE = "YouTube";
     public static final String ID_INSTAGRAM = "Instagram";
     public static final String ID_SPOTIFY = "Spotify";
     public static final String ID_WEB = "Website";
