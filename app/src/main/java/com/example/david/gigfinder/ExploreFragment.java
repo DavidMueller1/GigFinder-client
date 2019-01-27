@@ -61,10 +61,11 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class ExploreFragment extends Fragment implements OnMapReadyCallback {
-    private static final String TAG = "APPLOG - ExploreFragment";
 
-    SharedPreferences sharedPreferences;
-    String idToken;
+    private static final String TAG = "ExploreFragment";
+    private SharedPreferences sharedPreferences;
+    private String idToken;
+
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Boolean mLocationPermissionsGranted = false;
@@ -109,7 +110,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
             offlineMode();
         }else{
             //online mode
-            showGenres();
+            initGenres();
             getLocationPermission();
             GetEvents getEvents = new GetEvents();
             getEvents.execute();
@@ -122,6 +123,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         fragmentLoaded = true;
     }
 
+    /**
+     * Initializes the PopUpMenu for filtering
+     */
     private void initMenu() {
 
         LayoutInflater layoutInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -212,7 +216,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    private void showGenres(){
+    /**
+     * Initializes the genres using SharedPreferences and initializes the arrays used for genre filtering
+     */
+    private void initGenres(){
         myGenres = new ArrayList<String>();
         try {
             genresFromServer = new JSONArray(sharedPreferences.getString("genres", ""));
@@ -258,6 +265,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * OnClick listener for the filter menu
+     * @return
+     */
     private View.OnClickListener filterOnClick(){
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
@@ -271,59 +282,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
             }
         };
         return onClickListener;
-    }
-
-    //TODO
-    private void filterByGenres() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
-        mBuilder.setTitle(getString(R.string.filtern_by_genre_title));
-
-        final ArrayList<String> selectedGenres = myGenres;
-
-        mBuilder.setMultiChoiceItems(genreStrings, checkedGenres, new DialogInterface.OnMultiChoiceClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                //unchecking
-                if (isChecked) {
-                    selectedGenres.add(genreStrings[which].toString());
-                } else {
-                    selectedGenres.remove(genreStrings[which].toString());
-                }
-            }
-        });
-
-        mBuilder.setPositiveButton(getString(R.string.registration_genre_picker_positive), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                myGenres = selectedGenres;
-                GetEvents getEvents = new GetEvents();
-                getEvents.execute();
-                popupWindow.dismiss();
-            }
-        });
-
-        /*
-        mBuilder.setNeutralButton("Alle Genres", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                for(int i=0; i<checkedGenres.length; i++){
-                    checkedGenres[i] = true;
-                    //((AlertDialog) dialog).getListView().setItemChecked(i, true);
-                }
-            }
-        });
-
-
-        mBuilder.setNegativeButton(getString(R.string.registration_genre_picker_negative), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        */
-
-        AlertDialog dialog = mBuilder.create();
-        dialog.show();
     }
 
     /**
@@ -440,6 +398,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    /**
+     * Removes all old Marker and shows all new ones
+     * @param events
+     */
     private void showEvents(String events){
         for(Marker i : markers){
             i.remove();
@@ -456,6 +418,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    /**
+     * Filters the Events from Server using the User-Filters or the default ones
+     */
     private void filterEvents(String events){
         String favs = sharedPreferences.getString("favorites", "null");
         try {
@@ -492,6 +457,67 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * Filters the Events from Server using the User-Filters or the default ones
+     */
+    private void filterByGenres() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+        mBuilder.setTitle(getString(R.string.filtern_by_genre_title));
+
+        final ArrayList<String> selectedGenres = myGenres;
+
+        mBuilder.setMultiChoiceItems(genreStrings, checkedGenres, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                //unchecking
+                if (isChecked) {
+                    selectedGenres.add(genreStrings[which].toString());
+                } else {
+                    selectedGenres.remove(genreStrings[which].toString());
+                }
+            }
+        });
+
+        mBuilder.setPositiveButton(getString(R.string.registration_genre_picker_positive), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                myGenres = selectedGenres;
+                GetEvents getEvents = new GetEvents();
+                getEvents.execute();
+                popupWindow.dismiss();
+            }
+        });
+
+        /*
+        mBuilder.setNeutralButton("Alle Genres", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                for(int i=0; i<checkedGenres.length; i++){
+                    checkedGenres[i] = true;
+                    //((AlertDialog) dialog).getListView().setItemChecked(i, true);
+                }
+            }
+        });
+
+
+        mBuilder.setNegativeButton(getString(R.string.registration_genre_picker_negative), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        */
+
+        AlertDialog dialog = mBuilder.create();
+        dialog.show();
+    }
+
+    /**
+     * True if the event contains one of the genres used for filtering
+     * default filters: no genre filters
+     * @param eventGenres
+     * @return
+     */
     private boolean eventFitsGenres(JSONArray eventGenres){
         String genres = sharedPreferences.getString("genres", "");
         for(int i=0; i<eventGenres.length(); i++){
@@ -507,6 +533,10 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         return false;
     }
 
+    /**
+     * Shows the Marker on the Event
+     * @param event
+     */
     private void dropMarker(JSONObject event){
         try {
                 LatLng testMarker = new LatLng(event.getDouble("latitude"), event.getDouble("longitude"));//TODO Get right Location
@@ -544,7 +574,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     *
+     * Used to GetEvents from server, depending on location and radius
      */
     private class GetEvents extends AsyncTask<String, Void, String> {
 
