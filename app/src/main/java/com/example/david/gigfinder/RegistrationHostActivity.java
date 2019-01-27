@@ -67,7 +67,10 @@ import static android.view.View.GONE;
 import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
 
 public class RegistrationHostActivity extends AppCompatActivity {
+
     private static final String TAG = "RegistrationHostActivity";
+    private String idToken;
+
     private static final int PICK_IMAGE = 1;
     private static final int PLACE_PICKER_REQUEST = 2;
 
@@ -82,6 +85,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private ImageView locationButtonIcon;
     private TextView locationButtonText;
     private TextView genreTitle;
+
+    //social media
     private TextView socialMediaTitle;
     private EditText soundcloudField;
     private EditText facebookField;
@@ -90,6 +95,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private EditText instagramField;
     private EditText spotifyField;
     private EditText webField;
+
     private Button backgroundColorPickerButton;
     private Button genrePickerButton;
     private Button registrationButton;
@@ -104,9 +110,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
     private boolean pictureChosen;
 
-    String idToken;
-    private String profilePictureString;
-
+    //Genres
     private String[] genreStrings;
     private JSONArray genres;
     private ArrayList<String> myGenres;
@@ -207,19 +211,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
         position = null;
     }
 
-
-    /**
-     * Called when the user presses the profile picture button
-     * User can choose between camera and gallery
-     */
-    private void performProfilePictureSelection() {
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(pickIntent, PICK_IMAGE);
-    }
-
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_IMAGE) {
             if(resultCode == RESULT_OK) {
                 Uri path = data.getData();
@@ -277,6 +270,16 @@ public class RegistrationHostActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * Called when the user presses the profile picture button
+     * User can choose between camera and gallery
+     */
+    private void performProfilePictureSelection() {
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickIntent, PICK_IMAGE);
+    }
+
     /**
      * Called when the user presses the choose location button
      */
@@ -298,6 +301,9 @@ public class RegistrationHostActivity extends AppCompatActivity {
         colorPicker.show();
     }
 
+    /**
+     * Opens the dialog used to choose the genres
+     */
     private void performGenreSelection(){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
         mBuilder.setTitle(getString(R.string.registration_genre_picker_title));
@@ -401,6 +407,10 @@ public class RegistrationHostActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks if the user provided all information needed for registration
+     * @return
+     */
     private boolean checkUserInputBasic(){
         // Check whether a profile picture is selected
         if(!pictureChosen) {
@@ -438,6 +448,10 @@ public class RegistrationHostActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Shows the genres from server
+     * @param result
+     */
     private void showGenres(String result){
         try {
             genres = new JSONArray(result);
@@ -450,6 +464,12 @@ public class RegistrationHostActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Convertes the selected genres to a JSONArray
+     * @param genreStrings
+     * @return
+     * @throws JSONException
+     */
     private JSONArray genresToJson(ArrayList<String> genreStrings) throws JSONException {
         JSONArray genresJson = new JSONArray();
         for(String i : genreStrings){
@@ -465,30 +485,38 @@ public class RegistrationHostActivity extends AppCompatActivity {
         return genresJson;
     }
 
+    /**
+     * If the user added a social media, calls pickSocialMedia
+     */
     private void postSocialMedia(){
         if(!soundcloudField.getText().toString().equals("")){
-            pickSocialMedia("Soundcloud", soundcloudField.getText().toString());
+            pickSocialMedia(getString(R.string.soundcloud), soundcloudField.getText().toString());
         }
         if(!facebookField.getText().toString().equals("")){
-            pickSocialMedia("Facebook", facebookField.getText().toString());
+            pickSocialMedia(getString(R.string.facebook), facebookField.getText().toString());
         }
         if(!twitterField.getText().toString().equals("")){
-            pickSocialMedia("Twitter", twitterField.getText().toString());
+            pickSocialMedia(getString(R.string.twitter), twitterField.getText().toString());
         }
         if(!youtubeField.getText().toString().equals("")){
-            pickSocialMedia("YouTube", youtubeField.getText().toString());
+            pickSocialMedia(getString(R.string.youtube), youtubeField.getText().toString());
         }
         if(!instagramField.getText().toString().equals("")){
-            pickSocialMedia("Instagram", instagramField.getText().toString());
+            pickSocialMedia(getString(R.string.instagram), instagramField.getText().toString());
         }
         if(!spotifyField.getText().toString().equals("")){
-            pickSocialMedia("Spotify", spotifyField.getText().toString());
+            pickSocialMedia(getString(R.string.spotify), spotifyField.getText().toString());
         }
         if(!webField.getText().toString().equals("")){
-            pickSocialMedia("Website", webField.getText().toString());
+            pickSocialMedia(getString(R.string.website), webField.getText().toString());
         }
     }
 
+    /**
+     * Converts the social media to a JSONObject
+     * @param name
+     * @param handle
+     */
     private void pickSocialMedia(String name, String handle){
         try {
             JSONObject jsonObject = new JSONObject();
@@ -500,6 +528,11 @@ public class RegistrationHostActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Returns the id of the social media
+     * @param name
+     * @return
+     */
     private int getSocialMediaId(String name){
         for(int i = 0; i< socialMedias.length(); i++){
             try {
@@ -513,6 +546,10 @@ public class RegistrationHostActivity extends AppCompatActivity {
         return 0;
     }
 
+    /**
+     * Displays the loading screen if true
+     * @param isLoading
+     */
     private void displayLoadingScreen(boolean isLoading) {
         if(isLoading) {
             runOnUiThread(new Runnable() {
@@ -531,6 +568,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
             });
         }
     }
+
+    //region Server Requests
 
     /**
      * Send the registration request to the Server
@@ -642,8 +681,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
         }
     }
 
-
-
     /**
      * Requests Genres from Server
      */
@@ -741,4 +778,5 @@ public class RegistrationHostActivity extends AppCompatActivity {
         }
     }
 
+    //endregion
 }

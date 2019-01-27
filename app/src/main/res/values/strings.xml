@@ -162,6 +162,13 @@
     <string name="event_alredy_started">Event schon angefangen!</string>
 
     <string name="max_stale_online">900</string> <!-- 60*15 = 15 min -->
-    <string name="max_stale_offline">25200</string> <!-- 60*60*7 = 7 tage -->
+    <string name="max_stale_offline">25200</string>
+    <string name="soundcloud">Soundcloud</string>
+    <string name="facebook">Facebook</string>
+    <string name="twitter">Twitter</string>
+    <string name="youtube">YouTube</string>
+    <string name="instagram">Instagram</string>
+    <string name="spotify">Spotify</string>
+    <string name="website">Website</string> <!-- 60*60*7 = 7 tage -->
 
 </resources>
