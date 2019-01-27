@@ -58,7 +58,6 @@ public class GigsFragment extends Fragment {
 
     private NonScrollListView upcomingListView;
     private NonScrollListView pastListView;
-    private FrameLayout progress;
 
     int userId;
 
@@ -117,10 +116,8 @@ public class GigsFragment extends Fragment {
 
         }else{
             //online mode
-            if(isNetworkAvailable()) {
-                GetParticipations getParticipations = new GetParticipations();
-                getParticipations.execute();
-            }
+            GetParticipations getParticipations = new GetParticipations();
+            getParticipations.execute();
 
             upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
