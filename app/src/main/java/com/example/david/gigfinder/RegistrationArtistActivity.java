@@ -425,8 +425,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private void pickSocialMedia(String name, String handle){
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("SocialMediaId", getSocialMediaId(name));
-            jsonObject.put("Handle", handle);
+            jsonObject.put("socialMediaId", getSocialMediaId(name));
+            jsonObject.put("handle", handle);
             mySocialMedias.put(jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -488,7 +488,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
                 JSONObject imageJson = new JSONObject();
-                imageJson.put("Image", params[3]);
+                imageJson.put("image", params[3]);
                 jsonObject.put("name", params[0]);
                 jsonObject.put("description", params[1]);
                 jsonObject.put("backgroundColor", params[2]);

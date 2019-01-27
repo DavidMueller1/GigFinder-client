@@ -46,6 +46,7 @@ public class SelectUserActivity extends AppCompatActivity {
     private void startHostRegistration() {
         Intent intent = new Intent(getApplicationContext(), RegistrationHostActivity.class);
         intent.putExtra("idToken", idToken);
+        intent.putExtra("mode", 0); // = Profile Registration
         startActivity(intent);
     }
 }

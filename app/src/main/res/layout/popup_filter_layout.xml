@@ -2,9 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="@drawable/overlay"
+    android:padding="@dimen/padding_default"
     android:orientation="vertical"
     tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/explore_filter"
+        android:layout_marginBottom="@dimen/padding_small"
+        android:textAlignment="center"
+        android:textSize="@dimen/font_big"/>
 
     <Switch
         android:id="@+id/expiredEventsSwitch"
@@ -54,9 +63,13 @@
         android:id="@+id/filterByGenreTxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
+        android:padding="@dimen/padding_smaller"
+        android:layout_marginTop="@dimen/padding_smaller"
         android:text="@string/filtern_by_genre"
-        android:textColor="@color/black"
-        android:textSize="18sp" />
+        android:background="@drawable/standart_button"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textAlignment="center"/>
 
 </LinearLayout>

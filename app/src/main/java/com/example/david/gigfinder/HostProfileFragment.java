@@ -65,6 +65,8 @@ import static android.content.Context.MODE_PRIVATE;
 public class HostProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - HostProfileFragment";
 
+    private static final int RESULT_EDIT_PROFILE = 1;
+
     SharedPreferences sharedPreferences;
 
     private int userID;
@@ -79,6 +81,7 @@ public class HostProfileFragment extends Fragment {
     private TextView genresText;
     private String idToken;
     private RatingBar ratingBar;
+    private ImageView editButton;
 
     private RelativeLayout showAllReviewsButton;
     private ListView reviewListView;
@@ -97,6 +100,8 @@ public class HostProfileFragment extends Fragment {
     private ArrayList<String[]> reviewStrings;
     private ReviewAdapter reviewAdapter;
     boolean isReviewListExpanded;
+
+    private String profilePictureString;
 
     @Nullable
     @Override
@@ -119,6 +124,17 @@ public class HostProfileFragment extends Fragment {
         locationIcon = getView().findViewById(R.id.profile_host_location_icon);
         locationContainer = getView().findViewById(R.id.profile_host_location_container);
         genresText = getView().findViewById(R.id.profile_host_genre);
+        editButton = getView().findViewById(R.id.profile_edit_button);
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), RegistrationHostActivity.class);
+                intent.putExtra("idToken", idToken);
+                intent.putExtra("mode", 1); // = Profile Edit
+                //intent.putExtra("profilePictureString", profilePictureString);
+                startActivityForResult(intent, RESULT_EDIT_PROFILE);
+            }
+        });
 
         soundcloudText = getView().findViewById(R.id.profile_soundcloud_text);
         facebookText = getView().findViewById(R.id.profile_facebook_text);
@@ -176,6 +192,16 @@ public class HostProfileFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RESULT_EDIT_PROFILE) {
+            updateProfile(sharedPreferences.getString("userProfile", "x"));
+        }
+    }
+
     /**
      * Updates the color of all relevant elements
      */
@@ -183,6 +209,8 @@ public class HostProfileFragment extends Fragment {
         int fontColor = ColorTools.isBrightColor(color);
         nameText.setTextColor(fontColor);
         genresText.setTextColor(fontColor);
+        editButton.setImageTintList(ColorStateList.valueOf(fontColor));
+
         getView().findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(color);
 
         int titleBarColor = ColorTools.getSecondaryColor(color);
@@ -546,8 +574,10 @@ public class HostProfileFragment extends Fragment {
                     .override(ImageTools.PROFILE_PICTURE_SIZE)
                     .transforms(new CenterCrop(), new RoundedCorners(30));
 
+            profilePictureString = imageProfile.getString("image");
+
             Glide.with(getContext())
-                    .load(Base64.decode(imageProfile.getString("image"), Base64.DEFAULT))
+                    .load(Base64.decode(profilePictureString, Base64.DEFAULT))
                     .apply(options)
                     .into(imageButton);
 
