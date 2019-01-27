@@ -38,17 +38,16 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class ChatFragment extends Fragment {
 
-    private static final String TAG = "APPLOG - ChatFragment";
-
-    private ChatAdapter chatAdapter;
+    private static final String TAG = "ChatFragment";
+    private String idToken;
+    private String user;
 
     private TextView noChatsText;
     private ListView listView;
     private FrameLayout progress;
 
+    private ChatAdapter chatAdapter;
     private ArrayList<String[]> chatStrings;
-    private String idToken;
-    private String user;
 
     @Nullable
     @Override
@@ -99,6 +98,10 @@ public class ChatFragment extends Fragment {
         getReceivers.execute();
     }
 
+    /**
+     * Shows the messages from the server
+     * @param result
+     */
     private void showMessages(String result){
         try {
             String chatpartner;
@@ -124,6 +127,9 @@ public class ChatFragment extends Fragment {
         }
     }
 
+    /**
+     * Updating profile pictures from server
+     */
     private void updateProfilePictures(){
         for(int i=0; i<chatStrings.size(); i++) {
             GetProfilePicture getProfilePicture = new GetProfilePicture();
@@ -131,6 +137,10 @@ public class ChatFragment extends Fragment {
         }
     }
 
+    /**
+     * Displays the loading screen if true
+     * @param isLoading
+     */
     private void displayLoadingScreen(boolean isLoading) {
         if(isLoading) {
             getActivity().runOnUiThread(new Runnable() {
@@ -175,6 +185,9 @@ public class ChatFragment extends Fragment {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    /**
+     * Used to get all chatpartners from the Server
+     */
     private class GetReceivers extends AsyncTask<String, Void, String> {
 
         @Override
@@ -224,6 +237,10 @@ public class ChatFragment extends Fragment {
         }
     }
 
+    /**
+     * Used to get profile pictures from server
+     * Uses caching
+     */
     private class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         int id;

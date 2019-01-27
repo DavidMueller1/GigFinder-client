@@ -117,12 +117,13 @@ public class FavoritesFragment extends Fragment {
         }
     }
 
+    /**
+     * Updates the pictures from server (or cache if offline)
+     */
     private void updatePictures() {
         for(int i=0; i<favorites.size(); i++){
-            //if(isNetworkAvailable()) {
-                GetProfilePicture getProfilePicture = new GetProfilePicture();
-                getProfilePicture.execute(favorites.get(i)[2], String.valueOf(i));
-            //}
+            GetProfilePicture getProfilePicture = new GetProfilePicture();
+            getProfilePicture.execute(favorites.get(i)[2], String.valueOf(i));
         }
     }
 
