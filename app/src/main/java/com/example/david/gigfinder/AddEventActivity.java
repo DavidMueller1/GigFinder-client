@@ -70,7 +70,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class AddEventActivity extends AppCompatActivity {
     private static final String TAG = "AddEventActivity";
-    private static final int PICK_IMAGE = 1;
     private static final int PLACE_PICKER_REQUEST = 2;
 
     SharedPreferences sharedPreferences;
@@ -100,12 +99,6 @@ public class AddEventActivity extends AppCompatActivity {
     private JSONArray genres;
     private String[] genreStrings;
     private ArrayList<String> myGenres;
-
-    /*@Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_event_add, container, false);
-    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +137,6 @@ public class AddEventActivity extends AppCompatActivity {
         });
         locationButtonText = findViewById(R.id.add_event_location_text);
         gageField = findViewById(R.id.add_event_gage);
-        //Replaced the Strings with the Genre-Enum
 
 
         addEventButton = findViewById(R.id.button_add_event_save);
@@ -281,6 +273,7 @@ public class AddEventActivity extends AppCompatActivity {
 
     /**
      *  called when the user presses the save-event-button
+     *  will send the event to the server
      */
     private void performAddEvent() {
         if(checkUserInput()) {
@@ -296,30 +289,7 @@ public class AddEventActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        /*if (requestCode == PICK_IMAGE) {
-            if(resultCode == RESULT_OK) {
-                Uri path = data.getData();
-
-                try {
-                    profilePicture = ImageTools.decodeUri(path, getContentResolver());
-
-                    ViewGroup.LayoutParams params = profilePictureButton.getLayoutParams();
-                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    profilePictureButton.setBackground(null);
-                    profilePictureButton.setLayoutParams(params);
-                    profilePictureButton.setImageBitmap(profilePicture);
-                    profilePictureButton.setImageTintList(null);
-
-                    findViewById(R.id.registration_host_image_hint).setVisibility(View.VISIBLE);
-                } catch (FileNotFoundException e) {
-                    Log.d(TAG, "File not found");
-                }
-
-
-            }
-        }*/
-        if(requestCode == PLACE_PICKER_REQUEST) {
+        if(requestCode == PLACE_PICKER_REQUEST) { // the user chose a location
             if(resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, getApplicationContext());
                 position = place.getLatLng();
@@ -343,7 +313,8 @@ public class AddEventActivity extends AppCompatActivity {
     }
 
     /**
-     * Called when the user presses the choose location button
+     * Called when the user presses the choose location button.
+     * Opens a Place Picker Activity.
      */
     private void performLocationSelection() {
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
@@ -356,6 +327,10 @@ public class AddEventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Called when the user presses the select genre button.
+     * Opens a checkbox Overlay
+     */
     private void performGenreSelection(){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
         mBuilder.setTitle(getString(R.string.registration_genre_picker_title));
@@ -407,6 +382,10 @@ public class AddEventActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * Checks if all necessary inputs have a valid value
+     * @return true if the user input is ok
+     */
     private boolean checkUserInput(){
 
         if(nameField.getText().toString().equals("")) {
@@ -465,6 +444,11 @@ public class AddEventActivity extends AppCompatActivity {
         return true;
     }
 
+
+    /**
+     * Displays all genres
+     * @param result The Sring which contains the genres
+     */
     private void showGenres(String result){
         myGenres = new ArrayList<String>();
         try {
@@ -478,6 +462,10 @@ public class AddEventActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * Converts the genre-array into a JsonArray
+     */
     private JSONArray genresToJson(ArrayList<String> genreStrings) throws JSONException {
         JSONArray genresJson = new JSONArray();
         for(String i : genreStrings){
@@ -493,6 +481,10 @@ public class AddEventActivity extends AppCompatActivity {
         return genresJson;
     }
 
+
+    /**
+     * Sends the event to the Server
+     */
     class PostEvent extends AsyncTask<String, Void, String> {
 
         @Override
@@ -583,6 +575,9 @@ public class AddEventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Gets the available genres
+     */
     class GetGenres extends AsyncTask<String, Void, String> {
 
         @Override

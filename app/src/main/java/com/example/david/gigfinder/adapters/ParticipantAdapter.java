@@ -62,6 +62,7 @@ public class ParticipantAdapter extends ArrayAdapter<String[]> {
 
         partName.setText(getItem(position)[0]);
 
+        // checks whether the select pacticipant button or the cancel button must be visible
         if(isEventHost.equals("false")) {
             selectButton.setVisibility(View.GONE);
             if(buttonMode.equals("cancel")) {
@@ -113,20 +114,6 @@ public class ParticipantAdapter extends ArrayAdapter<String[]> {
 
         participantImgs.add(partImg);
         participantNames.add(partName);
-
-        /*if(!getItem(position)[4].equals("empty")) {
-            try {
-                JSONObject imageProfile = new JSONObject(getItem(position)[4]);
-
-                byte[] decodedString = Base64.decode(imageProfile.getString("image"), Base64.DEFAULT);
-                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                partImg.setImageBitmap(decodedByte);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }*/
 
         final ListView parentList = (ListView) parent;
         final int finalPosition = position;

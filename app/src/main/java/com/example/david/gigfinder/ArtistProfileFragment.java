@@ -179,7 +179,8 @@ public class ArtistProfileFragment extends Fragment {
         TextView descriptionLabel = getView().findViewById(R.id.profile_artist_description_label);
         TextView socialMediaLabel = getView().findViewById(R.id.profile_artist_social_media_label);
         TextView reviewLabel = getView().findViewById(R.id.profile_artist_review_label);
-        if(ColorTools.isBrightColorBool(color)) {
+
+        if(ColorTools.isBrightColorBool(color)) { // Check if the color is too bright for the white background
             getView().findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(titleBarColor);
             ratingBar.setProgressTintList(ColorStateList.valueOf(titleBarColor));
             testSignOutBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
@@ -273,9 +274,9 @@ public class ArtistProfileFragment extends Fragment {
 
     /**
      * Displays a SocialMediaLink
-     * @param socialMedia
-     * @param text
-     * @param socialMediaLink
+     * @param socialMedia The name of the Social Media Platform (e.g. facebook)
+     * @param text The "Name" of the account
+     * @param socialMediaLink The Link to the userprofile
      */
     private void displaySocialMedia(String socialMedia, final String text, final String socialMediaLink) {
         LinearLayout container;
@@ -374,7 +375,7 @@ public class ArtistProfileFragment extends Fragment {
 
     /**
      * Updates the Reviews in the Profile
-     * @param result
+     * @param result Contains a JsonArray with the Reviews
      */
     private void displayReviews(String result) {
         try {
@@ -439,7 +440,7 @@ public class ArtistProfileFragment extends Fragment {
 
     /**
      * Displays the Website dialog
-     * @param link
+     * @param link The link to the external website
      */
     private void openWebsiteDialog(final Uri link){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
@@ -517,8 +518,8 @@ public class ArtistProfileFragment extends Fragment {
     }
 
     /**
-     * Displays the profile picture of the user
-     * @param result
+     * Displays the profile picture
+     * @param result Contains a JSONObject of the image class
      */
     private void displayProfilePicture(String result) {
         try {
@@ -550,8 +551,8 @@ public class ArtistProfileFragment extends Fragment {
     }
 
     /**
-     * Displays the Loading screen if the App is loading data From Server
-     * @param isLoading
+     * Displays and hides a rotating loading animation
+     * @param isLoading Is the laoding screen visible?
      */
     private void displayLoadingScreen(boolean isLoading) {
         if(isLoading) {
@@ -657,7 +658,7 @@ public class ArtistProfileFragment extends Fragment {
     }
 
     /**
-     *
+     * Tells the server to delete the user
      */
     private class DeleteUser extends AsyncTask<String, Void, String> {
 
@@ -716,6 +717,9 @@ public class ArtistProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Gets the reviews of the user from the server
+     */
     private class GetReview extends AsyncTask<String, Void, String> {
 
         @Override

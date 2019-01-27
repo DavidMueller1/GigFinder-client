@@ -16,8 +16,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.david.gigfinder.adapters.ParticipantAdapter;
-import com.example.david.gigfinder.data.Event;
-import com.example.david.gigfinder.data.enums.Genre;
 import com.example.david.gigfinder.tools.GeoTools;
 import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -42,7 +40,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -51,8 +48,6 @@ public class EventProfileActivity extends AppCompatActivity {
     private static final String TAG = "EventProfileActivity";
 
     SharedPreferences prefs;
-
-    private Event event;
     private String idToken;
     private String user;
     private int userId;
@@ -112,7 +107,6 @@ public class EventProfileActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        // TODO move the following code (including the callback method) to where the Event is generated
 
         // region Test Event
         GeoDataClient mGeoDataClient = Places.getGeoDataClient(this);
@@ -222,18 +216,6 @@ public class EventProfileActivity extends AppCompatActivity {
                 // Get the Place object from the buffer.
                 Place place = places.get(0);
 
-                /*
-                // Some example Genres
-                ArrayList<Genre> list = new ArrayList<>();
-                list.add(Genre.ROCK);
-                list.add(Genre.HOUSE);
-
-                // Generate a Test Event
-                event = new Event(1, "Testevent in der gemütlichen Beispielbar",
-                        "Suche talentierten Drehorgelspieler für Freitag Abend in meiner Bar. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-                        list, place.getLatLng(), new Timestamp(2019, 1, 20, 20, 15, 0, 0),
-                        new Timestamp(2019, 1, 21, 3, 30, 0, 0), null);
-                */
 
                 displayEvent();
 
@@ -315,6 +297,9 @@ public class EventProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Displays the hosts name on the button
+     */
     private void showHost(String result){
 
         try {
@@ -330,6 +315,10 @@ public class EventProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Displays all participants of the event
+     * @param result Contains the participants
+     */
     private void showParticipants(String result){
         findViewById(R.id.event_participants_none).setVisibility(View.GONE);
         participantStrings.clear();
@@ -368,8 +357,6 @@ public class EventProfileActivity extends AppCompatActivity {
                     isParticipant = true;
                 }
             }
-            /*participantStrings.add(new String[]{"Test1", "", "1", "true", "none"});
-            participantStrings.add(new String[]{"Test2", "", "2", "true", "none"});*/
 
             ListView listView = findViewById(R.id.event_participants_list);
             int count = listView.getChildCount();
@@ -399,6 +386,9 @@ public class EventProfileActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Displayis the profile pictures of the participants
+     */
     private void updateProfilePictures(){
         for(int i = 0; i < participantStrings.size(); i++){
             GetProfilePicture getProfilePicture = new GetProfilePicture();
@@ -406,7 +396,9 @@ public class EventProfileActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Downloads the profile pictur of an participant
+     */
     class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         int id;
@@ -473,7 +465,7 @@ public class EventProfileActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets the participants of this event from the server
      */
     class GetParticipants extends AsyncTask<String, Void, String> {
 
@@ -521,57 +513,8 @@ public class EventProfileActivity extends AppCompatActivity {
         }
     }
 
-    /*class GetProfilePicture extends AsyncTask<String, Void, String> {
-
-        int id;
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                id = Integer.parseInt(params[1]);
-
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + params[0]);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestMethod("GET");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if(!chatStrings.equals(null)) {
-                chatStrings.get(id)[4] = result;
-                chatAdapter.notifyDataSetChanged();
-            }
-        }
-
-
-    }*/
-
-
-
     /**
-     *
+     * Gets the host of this event from the server
      */
     class GetHost extends AsyncTask<String, Void, String> {
 
@@ -614,6 +557,9 @@ public class EventProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Tells the server that the current user is now a participant
+     */
     class PostParticipation extends AsyncTask<String, Void, String> {
 
         @Override
@@ -688,6 +634,9 @@ public class EventProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Tells the server that the current user is no longer a participant
+     */
     class PutParticipation extends AsyncTask<String, Void, String> {
 
         @Override
