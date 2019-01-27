@@ -193,23 +193,38 @@ public class HostProfileFragment extends Fragment {
         int fontColor = ColorTools.isBrightColor(color);
         nameText.setTextColor(fontColor);
         genresText.setTextColor(fontColor);
+        testSignOutBtn.setTextColor(fontColor);
+        testDeleteBtn.setTextColor(fontColor);
 
-        getView().findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(color);
 
         int titleBarColor = ColorTools.getSecondaryColor(color);
         // happens in MainActivity, otherwise the statusBar changes on chat tab
         //getActivity().getWindow().setStatusBarColor(titleBarColor);
 
         TextView descriptionLabel = getView().findViewById(R.id.profile_host_description_label);
+        TextView socialMediaLabel = getView().findViewById(R.id.profile_host_social_media_label);
+        TextView reviewLabel = getView().findViewById(R.id.profile_artist_review_label);
         if(ColorTools.isBrightColorBool(color)) {
+            getView().findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(titleBarColor);
+            testDeleteBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            testSignOutBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            locationIcon.setImageTintList(ColorStateList.valueOf(titleBarColor));
+            ratingBar.setProgressTintList(ColorStateList.valueOf(titleBarColor));
             descriptionLabel.setTextColor(titleBarColor);
+            socialMediaLabel.setTextColor(titleBarColor);
+            reviewLabel.setTextColor(titleBarColor);
         }
         else {
+            getView().findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(color);
+            testDeleteBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            testSignOutBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            locationIcon.setImageTintList(ColorStateList.valueOf(color));
+            ratingBar.setProgressTintList(ColorStateList.valueOf(color));
             descriptionLabel.setTextColor(color);
+            socialMediaLabel.setTextColor(color);
+            reviewLabel.setTextColor(color);
         }
 
-        descriptionLabel.setTextColor(color);
-        locationIcon.setImageTintList(ColorStateList.valueOf(color));
 
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -238,8 +253,6 @@ public class HostProfileFragment extends Fragment {
             descriptionText.setText(userProfile.getString("description"));
             userID = userProfile.getInt("id");
             updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
-            testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
-            testSignOutBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
             final float lat = Float.parseFloat(userProfile.getString("latitude"));
             final float lng = Float.parseFloat(userProfile.getString("longitude"));
 
@@ -295,6 +308,7 @@ public class HostProfileFragment extends Fragment {
         LinearLayout container;
         final Uri link = Uri.parse(socialMediaLink + text);
         Log.d(TAG, "Link: " + link.toString());
+        getView().findViewById(R.id.profile_host_social_media_label).setVisibility(View.VISIBLE);
 
         switch(socialMedia) {
             case Utils.ID_SOUNDCLOUD:

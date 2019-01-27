@@ -111,7 +111,7 @@
 
                 <TextView
                     android:visibility="gone"
-                    android:id="@+id/textView7"
+                    android:id="@+id/profile_artist_social_media_label"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/profile_social_media_links"
@@ -408,6 +408,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
                     android:layout_marginTop="5dp"
+                    android:background="@drawable/standart_button"
                     android:text="Sing Out" />
 
                 <Button
@@ -416,6 +417,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
                     android:layout_marginTop="5dp"
+                    android:background="@drawable/standart_button"
                     android:text="Delete Profile" />
 
             </LinearLayout>

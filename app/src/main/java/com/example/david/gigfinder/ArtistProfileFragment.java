@@ -169,22 +169,36 @@ public class ArtistProfileFragment extends Fragment {
         int fontColor = ColorTools.isBrightColor(color);
         nameText.setTextColor(fontColor);
         genresText.setTextColor(fontColor);
-        ratingBar.setProgressTintList(ColorStateList.valueOf(color));
-        getView().findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
+        testSignOutBtn.setTextColor(fontColor);
+        testDeleteBtn.setTextColor(fontColor);
 
         int titleBarColor = ColorTools.getSecondaryColor(color);
         // happens in MainActivity, otherwise the statusBar changes on chat tab
         //getActivity().getWindow().setStatusBarColor(titleBarColor);
 
         TextView descriptionLabel = getView().findViewById(R.id.profile_artist_description_label);
+        TextView socialMediaLabel = getView().findViewById(R.id.profile_artist_social_media_label);
+        TextView reviewLabel = getView().findViewById(R.id.profile_artist_review_label);
         if(ColorTools.isBrightColorBool(color)) {
+            getView().findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(titleBarColor);
+            ratingBar.setProgressTintList(ColorStateList.valueOf(titleBarColor));
+            testSignOutBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            testDeleteBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            ratingBar.setProgressTintList(ColorStateList.valueOf(titleBarColor));
             descriptionLabel.setTextColor(titleBarColor);
+            socialMediaLabel.setTextColor(titleBarColor);
+            reviewLabel.setTextColor(titleBarColor);
         }
         else {
+            getView().findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
+            ratingBar.setProgressTintList(ColorStateList.valueOf(color));
+            testSignOutBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+            testDeleteBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+            ratingBar.setProgressTintList(ColorStateList.valueOf(color));
             descriptionLabel.setTextColor(color);
+            socialMediaLabel.setTextColor(color);
+            reviewLabel.setTextColor(color);
         }
-
-        descriptionLabel.setTextColor(color);
 
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -218,8 +232,6 @@ public class ArtistProfileFragment extends Fragment {
             descriptionText.setText(userProfile.getString("description"));
             userID = userProfile.getInt("id");
             updateColor(Integer.parseInt(userProfile.getString("backgroundColor")));
-            testDeleteBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
-            testSignOutBtn.setBackgroundColor(Integer.parseInt(userProfile.getString("backgroundColor")));
 
             SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
             editor.putInt("userId", userID);
@@ -269,6 +281,7 @@ public class ArtistProfileFragment extends Fragment {
         LinearLayout container;
         final Uri link = Uri.parse(socialMediaLink + text);
         Log.d(TAG, "Link: " + link.toString());
+        getView().findViewById(R.id.profile_artist_social_media_label).setVisibility(View.VISIBLE);
 
         switch(socialMedia) {
             case Utils.ID_SOUNDCLOUD:

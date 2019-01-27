@@ -146,7 +146,7 @@
                     android:text="@string/profile_social_media_links"
                     android:textColor="@android:color/black"
                     android:textSize="@dimen/font_bigger"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
 
                 <LinearLayout
                     android:visibility="gone"
