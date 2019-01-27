@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -90,6 +91,9 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private boolean onlyEventsByFavs = false;
     private boolean onlyMyEvents = false;
 
+    private ConstraintLayout noInternetLayout;
+    private ImageView reloadBtn;
+
     private ImageView filterBtn;
     private PopupWindow popupWindow;
 
@@ -106,9 +110,12 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
 
         sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_prefs), Context.MODE_PRIVATE);
         idToken = getArguments().getString("idToken");
-        filterBtn = getView().findViewById(R.id.filter_btn);
         user = sharedPreferences.getString("user", "");
         userId = sharedPreferences.getInt("userId", 1);
+
+        filterBtn = getView().findViewById(R.id.filter_btn);
+        noInternetLayout = getView().findViewById(R.id.explore_no_internet);
+        reloadBtn = getView().findViewById(R.id.explore_reload);
 
         if(idToken.equals("offline")) {
             //offline mode
@@ -124,7 +131,6 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
         }
         super.onActivityCreated(savedInstanceState);
 
-        reloadAnimation(true);
         fragmentLoaded = true;
     }
 
@@ -389,7 +395,26 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
             getActivity().finish();
         }else{
             //Show Popup
+            noInternetLayout.setVisibility(View.VISIBLE);
+            reloadBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    reloadAnimation(true);
+                    if(isNetworkAvailable()) {
+                        //Go back to Login
+                        Intent intent = new Intent(getActivity(), LoginActivity.class);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+                    reloadAnimation(false);
+                }
+            });
         }
+        filterBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
     }
 
     /**
@@ -604,6 +629,8 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
                     in.close();
 
                     return response.toString();
+                }else{
+                    offlineMode();
                 }
             } catch (ProtocolException e) {
                 e.printStackTrace();
