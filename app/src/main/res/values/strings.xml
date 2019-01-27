@@ -161,14 +161,24 @@
     <string name="profile_host_upcoming_events">Kommende Events:</string>
     <string name="event_alredy_started">Event schon angefangen!</string>
 
+    <!-- Cache -->
     <string name="max_stale_online">900</string> <!-- 60*15 = 15 min -->
-    <string name="max_stale_offline">25200</string>
+    <string name="max_stale_offline">25200</string> <!-- 60*60*7 = 7 tage -->
+
+    <!-- Social Media -->
     <string name="soundcloud">Soundcloud</string>
     <string name="facebook">Facebook</string>
     <string name="twitter">Twitter</string>
     <string name="youtube">YouTube</string>
     <string name="instagram">Instagram</string>
     <string name="spotify">Spotify</string>
-    <string name="website">Website</string> <!-- 60*60*7 = 7 tage -->
+    <string name="website">Website</string>
+
+    <!-- Placeholder -->
+    <string name="no_upcoming_gigs">Keine kommenden Auftritte</string>
+    <string name="no_past_gigs">Keine vergangenen Auftritte</string>
+
+    <string name="no_upcoming_events">Keine kommenden Events</string>
+    <string name="no_past_events">Keine vergangenen Events</string>
 
 </resources>

@@ -480,7 +480,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
                 }
                 newArray.put(jsonArray.getJSONObject(i));
             }
-            Log.d(TAG, "!!! NEW EVENTS:" + newArray.toString());
+            Log.d(TAG, "New Events:" + newArray.toString());
             showEvents(newArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
