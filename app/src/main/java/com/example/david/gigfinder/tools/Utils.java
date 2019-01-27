@@ -90,7 +90,7 @@ public abstract class Utils {
             Log.d(TAG, "Modified String: " + modifiedString);
 
             DateFormat formatter;
-            formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = (Date) formatter.parse(modifiedString);
 
             return date;

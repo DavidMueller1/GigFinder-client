@@ -10,7 +10,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.david.gigfinder.data.Message;
+import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.common.util.DataUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ReceivedMsgHolder extends RecyclerView.ViewHolder{
 
@@ -30,7 +35,16 @@ public class ReceivedMsgHolder extends RecyclerView.ViewHolder{
 
         // Format the stored timestamp into a readable String using method.
         Context mContext = null;
-        timeText.setText(DateUtils.formatDateTime(null, message.getCreatedAt(), 0));
+
+        Date date = Utils.convertStringToDate(message.getCreatedAt());
+        SimpleDateFormat dt1;
+        if (!DateUtils.isToday(date.getTime())) {
+            dt1 = new SimpleDateFormat("dd MMMM", Locale.GERMAN);
+        }else{
+            dt1 = new SimpleDateFormat("HH:mm");
+        }
+
+        timeText.setText(dt1.format(date));
         nameText.setText(message.getName());
         profileImage.setImageBitmap(BitmapFactory.decodeByteArray(message.getPicture(), 0, message.getPicture().length));
 

@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.example.david.gigfinder.adapters.MessageListAdapter;
 import com.example.david.gigfinder.data.Message;
+import com.example.david.gigfinder.tools.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 
-import static com.example.david.gigfinder.tools.Utils.convertStringToTimestamp;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -98,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(chatText.getText().toString() != "") {
+                if(!chatText.getText().toString().equals("")) {
                     PostMessage postMessage = new PostMessage();
                     postMessage.execute(chatText.getText().toString());
                 }
@@ -139,12 +139,11 @@ public class ChatActivity extends AppCompatActivity {
                 //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 //Date date = format.parse(messagesArray.getJSONObject(i).getString("created"));
                 //long l = date.getTime();
-                Timestamp timestamp = convertStringToTimestamp(messagesArray.getJSONObject(i).getString("created"));
+                String createdAt = messagesArray.getJSONObject(i).getString("created");
                 if(messagesArray.getJSONObject(i).getInt("authorId")==receiverId){
-                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), name, false, timestamp.getTime(), picture));
-
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), name, false, createdAt, picture));
                 }else{
-                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "me", true, timestamp.getTime(), null));
+                    messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), "me", true, createdAt, null));
                 }
             }
             sortMessages();
@@ -159,9 +158,9 @@ public class ChatActivity extends AppCompatActivity {
         messageList.sort(new Comparator<Message>() {
             @Override
             public int compare(Message o1, Message o2) {
-                Timestamp t1 = new Timestamp(o1.getCreatedAt());
-                Timestamp t2 = new Timestamp(o2.getCreatedAt());
-                return t1.compareTo(t2);
+                Date d1 = Utils.convertStringToDate(o1.getCreatedAt());
+                Date d2 = Utils.convertStringToDate(o2.getCreatedAt());
+                return d1.compareTo(d2);
             }
         });
     }
@@ -180,8 +179,6 @@ public class ChatActivity extends AppCompatActivity {
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestProperty("Content-Type","application/json;charset=utf-8");
                 urlConnection.setRequestMethod("POST");
-                urlConnection.setUseCaches(false);
-                urlConnection.setDoOutput(true);
 
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
@@ -239,15 +236,10 @@ public class ChatActivity extends AppCompatActivity {
             JSONObject msg = null;
             try {
                 msg = new JSONObject(result);
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                Date date = format.parse(msg.getString("created"));
-                long l = date.getTime();
-                messageList.add(new Message(msg.getString("content"), "me", true, l, null));
+                messageList.add(new Message(msg.getString("content"), "me", true, msg.getString("created"), null));
                 mMessageAdapter.notifyDataSetChanged();
                 mMessageRecycler.scrollToPosition(messageList.size()-1);
             } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
