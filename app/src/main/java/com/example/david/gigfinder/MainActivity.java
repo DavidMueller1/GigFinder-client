@@ -519,6 +519,5 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
     }
-
     //endregion
 }
