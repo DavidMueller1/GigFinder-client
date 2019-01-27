@@ -267,8 +267,12 @@ public class EventsFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "Events by this user: " + result);
-            if(result != null && !result.equals("[]")) {
-                updateList(result);
+            if(result != null) {
+                if(!result.equals("[]")){
+                    updateList(result);
+                }else{
+                    displayLoadingScreen(false);
+                }
             }
         }
     }
