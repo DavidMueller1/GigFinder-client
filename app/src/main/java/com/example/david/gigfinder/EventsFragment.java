@@ -22,6 +22,7 @@ import android.widget.ListView;
 import com.example.david.gigfinder.adapters.PastGigsAdapter;
 import com.example.david.gigfinder.adapters.UpcomingGigsAdapter;
 import com.example.david.gigfinder.tools.GeoTools;
+import com.example.david.gigfinder.tools.NonScrollListView;
 import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -55,8 +56,8 @@ public class EventsFragment extends Fragment {
     private ArrayList<JSONObject> futureEventObjects;
     private ArrayList<JSONObject> pastEventObjects;
 
-    private ListView upcomingListView;
-    private ListView pastListView;
+    private NonScrollListView upcomingListView;
+    private NonScrollListView pastListView;
     private FrameLayout progress;
 
     int userId;
@@ -218,8 +219,6 @@ public class EventsFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setUseCaches(false);
-                urlConnection.addRequestProperty("Cache-Control", "no-cache");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 
