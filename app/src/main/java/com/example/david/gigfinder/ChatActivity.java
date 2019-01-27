@@ -16,14 +16,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.david.gigfinder.adapters.MessageListAdapter;
-import com.example.david.gigfinder.data.Artist;
 import com.example.david.gigfinder.data.Message;
-import com.example.david.gigfinder.data.User;
-import com.example.david.gigfinder.tools.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,15 +34,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
 import static com.example.david.gigfinder.tools.Utils.convertStringToTimestamp;
 
@@ -316,7 +309,7 @@ public class ChatActivity extends AppCompatActivity {
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setUseCaches(true);
-                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
+                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale_online));
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;

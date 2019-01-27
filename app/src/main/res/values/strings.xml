@@ -144,7 +144,6 @@
     <string name="registration_genre_picker_negative">Beenden</string>
     <string name="registration_genre_picker_positive">Auswählen</string>
     <string name="registration_genre_hint">Genres Auswählen</string>
-    <string name="max_stale">900</string>
 
     <!-- Filter Menu -->
     <string name="filter_expired_events">Vergangene Events</string>
@@ -161,5 +160,8 @@
     <string name="chat_hint">Nachricht schreiben</string>
     <string name="profile_host_upcoming_events">Kommende Events:</string>
     <string name="event_alredy_started">Event schon angefangen!</string>
+
+    <string name="max_stale_online">900</string> <!-- 60*15 = 15 min -->
+    <string name="max_stale_offline">25200</string> <!-- 60*60*7 = 7 tage -->
 
 </resources>

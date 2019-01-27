@@ -17,12 +17,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.FavAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,13 +35,13 @@ import java.util.ArrayList;
 
 public class FavoritesFragment extends Fragment {
 
-    private static final String TAG = "APPLOG - FavoritesFragment";
+    private static final String TAG = "FavoritesFragment";
     private SharedPreferences sharedPreferences;
+    private String idToken;
 
     private FavAdapter favAdapter;
-    private String idToken;
     private TextView noFavsText;
-    ArrayList<String[]> favorites;
+    private ArrayList<String[]> favorites;
 
     @Nullable
     @Override
@@ -65,6 +65,12 @@ public class FavoritesFragment extends Fragment {
 
         if(idToken.equals("offline")){
             offlineMode();
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Toast.makeText(getContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
+                }
+            });
         }else {
             //online mode
             if(isNetworkAvailable()) {
@@ -84,8 +90,13 @@ public class FavoritesFragment extends Fragment {
         }
     }
 
+    /**
+     * Shows the Artists favorite Hosts
+     * @param result
+     */
     private void showFavorites(String result) {
         try {
+            noFavsText.setVisibility(View.GONE);
             JSONArray favoritesJson = new JSONArray(result);
             for(int i=0; i<favoritesJson.length(); i++){
                 String name = favoritesJson.getJSONObject(i).getJSONObject("host").getString("name");
@@ -108,10 +119,10 @@ public class FavoritesFragment extends Fragment {
 
     private void updatePictures() {
         for(int i=0; i<favorites.size(); i++){
-            if(isNetworkAvailable()) {
+            //if(isNetworkAvailable()) {
                 GetProfilePicture getProfilePicture = new GetProfilePicture();
                 getProfilePicture.execute(favorites.get(i)[2], String.valueOf(i));
-            }
+            //}
         }
     }
 
@@ -126,6 +137,9 @@ public class FavoritesFragment extends Fragment {
             getActivity().finish();
         }else{
             //Show Popup
+            if(!sharedPreferences.getString("favorites", "x").equals("x")){
+                showFavorites(sharedPreferences.getString("favorites", "x"));
+            }
         }
     }
 
@@ -141,9 +155,9 @@ public class FavoritesFragment extends Fragment {
     }
 
     /**
-     *
+     * Used to get all of favorite hosts of current artist
      */
-    class GetFavorites extends AsyncTask<String, Void, String> {
+    private class GetFavorites extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -153,6 +167,7 @@ public class FavoritesFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setUseCaches(false);
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -178,16 +193,16 @@ public class FavoritesFragment extends Fragment {
         @Override
         protected void onPostExecute(String result){
             Log.d(TAG, "FAVORITES: " + result);
-            if(result.equals("[]")){
-
-            }else{
-                noFavsText.setVisibility(View.GONE);
+            if(!result.equals("[]") && !result.equals("") && result!=null){
                 showFavorites(result);
             }
         }
     }
 
-    class GetProfilePicture extends AsyncTask<String, Void, String> {
+    /**
+     * Used to get the profile pictures of current favorites, if offline using cache
+     */
+    private class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         int id;
 
@@ -202,7 +217,11 @@ public class FavoritesFragment extends Fragment {
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setUseCaches(true);
-                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
+                if(isNetworkAvailable()) {
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_online));
+                }else{
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_offline));
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
