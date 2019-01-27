@@ -103,8 +103,8 @@
     <string name="event_participants_cancel">Absagen</string>
     <string name="event_participants_none">Noch keine Bewerber vorhanden</string>
     <string name="event_gage">Bezahlung in €</string>
-    <string name="upcoming_events">Kommende Auftritte</string>
-    <string name="past_events">Vergangene Auftritte</string>
+    <string name="upcoming_events">Kommende Events</string>
+    <string name="past_events">Vergangene Events</string>
 
     <!-- Add Event -->
     <string name="add_event_title_hint">Name des Events</string>

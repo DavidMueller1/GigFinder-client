@@ -105,7 +105,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private boolean pictureChosen;
 
     String idToken;
-    private int mode; // registration or edit
     private String profilePictureString;
 
     private String[] genreStrings;
@@ -116,8 +115,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private JSONArray socialMedias;
     private JSONArray mySocialMedias;
 
-    // Edit Profile
-    private JSONObject editableProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +122,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_registration_host);
 
         idToken = getIntent().getExtras().getString("idToken");
-        mode = getIntent().getExtras().getInt("mode", 0);
 
         pictureChosen = false;
         progress = findViewById(R.id.progressBarHolder);
@@ -209,112 +205,8 @@ public class RegistrationHostActivity extends AppCompatActivity {
         });
 
         position = null;
-
-        if(mode == 1) {
-            profilePictureString = getIntent().getExtras().getString("profilePictureString");
-            try {
-                editableProfile = new JSONArray(getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).getString("userProfile", "x")).getJSONObject(0);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            setupEditProfile();
-        }
-        else {
-            editableProfile = new JSONObject();
-        }
     }
 
-    /**
-     * Called if the Activity is used for Profile editing (not for registration)
-     */
-    private void setupEditProfile() {
-        ((TextView) findViewById(R.id.registration_host_title)).setText(R.string.profile_edit_label);
-        registrationButton.setText(getString(R.string.profile_edit_save));
-        profilePictureButton.setVisibility(GONE);
-        profilePictureHint.setVisibility(GONE);
-        profilePictureTitle.setVisibility(GONE);
-        Log.d(TAG, "Profile: " + editableProfile.toString());
-        try {
-            host.setName(editableProfile.getString("name"));
-            nameField.setText(editableProfile.getString("name"));
-            host.setDescription(editableProfile.getString("description"));
-            descriptionField.setText(editableProfile.getString("description"));
-
-            //profilePictureHint.setVisibility(View.VISIBLE);
-            ViewGroup.LayoutParams params = profilePictureButton.getLayoutParams();
-            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-            profilePictureButton.setBackground(null);
-            profilePictureButton.setLayoutParams(params);
-            profilePictureButton.setImageTintList(null);
-
-            RequestOptions options = new RequestOptions()
-                    .centerCrop()
-                    .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER) // TODO default image
-                    .override(ImageTools.PROFILE_PICTURE_SIZE)
-                    .transforms(new CenterCrop(), new RoundedCorners(30));
-
-            Glide.with(getApplicationContext())
-                    .load(Base64.decode(editableProfile.getJSONObject("profilePicture").getString("image"), Base64.DEFAULT))
-                    .apply(options)
-                    .into(profilePictureButton);
-
-
-            final float lat = Float.parseFloat(editableProfile.getString("latitude"));
-            final float lng = Float.parseFloat(editableProfile.getString("longitude"));
-
-            position = new LatLng(lat, lng);
-
-            String address = GeoTools.getAddressFromLatLng(getApplicationContext(), position);
-            locationButtonText.setText(address);
-
-            JSONArray genresJson = editableProfile.getJSONArray("hostGenres");
-            String genreString = "";
-            myGenres = new ArrayList<>();
-
-            for(int i = 0; i < genresJson.length(); i++) {
-                String singleGenreString = Utils.genreIdToString(genresJson.getJSONObject(i).getInt("genreId"),
-                        getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).getString("genres", "x"));
-                myGenres.add(singleGenreString);
-                genreString += singleGenreString + ", ";
-            }
-
-            Log.d(TAG, "MYGENRES: " + myGenres.toString());
-
-            genrePickerButton.setText(genreString.substring(0, genreString.length() - 2));
-
-
-            //showGenres(editableProfile.getJSONArray("hostGenres").toString());
-
-            int profileColor = editableProfile.getInt("backgroundColor");
-            colorPicker = new ColorPicker(RegistrationHostActivity.this, Color.red(profileColor), Color.green(profileColor), Color.blue(profileColor));
-            colorPicker.enableAutoClose();
-            colorPicker.setCallback(new ColorPickerCallback() {
-                @Override
-                public void onColorChosen(int color) {
-                    applyColor(color);
-                }
-            });
-            applyColor(profileColor);
-
-
-            // TODO fix getting social medias
-            JSONArray socialMedias = editableProfile.getJSONArray("hostSocialMedias");
-            Log.d(TAG, "SOCIALMEDIAS: " + socialMedias.toString());
-
-            String socials = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).getString("social medias", "");
-            JSONArray socialMediaArrays = new JSONArray(socials);
-
-            for(int i=0; i<socialMedias.length(); i++){
-                JSONObject jsonObject = Utils.getSocialMedia(socialMedias.getJSONObject(i).getInt("socialMediaId"), socialMediaArrays);
-                ((EditText) findViewById(getResources().getIdentifier("registration_" + jsonObject.getString("name").toLowerCase(), "id", getPackageName()))).setText(socialMedias.getJSONObject(i).getString("handle"));
-            }
-
-        } catch (JSONException e) {
-            Log.d(TAG, "Error: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Called when the user presses the profile picture button
@@ -492,47 +384,26 @@ public class RegistrationHostActivity extends AppCompatActivity {
 
         if(checkUserInputBasic()) {
             Log.d(TAG, "User input ok");
-            String imageString = "";
-            if(!pictureChosen && mode == 1) {
-                try {
-                    imageString = editableProfile.getJSONObject("profilePicture").getString("image");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            else {
-                byte[] imageByteArray = null;
-                try {
-                    imageByteArray = ImageTools.uriToByteArray(profilePictureUri, getApplicationContext());
-                    imageByteArray = ImageTools.compressImage(getApplicationContext(), profilePictureUri, imageByteArray);
-                } catch (IOException e) {
-                    Log.d(TAG, "Uri not found");
-                    Toast.makeText(getApplicationContext(),"Uri not found",Toast.LENGTH_SHORT).show();
 
-                }
-                imageString = Base64.encodeToString(imageByteArray, Base64.DEFAULT);
-            }
-
-
-            if(mode == 0) {
-                SendRegisterHost sendRegisterHost = new SendRegisterHost();
-                sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude, imageString);
-            }
-            else {
-                /*if(pictureChosen) {
-                    UpdateImage updateImage = new UpdateImage();
-                    updateImage.execute(imageString);
-                }*/
-                UpdateHost updateHost = new UpdateHost();
-                updateHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude, imageString);
+            byte[] imageByteArray = null;
+            try {
+                imageByteArray = ImageTools.uriToByteArray(profilePictureUri, getApplicationContext());
+                imageByteArray = ImageTools.compressImage(getApplicationContext(), profilePictureUri, imageByteArray);
+            } catch (IOException e) {
+                Log.d(TAG, "Uri not found");
+                Toast.makeText(getApplicationContext(),"Uri not found",Toast.LENGTH_SHORT).show();
 
             }
+            String imageString = Base64.encodeToString(imageByteArray, Base64.DEFAULT);
+
+            SendRegisterHost sendRegisterHost = new SendRegisterHost();
+            sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude, imageString);
         }
     }
 
     private boolean checkUserInputBasic(){
         // Check whether a profile picture is selected
-        if(!pictureChosen && mode == 0) {
+        if(!pictureChosen) {
             Toast.makeText(getApplicationContext(),"Bitte ein Profilbild wählen.",Toast.LENGTH_SHORT).show();
             Log.d(TAG, "No profile picture");
             return false;
@@ -770,216 +641,6 @@ public class RegistrationHostActivity extends AppCompatActivity {
             finish();
         }
     }
-
-
-    /**
-     * Send the registration request to the Server
-     */
-    private class UpdateHost extends AsyncTask<String, Void, String> {
-
-        String picture;
-
-        @Override
-        protected String doInBackground(String... params) {
-            displayLoadingScreen(true);
-            picture = params[5];
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/hosts/" + editableProfile.getInt("id"));
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestProperty("Content-Type","application/json");
-                urlConnection.setRequestMethod("PUT");
-                urlConnection.setUseCaches(false);
-                urlConnection.setDoOutput(true);
-
-                //Send data
-                DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
-                //JSONObject jsonObject = new JSONObject();
-                //JSONObject jsonObject = editableProfile;
-                JSONObject imageJson = new JSONObject();
-                imageJson.put("image", params[5]);
-                editableProfile.put("name", params[0]);
-                editableProfile.put("description", params[1]);
-                editableProfile.put("backgroundColor", params[2]);
-                editableProfile.put("latitude", params[3]);
-                editableProfile.put("longitude", params[4]);
-                //editableProfile.put("profilePicture", imageJson);
-                editableProfile.put("hostGenres", genresToJson(myGenres));
-                if(mySocialMedias.length()>0){
-                    editableProfile.put("hostSocialMedias", mySocialMedias);
-                    Log.d(TAG, mySocialMedias.toString());
-                }
-                os.write(editableProfile.toString().getBytes("UTF-8"));
-                os.close();
-
-                //Get response
-                InputStream is = null;
-                try {
-                    is = urlConnection.getInputStream();
-                } catch (IOException ioe) {
-                    displayLoadingScreen(false);
-                    if (urlConnection instanceof HttpURLConnection) {
-                        HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
-                        int statusCode = httpConn.getResponseCode();
-                        if (statusCode != 200) {
-                            is = httpConn.getErrorStream();
-                            Log.d(TAG, "SendRegisterHost: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "SendRegisterHost: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
-                            Log.d(TAG, httpConn.getURL().toString());
-                        }
-                    }
-                }
-
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = rd.readLine()) != null) {
-                    response.append(line);
-                    response.append('\r');
-                }
-                rd.close();
-
-                Log.d(TAG, "SendRegisterHost: RESPONSE:" + response.toString());
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                displayLoadingScreen(false);
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                displayLoadingScreen(false);
-                e.printStackTrace();
-            } catch (IOException e) {
-                displayLoadingScreen(false);
-                e.printStackTrace();
-            } catch (JSONException e) {
-                displayLoadingScreen(false);
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            /*GetProfilePicture getProfilePicture = new GetProfilePicture();
-            getProfilePicture.execute(picture);*/
-            /*UpdateProfilePicture updateProfileicture = new UpdateProfilePicture();
-            updateProfileicture.execute(picture);
-            GetHost getHost = new GetHost();
-            getHost.execute();*/
-            try {
-                //JSONObject user = new JSONObject(result);
-                JSONObject user = editableProfile;
-                JSONArray jsonArray = new JSONArray();
-                jsonArray.put(user);
-                SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
-                editor.putInt("userId", user.getInt("id"));
-                editor.putString("userProfile", jsonArray.toString());
-                editor.putString("user", "host");
-                editor.putInt("userColor", user.getInt("backgroundColor"));
-                editor.apply();
-
-                sendDeviceToken(getBaseContext());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            displayLoadingScreen(false);
-            finish();
-
-//            Intent intent = new Intent(RegistrationHostActivity.this, MainActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//            intent.putExtra("idToken", idToken);
-//            startActivity(intent);
-        }
-    }
-
-    /**
-     * Send the registration request to the Server
-     */
-    /*private class UpdateImage extends AsyncTask<String, Void, String> {
-
-        String picture;
-
-        @Override
-        protected String doInBackground(String... params) {
-            displayLoadingScreen(true);
-            //picture = params[5];
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + editableProfile.getInt("profilePictureId"));
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestProperty("Content-Type","application/json");
-                urlConnection.setRequestMethod("PUT");
-                urlConnection.setUseCaches(false);
-                urlConnection.setDoOutput(true);
-
-                //Send data
-                DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
-                //JSONObject jsonObject = new JSONObject();
-                //JSONObject jsonObject = editableProfile;
-                JSONObject imageJson = new JSONObject();
-                imageJson.put("image", params[0]);
-                imageJson.put("id", editableProfile.getInt("profilePictureId"));
-                imageJson.put("hostId", editableProfile.getInt("id"));
-                os.write(editableProfile.toString().getBytes("UTF-8"));
-                os.close();
-
-                //Get response
-                InputStream is = null;
-                try {
-                    is = urlConnection.getInputStream();
-                } catch (IOException ioe) {
-                    displayLoadingScreen(false);
-                    if (urlConnection instanceof HttpURLConnection) {
-                        HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
-                        int statusCode = httpConn.getResponseCode();
-                        if (statusCode != 200) {
-                            is = httpConn.getErrorStream();
-                            Log.d(TAG, "UpdateImage: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "UpdateImage: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
-                            Log.d(TAG, httpConn.getURL().toString());
-                        }
-                    }
-                }
-
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = rd.readLine()) != null) {
-                    response.append(line);
-                    response.append('\r');
-                }
-                rd.close();
-
-                Log.d(TAG, "UpdateImage: RESPONSE:" + response.toString());
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                displayLoadingScreen(false);
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                displayLoadingScreen(false);
-                e.printStackTrace();
-            } catch (IOException e) {
-                displayLoadingScreen(false);
-                e.printStackTrace();
-            } catch (JSONException e) {
-                displayLoadingScreen(false);
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            displayLoadingScreen(false);
-            finish();
-        }
-    }*/
 
 
 
