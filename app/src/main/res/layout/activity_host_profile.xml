@@ -33,7 +33,6 @@
                 android:textColor="@color/white"/>
 
 
-
             <TextView
                 android:id="@+id/profile_host_genre"
                 android:layout_width="match_parent"
@@ -437,6 +436,25 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/padding_default"/>
+
+                <TextView
+                    android:id="@+id/profile_host_events_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_host_upcoming_events"
+                    android:layout_marginBottom="@dimen/padding_small"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/font_bigger"
+                    android:fontFeatureSettings="smcp" />
+
+                <com.example.david.gigfinder.tools.NonScrollListView
+                    android:id="@+id/profile_host_events_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:scrollbars="none"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"/>
 
                 <!-- TODO make the buttons sexy -->
                 <Button
