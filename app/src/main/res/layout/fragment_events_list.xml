@@ -39,12 +39,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@android:color/darker_gray"/>
-
-                <ListView
+                <com.example.david.gigfinder.tools.NonScrollListView
                     android:id="@+id/upcomingEventsListView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -67,7 +62,7 @@
                     android:layout_height="1dp"
                     android:background="@android:color/darker_gray"/>
 
-                <ListView
+                <com.example.david.gigfinder.tools.NonScrollListView
                     android:id="@+id/pastEventsListView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />

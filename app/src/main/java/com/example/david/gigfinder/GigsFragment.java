@@ -23,6 +23,7 @@ import com.example.david.gigfinder.adapters.FavAdapter;
 import com.example.david.gigfinder.adapters.PastGigsAdapter;
 import com.example.david.gigfinder.adapters.UpcomingGigsAdapter;
 import com.example.david.gigfinder.tools.GeoTools;
+import com.example.david.gigfinder.tools.NonScrollListView;
 import com.example.david.gigfinder.tools.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -55,8 +56,8 @@ public class GigsFragment extends Fragment {
     private ArrayList<String[]> futureGigs;
     private ArrayList<String[]> pastGigs;
 
-    private ListView upcomingListView;
-    private ListView pastListView;
+    private NonScrollListView upcomingListView;
+    private NonScrollListView pastListView;
     private FrameLayout progress;
 
     int userId;
@@ -75,8 +76,8 @@ public class GigsFragment extends Fragment {
 
         idToken = getArguments().getString("idToken");
 
-        upcomingListView = (ListView) getView().findViewById(R.id.upcomingGigsListView);
-        pastListView = (ListView) getView().findViewById(R.id.pastGigsListView);
+        upcomingListView = (NonScrollListView) getView().findViewById(R.id.upcomingGigsListView);
+        pastListView = (NonScrollListView) getView().findViewById(R.id.pastGigsListView);
 
         futureGigs = new ArrayList<>();
         pastGigs = new ArrayList<>();
