@@ -46,8 +46,6 @@ public class ProfileEventsAdapter extends ArrayAdapter<String[]> {
             whenString.setText(formatter.format(start));
         }
 
-
-
         return customView;
     }
 }

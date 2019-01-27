@@ -132,13 +132,14 @@ public class ChatActivity extends AppCompatActivity {
         getProfilePicture.execute(String.valueOf(getIntent().getExtras().getInt("pictureId")));
     }
 
+    /**
+     * Displays the messages
+     * @param messages
+     */
     private void showMessages(String messages){
         try {
             JSONArray messagesArray = new JSONArray(messages);
             for(int i=0; i<messagesArray.length();i++){
-                //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                //Date date = format.parse(messagesArray.getJSONObject(i).getString("created"));
-                //long l = date.getTime();
                 String createdAt = messagesArray.getJSONObject(i).getString("created");
                 if(messagesArray.getJSONObject(i).getInt("authorId")==receiverId){
                     messageList.add(new Message(messagesArray.getJSONObject(i).getString("content"), name, false, createdAt, picture));
@@ -154,6 +155,9 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sorts the messages using the timestamps from server
+     */
     private void sortMessages(){
         messageList.sort(new Comparator<Message>() {
             @Override
@@ -166,9 +170,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Used to send messages to chatpartner via server
      */
-    class PostMessage extends AsyncTask<String, Void, String> {
+    private class PostMessage extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -232,23 +236,24 @@ public class ChatActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            chatText.getText().clear();
-            JSONObject msg = null;
-            try {
-                msg = new JSONObject(result);
-                messageList.add(new Message(msg.getString("content"), "me", true, msg.getString("created"), null));
-                mMessageAdapter.notifyDataSetChanged();
-                mMessageRecycler.scrollToPosition(messageList.size()-1);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if(result!=null) {
+                chatText.getText().clear();
+                try {
+                    JSONObject msg = new JSONObject(result);
+                    messageList.add(new Message(msg.getString("content"), "me", true, msg.getString("created"), null));
+                    mMessageAdapter.notifyDataSetChanged();
+                    mMessageRecycler.scrollToPosition(messageList.size() - 1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     /**
-     *
+     * Used to get all messages for this receiver
      */
-    class GetMessages extends AsyncTask<String, Void, String> {
+    private class GetMessages extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -289,7 +294,11 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    class GetProfilePicture extends AsyncTask<String, Void, String> {
+    /**
+     * Used to get the users profile picture
+     * Uses cache
+     */
+    private class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
