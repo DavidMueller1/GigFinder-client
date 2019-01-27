@@ -65,6 +65,7 @@ import java.util.Locale;
 
 import static android.view.View.GONE;
 import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
+import static com.example.david.gigfinder.LoginActivity.ID_TOKEN;
 
 public class RegistrationHostActivity extends AppCompatActivity {
 
@@ -665,6 +666,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 editor.putString("userProfile", jsonArray.toString());
                 editor.putString("user", "host");
                 editor.putInt("userColor", user.getInt("backgroundColor"));
+                editor.putString(ID_TOKEN, idToken);
                 editor.apply();
 
                 sendDeviceToken(getBaseContext());

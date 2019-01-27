@@ -47,6 +47,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
+import static com.example.david.gigfinder.LoginActivity.ID_TOKEN;
 import static com.example.david.gigfinder.tools.ImageTools.compressImage;
 
 public class RegistrationArtistActivity extends AppCompatActivity {
@@ -582,6 +583,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                     editor.putString("userProfile", jsonArray.toString());
                     editor.putString("user", "artist");
                     editor.putInt("userColor", user.getInt("backgroundColor"));
+                    editor.putString(ID_TOKEN, idToken);
                     editor.apply();
 
                     sendDeviceToken(getBaseContext());
