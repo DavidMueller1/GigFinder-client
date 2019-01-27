@@ -177,7 +177,7 @@ public class GigsFragment extends Fragment {
                     // event is in the past
                     pastEventObjects.add(event);
                     Log.d(TAG, "Event in the past: " + event.toString());
-                    pastGigs.add(new String[] {event.getString("title"), GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude")))});
+                    pastGigs.add(new String[] {event.getString("title"), GeoTools.getAddressFromLatLng(getContext(), new LatLng(event.getDouble("latitude"), event.getDouble("longitude"))), "loading"});
                 }
             }
         } catch (JSONException e) {
@@ -192,11 +192,18 @@ public class GigsFragment extends Fragment {
     }
 
     private void checkStatus() {
-        for(int i = 0; i < futureEventObjects.size(); i++) {
+        for(int i = 0; i < futureEventObjects.size() + pastEventObjects.size(); i++) {
                 try {
                     if(isNetworkAvailable()) {
+                        int id;
+                        if(i < futureEventObjects.size()) {
+                            id = futureEventObjects.get(i).getInt("id");
+                        }
+                        else {
+                            id = pastEventObjects.get(i - futureEventObjects.size()).getInt("id");
+                        }
                         GetEventParticipants getEventParticipants = new GetEventParticipants();
-                        getEventParticipants.execute(Integer.toString(futureEventObjects.get(i).getInt("id")), Integer.toString(i));
+                        getEventParticipants.execute(Integer.toString(id), Integer.toString(i));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -205,28 +212,47 @@ public class GigsFragment extends Fragment {
     }
 
     private void updateStatus(int index, String result) {
-        boolean someoneAccepted = false;
 
         try {
             JSONArray participants = new JSONArray(result);
-            for(int i = 0; i < participants.length(); i++) {
-                if(participants.getJSONObject(i).getBoolean("accepted")) {
-                    someoneAccepted = true;
-                    if(participants.getJSONObject(i).getInt("artistId") == userId) {
-                        futureGigs.get(index)[3] = "accepted";
+            if(index < futureEventObjects.size()) {
+
+                boolean someoneAccepted = false;
+                for (int i = 0; i < participants.length(); i++) {
+                    if (participants.getJSONObject(i).getBoolean("accepted")) {
+                        someoneAccepted = true;
+                        if (participants.getJSONObject(i).getInt("artistId") == userId) {
+                            futureGigs.get(index)[3] = "accepted";
+                        } else {
+                            futureGigs.get(index)[3] = "canceled";
+                        }
+                        break;
                     }
-                    else {
-                        futureGigs.get(index)[3] = "canceled";
-                    }
-                    break;
                 }
+
+                if (!someoneAccepted) {
+                    futureGigs.get(index)[3] = "pending";
+                }
+
+                upcomingGigsAdapter.notifyDataSetChanged();
+            }
+            else {
+                int pastIndex = index - futureEventObjects.size();
+                pastGigs.get(pastIndex)[2] = "canceled";
+
+                for (int i = 0; i < participants.length(); i++) {
+                    if (participants.getJSONObject(i).getBoolean("accepted")) {
+                        if (participants.getJSONObject(i).getInt("artistId") == userId) {
+                            pastGigs.get(pastIndex)[2] = "accepted";
+                        }
+                        break;
+                    }
+                }
+
+                pastGigsAdapter.notifyDataSetChanged();
             }
 
-            if(!someoneAccepted) {
-                futureGigs.get(index)[3] = "pending";
-            }
 
-            upcomingGigsAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
         }
