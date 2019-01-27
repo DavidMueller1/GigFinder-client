@@ -2,12 +2,12 @@ package com.example.david.gigfinder.data;
 
 public class Message {
     String message;
-    long createdAt;
+    String createdAt;
     String name;
     boolean me;
     private byte[] picture;
 
-    public Message(String message, String name, boolean me, long createdAt, byte[] picture) {
+    public Message(String message, String name, boolean me, String createdAt, byte[] picture) {
         this.message = message;
         this.name = name;
         this.me = me;
@@ -19,7 +19,7 @@ public class Message {
         return message;
     }
 
-    public long getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 

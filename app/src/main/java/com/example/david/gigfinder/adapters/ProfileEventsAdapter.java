@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class ProfileEventsAdapter extends ArrayAdapter<String[]> {
 
@@ -41,7 +42,7 @@ public class ProfileEventsAdapter extends ArrayAdapter<String[]> {
         if(start.before(Calendar.getInstance().getTime())){
             whenString.setText(R.string.event_alredy_started);
         }else {
-            SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
+            SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy", Locale.GERMAN);
             whenString.setText(formatter.format(start));
         }
 
