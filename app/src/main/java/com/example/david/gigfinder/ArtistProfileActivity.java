@@ -64,7 +64,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private TextView descriptionText;
     private TextView genresText;
     private Button sendMsgBtn;
-    private Button addToFavsBtn;
     private View overlayReview;
     private RatingBar ratingBar;
     private Button reviewButton;
@@ -107,11 +106,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
         profileUserId = getIntent().getIntExtra("profileUserId", -1);
         idToken = getIntent().getExtras().getString("idToken");
-        /*try {
-            hostJson = new JSONObject(getIntent().getExtras().getString("host"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
 
         SharedPreferences prefs = getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE);
         userId = prefs.getInt("userId", 0);
@@ -199,22 +193,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Adds the Host to Favorites
-     */
-    private void addToFavorites() {
-        PostFavorite postFavorite = new PostFavorite();
-        postFavorite.execute(); //TODO Ids;
-    }
-
-    /**
-     * Deletes the Host from Favorites
-     */
-    private void deleteFromFavorites() {
-        DeleteFavorite deleteFavorite = new DeleteFavorite();
-        deleteFavorite.execute();
-    }
-
-    /**
      * Updates the color of all relevant elements
      */
     private void updateColor(int color) {
@@ -232,7 +210,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
         TextView descriptionLabel = findViewById(R.id.profile_artist_description_label);
         TextView socialMediaLabel = findViewById(R.id.profile_artist_social_media_label);
         TextView reviewLabel = findViewById(R.id.profile_artist_review_label);
-        if(ColorTools.isBrightColorBool(color)) {
+
+        if(ColorTools.isBrightColorBool(color)) { // Check if the color is too bright for the white background
             findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(titleBarColor);
             sendMsgBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
             reviewButton.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
@@ -251,13 +230,15 @@ public class ArtistProfileActivity extends AppCompatActivity {
             reviewLabel.setTextColor(color);
         }
 
-        descriptionLabel.setTextColor(color);
 
     }
 
+    /**
+     * Displays the information of the given profile
+     * @param result profile which is displayed
+     */
     private void updateProfile(String result){
         try {
-            //Log.d(TAG, result);
             JSONObject userProfile = new JSONObject(result);
 
             pictureId = userProfile.getInt("profilePictureId");
@@ -306,9 +287,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     /**
      * Displays a SocialMediaLink
-     * @param socialMedia
-     * @param text
-     * @param socialMediaLink
+     * @param socialMedia The name of the Social Media Platform (e.g. facebook)
+     * @param text The "Name" of the account
+     * @param socialMediaLink The Link to the userprofile
      */
     private void displaySocialMedia(String socialMedia, final String text, final String socialMediaLink) {
         LinearLayout container;
@@ -405,6 +386,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
     };
 
 
+    /**
+     * Displays an overlay where the current user can rate the user of the profile
+     */
     private void showReviewOverlay() {
         ratingBarOverlay.setRating(0f);
         overlayReview.setVisibility(View.VISIBLE);
@@ -417,6 +401,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
         animation.start();
     }
 
+    /**
+     * Hides the rating overlay
+     */
     private void hideReviewOverlay() {
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
@@ -449,7 +436,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Called after the user hits "raedy" in the Review Overlay
+     * Called after the user hits "raedy" in the Review Overlay.
+     * Sends the review to the Server.
      */
     private void handleReview() {
         int rating = (int) (2 * ratingBarOverlay.getRating());
@@ -461,8 +449,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Updates the Reviews in the Profile and checks if the user allready wrote a review
-     * @param result
+     * Updates the Reviews in the Profile and checks if the user already wrote a review
+     * @param result Contains a JsonArray with the Reviews
      */
     private void displayReviews(String result) {
         boolean possibleReviewPermission = true;
@@ -534,11 +522,18 @@ public class ArtistProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Gets the participations of the user (they are used to check whether the user can be rated by the current user)
+     */
     private void checkParticipations() {
         GetParticipants getParticipants = new GetParticipants();
         getParticipants.execute();
     }
 
+    /**
+     * Checks whether the the user can be rated by the current user
+     * @param result The Participations of the current user
+     */
     private void checkReviewPermission(String result) {
         boolean reviewPermission = false;
         try {
@@ -567,7 +562,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
     /**
      * Displays the Website dialog
-     * @param link
+     * @param link The link to the external website
      */
     private void openWebsiteDialog(final Uri link){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
@@ -607,6 +602,10 @@ public class ArtistProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Displays the profile picture
+     * @param result Contains a JSONObject of the image class
+     */
     private void displayProfilePicture(String result) {
         try {
             JSONObject imageProfile = new JSONObject(result);
@@ -634,6 +633,10 @@ public class ArtistProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Displays and hides a rotating loading animation
+     * @param isLoading Is the laoding screen visible?
+     */
     private void displayLoadingScreen(boolean isLoading) {
         if(isLoading) {
             runOnUiThread(new Runnable() {
@@ -654,7 +657,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets the user profile from the server
      */
     class GetUser extends AsyncTask<String, Void, String> {
 
@@ -697,6 +700,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Downloads the profile picture from the server
+     */
     class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         @Override
@@ -738,114 +744,9 @@ public class ArtistProfileActivity extends AppCompatActivity {
         }
     }
 
-    class PostFavorite extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/favorites");
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestProperty("Content-Type","application/json");
-                urlConnection.setRequestMethod("POST");
-                urlConnection.setUseCaches(false);
-                urlConnection.setDoOutput(true);
-
-                //Send data
-                DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("ArtistId", userId);
-                jsonObject.put("HostId", profileUserId);
-                os.writeBytes(jsonObject.toString());
-                os.close();
-
-                //Get response
-                InputStream is = null;
-                try {
-                    is = urlConnection.getInputStream();
-                } catch (IOException ioe) {
-                    if (urlConnection instanceof HttpURLConnection) {
-                        HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
-                        int statusCode = httpConn.getResponseCode();
-                        if (statusCode != 200) {
-                            is = httpConn.getErrorStream();
-                            Log.d(TAG, "PostFavorite: STATUS CODE: " + statusCode);
-                            Log.d(TAG, "PostFavorite: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
-                            Log.d(TAG, httpConn.getURL().toString());
-                        }
-                    }
-                }
-
-                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = rd.readLine()) != null) {
-                    response.append(line);
-                    response.append('\r');
-                }
-                rd.close();
-
-                Log.d(TAG, "PostFavorite: RESPONSE:" + response.toString());
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            //TODO Show that the host is now a favorite
-        }
-    }
-
-    class DeleteFavorite extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/favorites/"+"this ID"); //TODO Id
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestProperty("Authorization", idToken);
-                urlConnection.setRequestMethod("DELETE");
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                return response.toString();
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            //TODO Update GUI
-        }
-    }
-
+    /**
+     * Sends a review th the server
+     */
     class PostReview extends AsyncTask<String, Void, String> {
 
         @Override
@@ -923,7 +824,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets the reviews of the user from the server
      */
     class GetReview extends AsyncTask<String, Void, String> {
 
@@ -965,7 +866,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets the participations of the user from the server
      */
     class GetParticipants extends AsyncTask<String, Void, String> {
 
