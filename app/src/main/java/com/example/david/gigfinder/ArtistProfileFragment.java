@@ -180,7 +180,7 @@ public class ArtistProfileFragment extends Fragment {
         TextView socialMediaLabel = getView().findViewById(R.id.profile_artist_social_media_label);
         TextView reviewLabel = getView().findViewById(R.id.profile_artist_review_label);
 
-        if(ColorTools.isBrightColorBool(color)) { // Check if the color is too bright for the white background
+        if(ColorTools.isSuperBrightColorBool(color)) { // Check if the color is too bright for the white background
             getView().findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(titleBarColor);
             ratingBar.setProgressTintList(ColorStateList.valueOf(titleBarColor));
             testSignOutBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
