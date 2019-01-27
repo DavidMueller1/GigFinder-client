@@ -190,6 +190,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/padding_default"
                 android:background="@drawable/standart_button"
+                android:textColor="@color/white"
                 android:text="Hosted By (Testbtn)" />
 
             <Button
@@ -199,6 +200,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/padding_default"
                 android:background="@drawable/standart_button"
+                android:textColor="@color/white"
                 android:text="Bewerben" />
 
         </LinearLayout>

@@ -262,9 +262,9 @@ public class HostProfileActivity extends AppCompatActivity {
         int fontColor = ColorTools.isBrightColor(color);
         nameText.setTextColor(fontColor);
         genresText.setTextColor(fontColor);
-        findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(color);
-        sendMsgBtn.setBackgroundColor(color);
-        addToFavsBtn.setBackgroundColor(color);
+        reviewButton.setTextColor(fontColor);
+        sendMsgBtn.setTextColor(fontColor);
+        addToFavsBtn.setTextColor(fontColor);
 
 
         int titleBarColor = ColorTools.getSecondaryColor(color);
@@ -273,17 +273,33 @@ public class HostProfileActivity extends AppCompatActivity {
 
         TextView descriptionLabel = findViewById(R.id.profile_host_description_label);
         TextView socialMediaLabel = findViewById(R.id.profile_host_social_media_label);
+        TextView reviewLabel = findViewById(R.id.profile_artist_review_label);
+        TextView eventsLabel = findViewById(R.id.profile_host_events_label);
         if(ColorTools.isBrightColorBool(color)) {
+            findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(titleBarColor);
+            reviewButton.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            sendMsgBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            addToFavsBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            ratingBar.setProgressTintList(ColorStateList.valueOf(titleBarColor));
             descriptionLabel.setTextColor(titleBarColor);
             socialMediaLabel.setTextColor(titleBarColor);
+            reviewLabel.setTextColor(titleBarColor);
+            eventsLabel.setTextColor(titleBarColor);
+            locationIcon.setImageTintList(ColorStateList.valueOf(titleBarColor));
         }
         else {
+            findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(color);
+            reviewButton.setBackgroundTintList(ColorStateList.valueOf(color));
+            sendMsgBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+            addToFavsBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+            ratingBar.setProgressTintList(ColorStateList.valueOf(color));
             descriptionLabel.setTextColor(color);
             socialMediaLabel.setTextColor(color);
+            reviewLabel.setTextColor(color);
+            eventsLabel.setTextColor(color);
+            locationIcon.setImageTintList(ColorStateList.valueOf(color));
         }
 
-        descriptionLabel.setTextColor(color);
-        locationIcon.setImageTintList(ColorStateList.valueOf(color));
 
     }
 
@@ -369,6 +385,7 @@ public class HostProfileActivity extends AppCompatActivity {
     private void displaySocialMedia(String socialMedia, final String text, final String socialMediaLink) {
         LinearLayout container;
         final Uri link = Uri.parse(socialMediaLink + text);
+        findViewById(R.id.profile_host_social_media_label).setVisibility(View.VISIBLE);
 
         switch(socialMedia) {
             case Utils.ID_SOUNDCLOUD:

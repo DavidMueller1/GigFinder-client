@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -220,8 +221,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
         int fontColor = ColorTools.isBrightColor(color);
         nameText.setTextColor(fontColor);
         genresText.setTextColor(fontColor);
-        findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
-        sendMsgBtn.setBackgroundColor(color);
+        sendMsgBtn.setTextColor(fontColor);
+        reviewButton.setTextColor(fontColor);
 
 
         int titleBarColor = ColorTools.getSecondaryColor(color);
@@ -230,13 +231,24 @@ public class ArtistProfileActivity extends AppCompatActivity {
 
         TextView descriptionLabel = findViewById(R.id.profile_artist_description_label);
         TextView socialMediaLabel = findViewById(R.id.profile_artist_social_media_label);
+        TextView reviewLabel = findViewById(R.id.profile_artist_review_label);
         if(ColorTools.isBrightColorBool(color)) {
+            findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(titleBarColor);
+            sendMsgBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            reviewButton.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
+            ratingBar.setProgressTintList(ColorStateList.valueOf(titleBarColor));
             descriptionLabel.setTextColor(titleBarColor);
             socialMediaLabel.setTextColor(titleBarColor);
+            reviewLabel.setTextColor(titleBarColor);
         }
         else {
+            findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
+            sendMsgBtn.setBackgroundTintList(ColorStateList.valueOf(color));
+            reviewButton.setBackgroundTintList(ColorStateList.valueOf(color));
+            ratingBar.setProgressTintList(ColorStateList.valueOf(color));
             descriptionLabel.setTextColor(color);
             socialMediaLabel.setTextColor(color);
+            reviewLabel.setTextColor(color);
         }
 
         descriptionLabel.setTextColor(color);
@@ -301,6 +313,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
     private void displaySocialMedia(String socialMedia, final String text, final String socialMediaLink) {
         LinearLayout container;
         final Uri link = Uri.parse(socialMediaLink + text);
+        findViewById(R.id.profile_artist_social_media_label).setVisibility(View.VISIBLE);
 
         switch(socialMedia) {
             case Utils.ID_SOUNDCLOUD:
