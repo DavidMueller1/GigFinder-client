@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.PastGigsAdapter;
 import com.example.david.gigfinder.adapters.UpcomingGigsAdapter;
@@ -91,13 +92,18 @@ public class EventsFragment extends Fragment {
 
         if(idToken.equals("offline")) {
             offlineMode();
+
+            getView().findViewById(R.id.events_addbutton).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         else {
             //online mode
-            if(isNetworkAvailable()) {
-                GetEvents getEvents = new GetEvents();
-                getEvents.execute();
-            }
+            GetEvents getEvents = new GetEvents();
+            getEvents.execute();
 
             getView().findViewById(R.id.events_addbutton).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -142,10 +148,14 @@ public class EventsFragment extends Fragment {
         upcomingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(isNetworkAvailable()){
                 Intent intent = new Intent(getActivity(), EventProfileActivity.class);
                 intent.putExtra("idToken", idToken);
                 intent.putExtra("Event", futureEventObjects.get(position).toString());
                 startActivity(intent);
+                }else {
+                    Toast.makeText(getContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -154,10 +164,14 @@ public class EventsFragment extends Fragment {
         pastListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), EventProfileActivity.class);
-                intent.putExtra("idToken", idToken);
-                intent.putExtra("Event", pastEventObjects.get(position).toString());
-                startActivity(intent);
+                if(isNetworkAvailable()) {
+                    Intent intent = new Intent(getActivity(), EventProfileActivity.class);
+                    intent.putExtra("idToken", idToken);
+                    intent.putExtra("Event", pastEventObjects.get(position).toString());
+                    startActivity(intent);
+                }else {
+                    Toast.makeText(getContext(),getString(R.string.no_connection),Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -193,7 +207,8 @@ public class EventsFragment extends Fragment {
             startActivity(intent);
             getActivity().finish();
         }else{
-            //Show Popup
+            GetEvents getEvents = new GetEvents();
+            getEvents.execute();
         }
     }
 
@@ -219,6 +234,9 @@ public class EventsFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                if(!isNetworkAvailable()){
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_offline));
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 
@@ -249,7 +267,9 @@ public class EventsFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             Log.d(TAG, "Events by this user: " + result);
-            updateList(result);
+            if(result != null && !result.equals("[]")) {
+                updateList(result);
+            }
         }
     }
 }
