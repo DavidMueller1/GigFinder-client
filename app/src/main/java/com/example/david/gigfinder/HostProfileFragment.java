@@ -67,7 +67,7 @@ public class HostProfileFragment extends Fragment {
     private static final int RESULT_EDIT_PROFILE = 1;
     private static final int RESULT_PICK_IMAGE = 2;
 
-    SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
 
     private int userID;
     private Button testDeleteBtn;
@@ -227,17 +227,11 @@ public class HostProfileFragment extends Fragment {
             JSONArray jsonArray = new JSONArray(jsonString);
             JSONObject userProfile = jsonArray.getJSONObject(0);
 
-            if(!idToken.equals("offline")) {
-                if(isNetworkAvailable()) {
+            GetProfilePicture getProfilePicture = new GetProfilePicture();
+            getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
 
-                    GetProfilePicture getProfilePicture = new GetProfilePicture();
-                    getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
-
-                    GetReview getReview = new GetReview();
-                    getReview.execute();
-
-                }
-            }
+            GetReview getReview = new GetReview();
+            getReview.execute();
 
             final String name = userProfile.getString("name");
             nameText.setText(name);
@@ -629,7 +623,7 @@ public class HostProfileFragment extends Fragment {
     /**
      * Gets the profile picture from the server and GUI update
      */
-    class GetProfilePicture extends AsyncTask<String, Void, String> {
+    private class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -639,8 +633,11 @@ public class HostProfileFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setUseCaches(true);
-                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale_online));
+                if(isNetworkAvailable()) {
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_online));
+                }else{
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_offline));
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -673,7 +670,7 @@ public class HostProfileFragment extends Fragment {
     /**
      *
      */
-    class DeleteUser extends AsyncTask<String, Void, String> {
+    private class DeleteUser extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -707,27 +704,29 @@ public class HostProfileFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.clear();
-            editor.apply();
-            Log.d(TAG, "DELETE HOST: " + result);
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.putExtra("SignOut", true);
-            startActivity(intent);
+            if (result != null) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply();
+                Log.d(TAG, "DELETE HOST: " + result);
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                intent.putExtra("SignOut", true);
+                startActivity(intent);
 
-            try {
-                HttpResponseCache cache = HttpResponseCache.getInstalled();
-                cache.delete();
-            } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    HttpResponseCache cache = HttpResponseCache.getInstalled();
+                    cache.delete();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Toast.makeText(getActivity().getApplicationContext(), "Profil Gelöscht", Toast.LENGTH_SHORT).show();
+                getActivity().finish();
             }
-
-            Toast.makeText(getActivity().getApplicationContext(),"Profil Gelöscht",Toast.LENGTH_SHORT).show();
-            getActivity().finish();
         }
     }
 
-    class GetReview extends AsyncTask<String, Void, String> {
+    private class GetReview extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -737,6 +736,9 @@ public class HostProfileFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                if(!isNetworkAvailable()){
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_offline));
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
