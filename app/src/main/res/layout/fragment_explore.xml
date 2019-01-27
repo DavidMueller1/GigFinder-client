@@ -39,17 +39,40 @@
             app:layout_constraintEnd_toEndOf="@+id/explore_title"
             app:layout_constraintTop_toTopOf="parent" />
 
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/explore_no_internet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darkGrey"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/explore_no_internet_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_default"
+            android:text="@string/no_connection"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="14dp" />
+
         <ImageView
             android:id="@+id/explore_reload"
-            android:visibility="gone"
-            android:layout_width="@dimen/element_smaller"
-            android:layout_height="@dimen/element_smaller"
-            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="@dimen/padding_smaller"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
             android:clickable="true"
             android:src="@drawable/ic_iconmonstr_refresh"
-            android:tint="@color/white"/>
+            android:tint="@color/white"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@+id/explore_no_internet_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 
