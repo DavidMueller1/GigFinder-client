@@ -51,7 +51,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -60,12 +62,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 public class HostProfileFragment extends Fragment {
     private static final String TAG = "APPLOG - HostProfileFragment";
 
     private static final int RESULT_EDIT_PROFILE = 1;
+    private static final int RESULT_PICK_IMAGE = 2;
 
     SharedPreferences sharedPreferences;
 
@@ -102,6 +106,7 @@ public class HostProfileFragment extends Fragment {
     boolean isReviewListExpanded;
 
     private String profilePictureString;
+    private JSONObject profilePictureObject;
 
     @Nullable
     @Override
@@ -118,6 +123,12 @@ public class HostProfileFragment extends Fragment {
         testDeleteBtn = getView().findViewById(R.id.deleteBtn);
         testSignOutBtn = getView().findViewById(R.id.signOutBtn);
         imageButton = getView().findViewById(R.id.profile_host_profilePicture);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO performProfilePictureSelection();
+            }
+        });
         nameText = getView().findViewById(R.id.profile_host_name);
         descriptionText = getView().findViewById(R.id.profile_host_description);
         locationText = getView().findViewById(R.id.profile_host_location_text);
@@ -192,6 +203,11 @@ public class HostProfileFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
+    private void performProfilePictureSelection() {
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickIntent, RESULT_PICK_IMAGE);
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -199,6 +215,50 @@ public class HostProfileFragment extends Fragment {
 
         if (requestCode == RESULT_EDIT_PROFILE) {
             updateProfile(sharedPreferences.getString("userProfile", "x"));
+        }
+        else if(requestCode == RESULT_PICK_IMAGE) {
+            if (resultCode == RESULT_OK) {
+                Uri path = data.getData();
+
+                try {
+//                profilePictureUri = path;
+
+                    ViewGroup.LayoutParams params = imageButton.getLayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    imageButton.setBackground(null);
+                    imageButton.setLayoutParams(params);
+                    /*profilePictureButton.setImageBitmap(profilePicture);*/
+                    imageButton.setImageTintList(null);
+                    RequestOptions options = new RequestOptions()
+                            .centerCrop()
+                            .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER)
+                            .override(ImageTools.PROFILE_PICTURE_SIZE)
+                            .transforms(new CenterCrop(), new RoundedCorners(30));
+
+                    Glide.with(getContext())
+                            .load(path)
+                            .apply(options)
+                            .into(imageButton);
+
+                    byte[] imageByteArray = null;
+                    try {
+                        imageByteArray = ImageTools.uriToByteArray(path, getContext());
+                        imageByteArray = ImageTools.compressImage(getContext(), path, imageByteArray);
+                    } catch (IOException e) {
+                        Log.d(TAG, "Uri not found");
+                        Toast.makeText(getContext(), "Uri not found", Toast.LENGTH_SHORT).show();
+
+                    }
+
+                    PutProfilePicture putProfilePicture = new PutProfilePicture();
+                    putProfilePicture.execute(Base64.encodeToString(imageByteArray, Base64.DEFAULT));
+
+
+                } catch (Exception e) {
+                    Log.d(TAG, "File not found");
+                }
+            }
         }
     }
 
@@ -559,7 +619,7 @@ public class HostProfileFragment extends Fragment {
      */
     private void displayProfilePicture(String result) {
         try {
-            JSONObject imageProfile = new JSONObject(result);
+            profilePictureObject = new JSONObject(result);
 
             ViewGroup.LayoutParams params = imageButton.getLayoutParams();
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -574,7 +634,7 @@ public class HostProfileFragment extends Fragment {
                     .override(ImageTools.PROFILE_PICTURE_SIZE)
                     .transforms(new CenterCrop(), new RoundedCorners(30));
 
-            profilePictureString = imageProfile.getString("image");
+            profilePictureString = profilePictureObject.getString("image");
 
             Glide.with(getContext())
                     .load(Base64.decode(profilePictureString, Base64.DEFAULT))
@@ -685,6 +745,74 @@ public class HostProfileFragment extends Fragment {
             displayProfilePicture(result);
         }
     }
+
+
+    class PutProfilePicture extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/pictures/" + profilePictureObject.getInt("id"));
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                urlConnection.setRequestProperty("Authorization", idToken);
+                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setRequestMethod("PUT");
+                urlConnection.setUseCaches(false);
+                urlConnection.setDoOutput(true);
+
+                //Send data
+                DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
+                profilePictureObject.put("image", params[0]);
+                os.write(profilePictureObject.toString().getBytes("UTF-8"));
+                os.close();
+
+                //Get response
+                InputStream is = null;
+                try {
+                    is = urlConnection.getInputStream();
+                } catch (IOException ioe) {
+                    if (urlConnection instanceof HttpURLConnection) {
+                        HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
+                        int statusCode = httpConn.getResponseCode();
+                        if (statusCode != 200) {
+                            is = httpConn.getErrorStream();
+                            Log.d(TAG, "PutProfilePicture: STATUS CODE: " + statusCode);
+                            Log.d(TAG, "PutProfilePicture: RESPONESE MESSAGE: " + httpConn.getResponseMessage());
+                        }
+                    }
+                }
+
+                BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = rd.readLine()) != null) {
+                    response.append(line);
+                    response.append('\r');
+                }
+                rd.close();
+
+                Log.d(TAG, "PutProfilePicture: RESPONSE:" + response.toString());
+
+                return response.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+        }
+    }
+
 
     /**
      *

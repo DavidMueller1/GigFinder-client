@@ -63,6 +63,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static android.view.View.GONE;
 import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
 
 public class RegistrationHostActivity extends AppCompatActivity {
@@ -229,6 +230,9 @@ public class RegistrationHostActivity extends AppCompatActivity {
     private void setupEditProfile() {
         ((TextView) findViewById(R.id.registration_host_title)).setText(R.string.profile_edit_label);
         registrationButton.setText(getString(R.string.profile_edit_save));
+        profilePictureButton.setVisibility(GONE);
+        profilePictureHint.setVisibility(GONE);
+        profilePictureTitle.setVisibility(GONE);
         Log.d(TAG, "Profile: " + editableProfile.toString());
         try {
             host.setName(editableProfile.getString("name"));
@@ -236,7 +240,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
             host.setDescription(editableProfile.getString("description"));
             descriptionField.setText(editableProfile.getString("description"));
 
-            profilePictureHint.setVisibility(View.VISIBLE);
+            //profilePictureHint.setVisibility(View.VISIBLE);
             ViewGroup.LayoutParams params = profilePictureButton.getLayoutParams();
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -515,10 +519,10 @@ public class RegistrationHostActivity extends AppCompatActivity {
                 sendRegisterHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude, imageString);
             }
             else {
-                if(pictureChosen) {
+                /*if(pictureChosen) {
                     UpdateImage updateImage = new UpdateImage();
                     updateImage.execute(imageString);
-                }
+                }*/
                 UpdateHost updateHost = new UpdateHost();
                 updateHost.execute(host.getName(), host.getDescription(), String.valueOf(host.getColor()), "" + position.latitude, "" + position.longitude, imageString);
 
@@ -651,7 +655,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    progress.setVisibility(View.GONE);
+                    progress.setVisibility(GONE);
                 }
             });
         }
@@ -894,7 +898,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
     /**
      * Send the registration request to the Server
      */
-    private class UpdateImage extends AsyncTask<String, Void, String> {
+    /*private class UpdateImage extends AsyncTask<String, Void, String> {
 
         String picture;
 
@@ -975,7 +979,7 @@ public class RegistrationHostActivity extends AppCompatActivity {
             displayLoadingScreen(false);
             finish();
         }
-    }
+    }*/
 
 
 
