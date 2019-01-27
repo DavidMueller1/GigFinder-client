@@ -8,35 +8,54 @@
 
     <include layout="@layout/fragment_loading"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/profile_host_title_bar_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/orange"
-        android:padding="@dimen/padding_smaller">
+        android:background="@color/orange">
 
-        <TextView
-            android:id="@+id/profile_host_name"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/padding_small"
-            android:text="Name"
-            android:textSize="@dimen/font_big"
-            android:textAlignment="center"
-            android:textColor="@color/white"/>
+            android:orientation="vertical"
+            android:padding="@dimen/padding_smaller">
 
-        <TextView
-            android:id="@+id/profile_host_genre"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="(Rock, Pop, Beispielgenre)"
-            android:textSize="@dimen/font_default"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:layout_marginBottom="@dimen/padding_small"/>
+            <TextView
+                android:id="@+id/profile_host_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding_small"
+                android:text="Name"
+                android:textSize="@dimen/font_big"
+                android:textAlignment="center"
+                android:textColor="@color/white"/>
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/profile_host_genre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="(Rock, Pop, Beispielgenre)"
+                android:textSize="@dimen/font_default"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:layout_marginBottom="@dimen/padding_small"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/profile_edit_button"
+            android:layout_width="@dimen/element_bigger"
+            android:layout_height="@dimen/element_bigger"
+            android:padding="@dimen/padding_small"
+            android:layout_marginEnd="@dimen/padding_smaller"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:tint="@color/white"
+            android:src="@drawable/ic_iconmonstr_edit"
+            android:clickable="true"/>
+
+    </RelativeLayout>
+
 
     <ScrollView
         android:layout_width="match_parent"

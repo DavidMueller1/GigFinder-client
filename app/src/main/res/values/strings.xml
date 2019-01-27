@@ -86,6 +86,8 @@
     <string name="profile_social_media_links">Social Media Links:</string>
     <string name="profile_genre_single">Genre:</string>
     <string name="profile_genre_multiple">Genres:</string>
+    <string name="profile_edit_label">Profil bearbeiten</string>
+    <string name="profile_edit_save">Speichern</string>
 
     <!-- Gigs  -->
     <string name="upcoming_gigs">Kommende Auftritte</string>
@@ -148,11 +150,12 @@
     <string name="filter_expired_events">Vergangene Events</string>
     <string name="filter_fav_events">Nur von Favoriten</string>
     <string name="filter_my_events">Nur meine Events</string>
-    <string name="filtern_by_genre">Filtern bei Genre</string>
+    <string name="filtern_by_genre">Nach Genre filtern</string>
     <string name="filtern_by_genre_title">Wählen Sie die gewünschten Genres</string>
 
     <!-- Titles -->
     <string name="explore_title">Explore</string>
+    <string name="explore_filter">Filter</string>
     <string name="favorites_title">Favoriten</string>
     <string name="chat_title">Chats</string>
     <string name="chat_hint">Nachricht schreiben</string>
