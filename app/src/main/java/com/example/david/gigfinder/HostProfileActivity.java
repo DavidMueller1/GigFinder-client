@@ -240,7 +240,6 @@ public class HostProfileActivity extends AppCompatActivity {
      * Adds the Host to Favorites
      */
     private void addToFavorites() {
-        // TODO check if already in favorites
         addToFavsBtn.setClickable(false);
         PostFavorite postFavorite = new PostFavorite();
         postFavorite.execute();
@@ -715,7 +714,7 @@ public class HostProfileActivity extends AppCompatActivity {
 
             RequestOptions options = new RequestOptions()
                     .centerCrop()
-                    .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER) // TODO default image
+                    .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER)
                     .override(ImageTools.PROFILE_PICTURE_SIZE)
                     .transforms(new CenterCrop(), new RoundedCorners(30));
 
@@ -781,7 +780,7 @@ public class HostProfileActivity extends AppCompatActivity {
     /**
      * Gets the user profile from the server
      */
-    class GetHost extends AsyncTask<String, Void, String> {
+    private class GetHost extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -825,7 +824,7 @@ public class HostProfileActivity extends AppCompatActivity {
     /**
      * Downloads the profile picture from the server
      */
-    class GetProfilePicture extends AsyncTask<String, Void, String> {
+    private class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -869,7 +868,7 @@ public class HostProfileActivity extends AppCompatActivity {
     /**
      * Tells the server that this user is now a favorite of the current user
      */
-    class PostFavorite extends AsyncTask<String, Void, String> {
+    private class PostFavorite extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -964,12 +963,12 @@ public class HostProfileActivity extends AppCompatActivity {
     /**
      * Tells the server that this user is not longer a favorite of the current user
      */
-    class DeleteFavorite extends AsyncTask<String, Void, String> {
+    private class DeleteFavorite extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
             try {
-                URL url = new URL("https://gigfinder.azurewebsites.net/api/favorites/"+params[0]); //TODO Id
+                URL url = new URL("https://gigfinder.azurewebsites.net/api/favorites/"+params[0]);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
                 urlConnection.setRequestProperty("Authorization", idToken);
@@ -1020,7 +1019,7 @@ public class HostProfileActivity extends AppCompatActivity {
     /**
      * Sends a review th the server
      */
-    class PostReview extends AsyncTask<String, Void, String> {
+    private class PostReview extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -1035,7 +1034,6 @@ public class HostProfileActivity extends AppCompatActivity {
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
-                //Send data TODO
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("AuthorId", userId);
@@ -1043,8 +1041,8 @@ public class HostProfileActivity extends AppCompatActivity {
                 jsonObject.put("Comment", params[1]);
                 jsonObject.put("HostId", profileUserId);
                 Log.d(TAG, jsonObject.toString());
-                //jsonObject.put("")
-                os.writeBytes(jsonObject.toString());
+
+                os.write(jsonObject.toString().getBytes("UTF-8"));
                 os.close();
 
                 //Get response
@@ -1099,7 +1097,7 @@ public class HostProfileActivity extends AppCompatActivity {
     /**
      * Gets the reviews of the user from the server
      */
-    class GetReview extends AsyncTask<String, Void, String> {
+    private class GetReview extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -1142,7 +1140,7 @@ public class HostProfileActivity extends AppCompatActivity {
     /**
      * Gets the participations of the user from the server
      */
-    class GetParticipants extends AsyncTask<String, Void, String> {
+    private class GetParticipants extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
