@@ -275,7 +275,8 @@ public class HostProfileActivity extends AppCompatActivity {
         TextView socialMediaLabel = findViewById(R.id.profile_host_social_media_label);
         TextView reviewLabel = findViewById(R.id.profile_artist_review_label);
         TextView eventsLabel = findViewById(R.id.profile_host_events_label);
-        if(ColorTools.isBrightColorBool(color)) {
+
+        if(ColorTools.isBrightColorBool(color)) { // Check if the color is too bright for the white background
             findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(titleBarColor);
             reviewButton.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
             sendMsgBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
@@ -303,6 +304,10 @@ public class HostProfileActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Displays the information of the given profile
+     * @param jsonString profile which is displayed
+     */
     private void updateProfile(String jsonString){
         try {
             JSONObject userProfile = new JSONObject(jsonString);
@@ -378,9 +383,9 @@ public class HostProfileActivity extends AppCompatActivity {
 
     /**
      * Displays a SocialMediaLink
-     * @param socialMedia
-     * @param text
-     * @param socialMediaLink
+     * @param socialMedia The name of the Social Media Platform (e.g. facebook)
+     * @param text The "Name" of the account
+     * @param socialMediaLink The Link to the userprofile
      */
     private void displaySocialMedia(String socialMedia, final String text, final String socialMediaLink) {
         LinearLayout container;
@@ -476,6 +481,9 @@ public class HostProfileActivity extends AppCompatActivity {
 
     };
 
+    /**
+     * Displays an overlay where the current user can rate the user of the profile
+     */
     private void showReviewOverlay() {
         ratingBarOverlay.setRating(0f);
         overlayReview.setVisibility(View.VISIBLE);
@@ -488,6 +496,9 @@ public class HostProfileActivity extends AppCompatActivity {
         animation.start();
     }
 
+    /**
+     * Hides the rating overlay
+     */
     private void hideReviewOverlay() {
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
@@ -520,7 +531,8 @@ public class HostProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Called after the user hits "raedy" in the Review Overlay
+     * Called after the user hits "raedy" in the Review Overlay.
+     * Sends the review to the Server.
      */
     private void handleReview() {
         int rating = (int) (2 * ratingBarOverlay.getRating());
@@ -532,8 +544,8 @@ public class HostProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Updates the Reviews in the Profile
-     * @param result
+     * Updates the Reviews in the Profile and checks if the user already wrote a review
+     * @param result Contains a JsonArray with the Reviews
      */
     private void displayReviews(String result) {
         boolean possibleReviewPermission = true;
@@ -606,11 +618,18 @@ public class HostProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Gets the participations of the user (they are used to check whether the user can be rated by the current user
+     */
     private void checkParticipations() {
         GetParticipants getParticipants = new GetParticipants();
         getParticipants.execute();
     }
 
+    /**
+     * Checks whether the the user can be rated by the current user
+     * @param result The Participations of the current user
+     */
     private void checkReviewPermission(String result) {
         boolean reviewPermission = false;
         try {
@@ -639,7 +658,7 @@ public class HostProfileActivity extends AppCompatActivity {
 
     /**
      * Displays the Website dialog
-     * @param link
+     * @param link The link to the external website
      */
     private void openWebsiteDialog(final Uri link){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(this);
@@ -679,6 +698,10 @@ public class HostProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Displays the profile picture
+     * @param result Contains a JSONObject of the image class
+     */
     private void displayProfilePicture(String result) {
         try {
             JSONObject imageProfile = new JSONObject(result);
@@ -706,6 +729,10 @@ public class HostProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Displays and hides a rotating loading animation
+     * @param isLoading Is the laoding screen visible?
+     */
     private void displayLoadingScreen(boolean isLoading) {
         if(isLoading) {
             runOnUiThread(new Runnable() {
@@ -725,6 +752,10 @@ public class HostProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Shows the future events in the profile
+     * @param result The events of the user
+     */
     private void showEvents(String result){
         if(result != null && !result.equals("[]") && !result.equals("")){
             try {
@@ -748,7 +779,7 @@ public class HostProfileActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets the user profile from the server
      */
     class GetHost extends AsyncTask<String, Void, String> {
 
@@ -791,6 +822,9 @@ public class HostProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Downloads the profile picture from the server
+     */
     class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         @Override
@@ -832,6 +866,9 @@ public class HostProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Tells the server that this user is now a favorite of the current user
+     */
     class PostFavorite extends AsyncTask<String, Void, String> {
 
         @Override
@@ -924,6 +961,9 @@ public class HostProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Tells the server that this user is not longer a favorite of the current user
+     */
     class DeleteFavorite extends AsyncTask<String, Void, String> {
 
         @Override
@@ -977,6 +1017,9 @@ public class HostProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sends a review th the server
+     */
     class PostReview extends AsyncTask<String, Void, String> {
 
         @Override
@@ -1054,7 +1097,7 @@ public class HostProfileActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets the reviews of the user from the server
      */
     class GetReview extends AsyncTask<String, Void, String> {
 
@@ -1097,7 +1140,7 @@ public class HostProfileActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Gets the participations of the user from the server
      */
     class GetParticipants extends AsyncTask<String, Void, String> {
 
