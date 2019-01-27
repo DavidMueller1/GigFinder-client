@@ -27,6 +27,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -89,7 +90,7 @@ public class ExploreFragment extends Fragment implements OnMapReadyCallback {
     private boolean onlyEventsByFavs = false;
     private boolean onlyMyEvents = false;
 
-    private ImageButton filterBtn;
+    private ImageView filterBtn;
     private PopupWindow popupWindow;
 
     private boolean fragmentLoaded = false;

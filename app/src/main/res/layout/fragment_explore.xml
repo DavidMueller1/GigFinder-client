@@ -23,21 +23,24 @@
             android:textColor="@color/white"
             android:textSize="24sp" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/filter_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/element_smaller"
+            android:layout_height="@dimen/element_smaller"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
-            android:background="@android:color/transparent"
+            android:clickable="true"
             android:onClick="showPopup"
-            android:src="@drawable/ic_filter_btn"
+            android:src="@drawable/ic_iconmonstr_control_panel"
+            android:tint="@color/white"
+            android:rotation="-90"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/explore_title"
             app:layout_constraintTop_toTopOf="parent" />
+
 
         <ImageView
             android:id="@+id/explore_reload"
