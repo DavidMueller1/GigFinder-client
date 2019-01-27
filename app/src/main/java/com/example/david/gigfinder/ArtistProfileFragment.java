@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -28,7 +26,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -136,7 +133,6 @@ public class ArtistProfileFragment extends Fragment {
 
         progress = getView().findViewById(R.id.progressBarHolder);
 
-
         reviewStrings = new ArrayList<>();
 
         reviewAdapter = new ReviewAdapter(getContext(), reviewStrings);
@@ -218,16 +214,6 @@ public class ArtistProfileFragment extends Fragment {
             userProfile.put("profilePicture", "");
             Log.d(TAG, userProfile.toString());
 
-            if(!idToken.equals("offline")) {
-                if(isNetworkAvailable()) {
-                    GetProfilePicture getProfilePicture = new GetProfilePicture();
-                    getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
-
-                    GetReview getReview = new GetReview();
-                    getReview.execute();
-                }
-            }
-
             nameText.setText(userProfile.getString("name"));
             descriptionText.setText(userProfile.getString("description"));
             userID = userProfile.getInt("id");
@@ -261,6 +247,12 @@ public class ArtistProfileFragment extends Fragment {
                         socialMedias.getJSONObject(i).getString("handle"),
                         jsonObject.getString("website"));
             }
+
+            GetProfilePicture getProfilePicture = new GetProfilePicture();
+            getProfilePicture.execute(userProfile.getInt("profilePictureId") + "");
+
+            GetReview getReview = new GetReview();
+            getReview.execute();
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -617,8 +609,11 @@ public class ArtistProfileFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setUseCaches(true);
-                urlConnection.addRequestProperty("Cache-Control", "max-stale="+getString(R.string.max_stale));
+                if(isNetworkAvailable()) {
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_online));
+                }else{
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_offline));
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;
@@ -651,7 +646,7 @@ public class ArtistProfileFragment extends Fragment {
     /**
      *
      */
-    class DeleteUser extends AsyncTask<String, Void, String> {
+    private class DeleteUser extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -706,7 +701,7 @@ public class ArtistProfileFragment extends Fragment {
         }
     }
 
-    class GetReview extends AsyncTask<String, Void, String> {
+    private class GetReview extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -716,6 +711,9 @@ public class ArtistProfileFragment extends Fragment {
 
                 urlConnection.setRequestProperty("Authorization", idToken);
                 urlConnection.setRequestMethod("GET");
+                if(!isNetworkAvailable()){
+                    urlConnection.addRequestProperty("Cache-Control", "max-stale=" + getString(R.string.max_stale_offline));
+                }
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 String inputLine;

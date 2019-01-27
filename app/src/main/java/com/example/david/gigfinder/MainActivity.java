@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             File httpCacheDir = new File(getCacheDir(), "http");
-            long httpCacheSize = 10 * 1024 * 1024; // 10 MiB
+            long httpCacheSize = 5 * 1024 * 1024; // 5 MiB
             HttpResponseCache.install(httpCacheDir, httpCacheSize);
         } catch (IOException e) {
             Log.i(TAG, "HTTP response cache installation failed:" + e);
