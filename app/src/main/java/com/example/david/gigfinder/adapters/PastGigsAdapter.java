@@ -30,7 +30,7 @@ public class PastGigsAdapter extends ArrayAdapter<String[]> {
 
         TextView gigName = (TextView) customView.findViewById(R.id.pastGigName);
         TextView gigLocation = (TextView) customView.findViewById(R.id.pastGigLocation);
-        ImageView gigImg = (ImageView) customView.findViewById(R.id.pastGigImg);
+        //ImageView gigImg = (ImageView) customView.findViewById(R.id.pastGigImg);
 
         gigName.setText(getItem(position)[0]);
         gigLocation.setText(getItem(position)[1]);
