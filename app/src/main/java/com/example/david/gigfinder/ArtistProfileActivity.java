@@ -201,6 +201,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
         genresText.setTextColor(fontColor);
         sendMsgBtn.setTextColor(fontColor);
         reviewButton.setTextColor(fontColor);
+        findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
 
 
         int titleBarColor = ColorTools.getSecondaryColor(color);
@@ -211,7 +212,7 @@ public class ArtistProfileActivity extends AppCompatActivity {
         TextView socialMediaLabel = findViewById(R.id.profile_artist_social_media_label);
         TextView reviewLabel = findViewById(R.id.profile_artist_review_label);
 
-        if(ColorTools.isBrightColorBool(color)) { // Check if the color is too bright for the white background
+        if(ColorTools.isSuperBrightColorBool(color)) { // Check if the color is too bright for the white background
             findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(titleBarColor);
             sendMsgBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
             reviewButton.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
@@ -221,7 +222,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
             reviewLabel.setTextColor(titleBarColor);
         }
         else {
-            findViewById(R.id.profile_artist_title_bar_form).setBackgroundColor(color);
             sendMsgBtn.setBackgroundTintList(ColorStateList.valueOf(color));
             reviewButton.setBackgroundTintList(ColorStateList.valueOf(color));
             ratingBar.setProgressTintList(ColorStateList.valueOf(color));
