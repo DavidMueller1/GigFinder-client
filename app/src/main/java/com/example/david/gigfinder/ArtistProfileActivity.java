@@ -762,7 +762,6 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
 
-                //Send data TODO
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("AuthorId", userId);
@@ -770,8 +769,8 @@ public class ArtistProfileActivity extends AppCompatActivity {
                 jsonObject.put("Comment", params[1]);
                 jsonObject.put("ArtistId", profileUserId);
                 Log.d(TAG, jsonObject.toString());
-                //jsonObject.put("")
-                os.writeBytes(jsonObject.toString());
+
+                os.write(jsonObject.toString().getBytes("UTF-8"));
                 os.close();
 
                 //Get response
