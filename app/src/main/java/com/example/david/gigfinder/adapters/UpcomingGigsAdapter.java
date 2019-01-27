@@ -32,7 +32,7 @@ public class UpcomingGigsAdapter  extends ArrayAdapter<String[]> {
         TextView gigLocation = (TextView) customView.findViewById(R.id.upcomingGigLocation);
         TextView gigTime= (TextView) customView.findViewById(R.id.upcomingGigStartTime);
         TextView gigStatus = customView.findViewById(R.id.gigs_status_text);
-        ImageView gigImg = (ImageView) customView.findViewById(R.id.upcomingGigImg);
+        //ImageView gigImg = (ImageView) customView.findViewById(R.id.upcomingGigImg);
 
         gigName.setText(getItem(position)[0]);
         gigTime.setText(getItem(position)[1]);
