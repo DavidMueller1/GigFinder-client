@@ -52,6 +52,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -151,6 +152,14 @@ public class EventProfileActivity extends AppCompatActivity {
                 postParticipation.execute();
             }
         });
+        try {
+            String start = eventJson.getString("start");
+            if(Utils.convertStringToDate(start).before(Calendar.getInstance().getTime())){
+                applyBtn.setVisibility(View.GONE);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         participantStrings = new ArrayList<>();
         participantJSONObjects = new ArrayList<>();
@@ -325,8 +334,6 @@ public class EventProfileActivity extends AppCompatActivity {
         }
     }
 
-
-
     private void showParticipants(String result){
         findViewById(R.id.event_participants_none).setVisibility(View.GONE);
         participantStrings.clear();
@@ -384,7 +391,14 @@ public class EventProfileActivity extends AppCompatActivity {
         }
 
         if(user.equals("artist") && !isParticipant) {
-            applyBtn.setVisibility(View.VISIBLE);
+            try {
+                String start = eventJson.getString("start");
+                if(Utils.convertStringToDate(start).after(Calendar.getInstance().getTime())){
+                    applyBtn.setVisibility(View.VISIBLE);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 

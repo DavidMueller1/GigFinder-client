@@ -159,5 +159,7 @@
     <string name="favorites_title">Favoriten</string>
     <string name="chat_title">Chats</string>
     <string name="chat_hint">Nachricht schreiben</string>
+    <string name="profile_host_upcoming_events">Kommende Events:</string>
+    <string name="event_alredy_started">Event schon angefangen!</string>
 
 </resources>
