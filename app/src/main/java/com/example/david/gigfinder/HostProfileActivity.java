@@ -275,7 +275,7 @@ public class HostProfileActivity extends AppCompatActivity {
         TextView reviewLabel = findViewById(R.id.profile_artist_review_label);
         TextView eventsLabel = findViewById(R.id.profile_host_events_label);
 
-        if(ColorTools.isBrightColorBool(color)) { // Check if the color is too bright for the white background
+        if(ColorTools.isSuperBrightColorBool(color)) { // Check if the color is too bright for the white background
             findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(titleBarColor);
             reviewButton.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
             sendMsgBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
