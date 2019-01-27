@@ -205,7 +205,7 @@ public class HostProfileFragment extends Fragment {
         TextView socialMediaLabel = getView().findViewById(R.id.profile_host_social_media_label);
         TextView reviewLabel = getView().findViewById(R.id.profile_artist_review_label);
 
-        if(ColorTools.isBrightColorBool(color)) { // Check if the color is too bright for the white background
+        if(ColorTools.isSuperBrightColorBool(color)) { // Check if the color is too bright for the white background
             getView().findViewById(R.id.profile_host_title_bar_form).setBackgroundColor(titleBarColor);
             testDeleteBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
             testSignOutBtn.setBackgroundTintList(ColorStateList.valueOf(titleBarColor));
