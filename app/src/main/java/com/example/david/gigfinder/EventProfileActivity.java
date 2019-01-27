@@ -222,6 +222,7 @@ public class EventProfileActivity extends AppCompatActivity {
                 // Get the Place object from the buffer.
                 Place place = places.get(0);
 
+                /*
                 // Some example Genres
                 ArrayList<Genre> list = new ArrayList<>();
                 list.add(Genre.ROCK);
@@ -232,6 +233,7 @@ public class EventProfileActivity extends AppCompatActivity {
                         "Suche talentierten Drehorgelspieler für Freitag Abend in meiner Bar. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
                         list, place.getLatLng(), new Timestamp(2019, 1, 20, 20, 15, 0, 0),
                         new Timestamp(2019, 1, 21, 3, 30, 0, 0), null);
+                */
 
                 displayEvent();
 
@@ -250,12 +252,16 @@ public class EventProfileActivity extends AppCompatActivity {
      * Displays the given Event in the Activity
      */
     private void displayEvent() throws JSONException { // TODO handle with the jsonevent?
+
         titleText.setText(eventJson.getString("title"));
         descriptionText.setText(eventJson.getString("description"));
+
+        Log.d(TAG, "!!! "+ prefs.getString("genres", "x"));
 
         String myGenres = "(";
         for(int i=0; i<eventJson.getJSONArray("eventGenres").length(); i++){
             myGenres = myGenres.concat(Utils.genreIdToString(eventJson.getJSONArray("eventGenres").getJSONObject(i).getInt("genreId"), prefs.getString("genres", "x")));
+            Log.d(TAG, "!!! "+ eventJson.getJSONArray("eventGenres").getJSONObject(i).getInt("genreId"));
             if(i < eventJson.getJSONArray("eventGenres").length()-1){
                 myGenres = myGenres.concat(", ");
             }

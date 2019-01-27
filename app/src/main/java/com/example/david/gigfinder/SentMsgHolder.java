@@ -8,6 +8,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.david.gigfinder.data.Message;
+import com.example.david.gigfinder.tools.Utils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class SentMsgHolder extends RecyclerView.ViewHolder {
 
@@ -24,7 +29,16 @@ public class SentMsgHolder extends RecyclerView.ViewHolder {
 
         // Format the stored timestamp into a readable String using method.
         Context mContext = null;
-        timeText.setText(DateUtils.formatDateTime(null, message.getCreatedAt(), 0));
+
+        Date date = Utils.convertStringToDate(message.getCreatedAt());
+        SimpleDateFormat dt1;
+        if (!DateUtils.isToday(date.getTime())) {
+            dt1 = new SimpleDateFormat("dd MMMM", Locale.GERMAN);
+        }else{
+            dt1 = new SimpleDateFormat("HH:mm");
+        }
+
+        timeText.setText(dt1.format(date));
 
         // Insert the profile image from the URL into the ImageView.
         //Utils.displayRoundImageFromUrl(mContext, message.getSender().getProfileUrl(), profileImage);

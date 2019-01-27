@@ -599,7 +599,7 @@ public class ArtistProfileFragment extends Fragment {
     /**
      * Gets the profile picture from the server and GUI update
      */
-    class GetProfilePicture extends AsyncTask<String, Void, String> {
+    private class GetProfilePicture extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -680,24 +680,26 @@ public class ArtistProfileFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String result) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.clear();
-            editor.apply();
-            Log.d(TAG, "DELETE ARTIST: " + result);
+            if(result != null) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply();
+                Log.d(TAG, "DELETE ARTIST: " + result);
 
-            try {
-                HttpResponseCache cache = HttpResponseCache.getInstalled();
-                cache.delete();
-            } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    HttpResponseCache cache = HttpResponseCache.getInstalled();
+                    cache.delete();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                intent.putExtra("SignOut", true);
+                startActivity(intent);
+
+                Toast.makeText(getActivity().getApplicationContext(), "Profil Gelöscht", Toast.LENGTH_SHORT).show();
+                getActivity().finish();
             }
-
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.putExtra("SignOut", true);
-            startActivity(intent);
-
-            Toast.makeText(getActivity().getApplicationContext(),"Profil Gelöscht",Toast.LENGTH_SHORT).show();
-            getActivity().finish();
         }
     }
 
