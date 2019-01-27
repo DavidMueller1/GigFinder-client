@@ -62,6 +62,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
 public class HostProfileFragment extends Fragment {
+
     private static final String TAG = "APPLOG - HostProfileFragment";
 
     private static final int RESULT_EDIT_PROFILE = 1;
@@ -270,7 +271,6 @@ public class HostProfileFragment extends Fragment {
             SharedPreferences.Editor editor = getActivity().getSharedPreferences(getString(R.string.shared_prefs), MODE_PRIVATE).edit();
             editor.putInt("userId", userID);
             editor.apply();
-            //TODO: We should probably cache everything here
 
             locationContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -561,7 +561,7 @@ public class HostProfileFragment extends Fragment {
 
             RequestOptions options = new RequestOptions()
                     .centerCrop()
-                    .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER) // TODO default image
+                    .placeholder(ImageTools.PROFILE_PICTURE_PLACEHOLDER)
                     .override(ImageTools.PROFILE_PICTURE_SIZE)
                     .transforms(new CenterCrop(), new RoundedCorners(30));
 
@@ -578,6 +578,10 @@ public class HostProfileFragment extends Fragment {
         displayLoadingScreen(false);
     }
 
+    /**
+     * Displays the loading screen
+     * @param isLoading
+     */
     private void displayLoadingScreen(boolean isLoading) {
         if(isLoading) {
             getActivity().runOnUiThread(new Runnable() {
@@ -634,6 +638,8 @@ public class HostProfileFragment extends Fragment {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    //region Server Requests
+
     /**
      * Gets the profile picture from the server and GUI update
      */
@@ -679,7 +685,6 @@ public class HostProfileFragment extends Fragment {
             displayProfilePicture(result);
         }
     }
-
 
     /**
      *
@@ -740,6 +745,9 @@ public class HostProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Gets reviews from Server
+     */
     private class GetReview extends AsyncTask<String, Void, String> {
 
         @Override
@@ -781,5 +789,7 @@ public class HostProfileFragment extends Fragment {
             displayReviews(result);
         }
     }
+
+    //endregion
 
 }

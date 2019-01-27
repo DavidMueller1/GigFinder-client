@@ -3,8 +3,6 @@ package com.example.david.gigfinder;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,7 +10,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.david.gigfinder.adapters.SectionsPageAdapter;
 import com.example.david.gigfinder.tools.ColorTools;
@@ -31,13 +28,13 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "APPLOG - MainActivity";
 
+    private static final String TAG = "MainActivity";
+    private SharedPreferences sharedPreferences;
     public static String idToken;
+
     public static int userId;
     private String user;
-
-    private SharedPreferences sharedPreferences;
 
     private SectionsPageAdapter sectionsPageAdapter;
     private ViewPager mViewPager;
@@ -280,6 +277,8 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(sectionsPageAdapter);
     }
 
+    //region Server requests
+
     /**
      * Gets artist object from Server and stores it in SharedPrefs
      */
@@ -520,4 +519,6 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
     }
+
+    //endregion
 }

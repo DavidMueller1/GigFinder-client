@@ -8,10 +8,10 @@ import android.widget.Button;
 
 public class SelectUserActivity extends AppCompatActivity {
 
-    Button artistButton;
-    Button hostButton;
+    private Button artistButton;
+    private Button hostButton;
 
-    String idToken;
+    private String idToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +37,18 @@ public class SelectUserActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Starts the registration for the Artist
+     */
     private void startArtistRegistration() {
         Intent intent = new Intent(getApplicationContext(), RegistrationArtistActivity.class);
         intent.putExtra("idToken", idToken);
         startActivity(intent);
     }
 
+    /**
+     * Starts the registration for the Host
+     */
     private void startHostRegistration() {
         Intent intent = new Intent(getApplicationContext(), RegistrationHostActivity.class);
         intent.putExtra("idToken", idToken);

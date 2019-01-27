@@ -19,9 +19,13 @@ import java.util.Locale;
 
 public class ReceivedMsgHolder extends RecyclerView.ViewHolder{
 
-    TextView messageText, timeText, nameText;
-    ImageView profileImage;
+    private TextView messageText, timeText, nameText;
+    private ImageView profileImage;
 
+    /**
+     * Constructor
+     * @param itemView
+     */
     public ReceivedMsgHolder(View itemView) {
         super(itemView);
         messageText = (TextView) itemView.findViewById(R.id.text_msg_body);
@@ -30,11 +34,12 @@ public class ReceivedMsgHolder extends RecyclerView.ViewHolder{
         profileImage = (ImageView) itemView.findViewById(R.id.image_msg_profile);
     }
 
+    /**
+     * Used to bind the message to the view
+     * @param message
+     */
     public void bind(Message message) {
         messageText.setText(message.getMessage());
-
-        // Format the stored timestamp into a readable String using method.
-        Context mContext = null;
 
         Date date = Utils.convertStringToDate(message.getCreatedAt());
         SimpleDateFormat dt1;
@@ -48,7 +53,5 @@ public class ReceivedMsgHolder extends RecyclerView.ViewHolder{
         nameText.setText(message.getName());
         profileImage.setImageBitmap(BitmapFactory.decodeByteArray(message.getPicture(), 0, message.getPicture().length));
 
-        // Insert the profile image from the URL into the ImageView.
-        //Utils.displayRoundImageFromUrl(mContext, message.getSender().getProfileUrl(), profileImage);
     }
 }

@@ -44,14 +44,15 @@ import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.DEVI
 import static com.example.david.gigfinder.GigFinderFirebaseMessagingService.sendDeviceToken;
 
 public class LoginActivity extends AppCompatActivity {
+
     public static final String ID_TOKEN = "IdToken";
     private static final String TAG = "LoginActivity";
+    private static final int RC_SIGN_IN = 123;
 
     private GoogleSignInClient mGoogleSignInClient;
     private SignInButton signInButton;
     private ProgressBar progress;
     private String idToken;
-    private static final int RC_SIGN_IN = 123;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +104,11 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * True if service isr unning
+     * @param serviceClass
+     * @return
+     */
     public boolean isServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -240,7 +246,7 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * Sends the Authorization Token to the Rest Server and UpdatesGUI if Login is successful
      */
-    class SendLogin extends AsyncTask<String, Void, String> {
+    private class SendLogin extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {

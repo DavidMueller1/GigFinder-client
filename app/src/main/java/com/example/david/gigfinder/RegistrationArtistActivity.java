@@ -62,6 +62,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private TextView descriptionTitle;
     private EditText descriptionField;
     private TextView genreTitle;
+
+    //social media
     private TextView socialMediaTitle;
     private EditText soundcloudField;
     private EditText facebookField;
@@ -70,6 +72,7 @@ public class RegistrationArtistActivity extends AppCompatActivity {
     private EditText instagramField;
     private EditText spotifyField;
     private EditText webField;
+
     private Button backgroundColorPickerButton;
     private Button genrePickerButton;
     private Button registrationButton;
@@ -180,13 +183,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
      * User can choose between camera and gallery
      */
     private void performProfilePictureSelection() {
-        /*Intent pickIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Intent chooserIntent = Intent.createChooser(pickIntent, getResources().getString(R.string.pick_photo_intent));
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {takePhotoIntent});
-
-        startActivityForResult(chooserIntent, PICK_IMAGE);*/
         Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(pickIntent, PICK_IMAGE);
     }
@@ -199,8 +195,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 Uri path = data.getData();
 
                 try {
-                    //profilePicture = ImageTools.decodeUri(path, getContentResolver());
-                    //profilePictureFile = new File(path.getPath());
                     profilePictureUri = path;
 
                     ViewGroup.LayoutParams params = profilePictureButton.getLayoutParams();
@@ -370,6 +364,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Shows the genres from server
+     * @param result
+     */
     private void showGenres(String result){
         myGenres = new ArrayList<String>();
         try {
@@ -383,6 +381,12 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Convertes the selected genres to a JSONArray
+     * @param genreStrings
+     * @return
+     * @throws JSONException
+     */
     private JSONArray genresToJson(ArrayList<String> genreStrings) throws JSONException {
         JSONArray genresJson = new JSONArray();
         for(String i : genreStrings){
@@ -398,30 +402,38 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         return genresJson;
     }
 
+    /**
+     * If the user added a social media, calls pickSocialMedia
+     */
     private void postSocialMedia(){
-            if(!soundcloudField.getText().toString().equals("")){
-                pickSocialMedia("Soundcloud", soundcloudField.getText().toString());
-            }
-            if(!facebookField.getText().toString().equals("")){
-                pickSocialMedia("Facebook", facebookField.getText().toString());
-            }
-            if(!twitterField.getText().toString().equals("")){
-                pickSocialMedia("Twitter", twitterField.getText().toString());
-            }
-            if(!youtubeField.getText().toString().equals("")){
-                pickSocialMedia("YouTube", youtubeField.getText().toString());
-            }
-            if(!instagramField.getText().toString().equals("")){
-                pickSocialMedia("Instagram", instagramField.getText().toString());
-            }
-            if(!spotifyField.getText().toString().equals("")){
-                pickSocialMedia("Spotify", spotifyField.getText().toString());
-            }
-            if(!webField.getText().toString().equals("")){
-                pickSocialMedia("Website", webField.getText().toString());
-            }
+        if(!soundcloudField.getText().toString().equals("")){
+            pickSocialMedia(getString(R.string.soundcloud), soundcloudField.getText().toString());
+        }
+        if(!facebookField.getText().toString().equals("")){
+            pickSocialMedia(getString(R.string.facebook), facebookField.getText().toString());
+        }
+        if(!twitterField.getText().toString().equals("")){
+            pickSocialMedia(getString(R.string.twitter), twitterField.getText().toString());
+        }
+        if(!youtubeField.getText().toString().equals("")){
+            pickSocialMedia(getString(R.string.youtube), youtubeField.getText().toString());
+        }
+        if(!instagramField.getText().toString().equals("")){
+            pickSocialMedia(getString(R.string.instagram), instagramField.getText().toString());
+        }
+        if(!spotifyField.getText().toString().equals("")){
+            pickSocialMedia(getString(R.string.spotify), spotifyField.getText().toString());
+        }
+        if(!webField.getText().toString().equals("")){
+            pickSocialMedia(getString(R.string.website), webField.getText().toString());
+        }
     }
 
+    /**
+     * Converts the social media to a JSONObject
+     * @param name
+     * @param handle
+     */
     private void pickSocialMedia(String name, String handle){
         try {
             JSONObject jsonObject = new JSONObject();
@@ -433,6 +445,11 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Returns the id of the social media
+     * @param name
+     * @return
+     */
     private int getSocialMediaId(String name){
         for(int i = 0; i< socialMedias.length(); i++){
             try {
@@ -446,6 +463,10 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         return 0;
     }
 
+    /**
+     * Displays the loading screen if true
+     * @param isLoading
+     */
     private void displayLoadingScreen(boolean isLoading) {
         if(isLoading) {
             runOnUiThread(new Runnable() {
@@ -465,6 +486,8 @@ public class RegistrationArtistActivity extends AppCompatActivity {
         }
     }
 
+    //region Server Requests
+
     /**
      * Send the registration request to the Server
      */
@@ -482,7 +505,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setUseCaches(false);
                 urlConnection.setDoOutput(true);
-
 
                 //Send data
                 DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
@@ -561,7 +583,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
                     editor.putString("user", "artist");
                     editor.putInt("userColor", user.getInt("backgroundColor"));
                     editor.apply();
-                    //TODO: We should probably cache everything here
 
                     sendDeviceToken(getBaseContext());
                 } catch (JSONException e) {
@@ -675,4 +696,6 @@ public class RegistrationArtistActivity extends AppCompatActivity {
             }
         }
     }
+
+    //endregion
 }
